@@ -1,0 +1,147 @@
+.navbar {
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.navContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.logoIcon {
+    font-size: 1.8rem;
+}
+
+.logoText {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    letter-spacing: -0.5px;
+}
+
+.desktopNav {
+    display: none;
+    align-items: center;
+    gap: 32px;
+}
+
+@media (min-width: 768px) {
+    .desktopNav {
+        display: flex;
+    }
+}
+
+.navLink {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: color 0.2s;
+    text-decoration: none;
+    position: relative;
+}
+
+.navLink:hover {
+    color: var(--primary);
+}
+
+.navLink.active {
+    color: var(--primary-dark);
+}
+
+.navLink.active::after {
+    content: '';
+    position: absolute;
+    bottom: -24px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--primary);
+    border-radius: 3px 3px 0 0;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.iconBtn {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.iconBtn:hover {
+    transform: scale(1.1);
+}
+
+.cartBadge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--secondary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+}
+
+.mobileMenuBtn {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .mobileMenuBtn {
+        display: none;
+    }
+}
+
+.mobileNav {
+    border-top: 1px solid var(--border);
+    padding: 10px 0;
+    background-color: var(--surface);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 70px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.mobileLink {
+    display: block;
+    padding: 16px 20px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+}
+
+.mobileLink:last-child {
+    border-bottom: none;
+}
