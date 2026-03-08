@@ -11,7 +11,7 @@ const CheckoutPage = () => {
 
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [newAddress, setNewAddress] = useState('');
+  const [newAddr, setNewAddr] = useState({ address: '', city: '', landmark: '', phone: '' });
   const [payment, setPayment] = useState('khalti');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -49,8 +49,8 @@ const CheckoutPage = () => {
     );
   }
 
-  const quickItems = items.filter(i => i.product?.deliveryType === 'quick' || i.deliveryType === 'quick');
-  const ecoItems = items.filter(i => i.product?.deliveryType !== 'quick' && i.deliveryType !== 'quick');
+  const quickItems = items.filter(i => (i.type || i.product?.deliveryType || i.deliveryType) === 'quick');
+  const ecoItems = items.filter(i => (i.type || i.product?.deliveryType || i.deliveryType) !== 'quick');
 
   const itemTotal = items.reduce((sum, item) => {
     const price = item.product?.price || item.price || 0;
@@ -70,10 +70,10 @@ const CheckoutPage = () => {
     e.preventDefault();
     const deliveryAddress = selectedAddress
       ? addresses.find(a => a._id === selectedAddress)
-      : { address: newAddress };
+      : { address: newAddr.address, city: newAddr.city, landmark: newAddr.landmark, phone: newAddr.phone };
 
-    if (!deliveryAddress?.address && !newAddress) {
-      setError('Please select or enter a delivery address');
+    if (!deliveryAddress?.address && !newAddr.address) {
+      setError('Please enter your street address');
       return;
     }
 
@@ -88,7 +88,7 @@ const CheckoutPage = () => {
           name: item.product?.name || item.name,
           price: item.product?.price || item.price,
         })),
-        address: deliveryAddress?.address ? deliveryAddress : { address: newAddress },
+        address: deliveryAddress,
         paymentMethod: paymentMap[payment] || 'cashOnDelivery',
         deliveryType: hasQuick ? 'quick' : 'ecommerce',
         total: grandTotal,
@@ -122,8 +122,8 @@ const CheckoutPage = () => {
         )}
       </div>
 
-      <div style={styles.content}>
-        <div style={styles.formSection}>
+      <div className="checkout-layout">
+        <div className="checkout-form-col">
           <form id="checkout-form" onSubmit={handleCheckout}>
             <div style={styles.card}>
               <h2 style={styles.cardTitle}>1. Delivery Address</h2>
@@ -131,8 +131,8 @@ const CheckoutPage = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
                   {addresses.map(addr => (
                     <label key={addr._id} style={styles.paymentOption(selectedAddress === addr._id)}>
-                      <input type="radio" value={addr._id} checked={selectedAddress === addr._id} onChange={() => { setSelectedAddress(addr._id); setNewAddress(''); }} style={{ marginRight: '12px' }} />
-                      <span>{addr.label || addr.address} — {addr.city || ''}</span>
+                      <input type="radio" value={addr._id} checked={selectedAddress === addr._id} onChange={() => { setSelectedAddress(addr._id); }} style={{ marginRight: '12px' }} />
+                      <span>{addr.label || addr.address} {addr.city ? `— ${addr.city}` : ''}</span>
                     </label>
                   ))}
                   <label style={styles.paymentOption(!selectedAddress)}>
@@ -142,14 +142,53 @@ const CheckoutPage = () => {
                 </div>
               )}
               {(!selectedAddress || addresses.length === 0) && (
-                <textarea
-                  required={!selectedAddress}
-                  rows="3"
-                  value={newAddress}
-                  onChange={(e) => setNewAddress(e.target.value)}
-                  placeholder="Enter complete delivery address (street, building, landmark)"
-                  style={styles.input}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={styles.inputGroup}>
+                    <label style={styles.fieldLabel}>Street Address *</label>
+                    <input
+                      type="text"
+                      required={!selectedAddress}
+                      value={newAddr.address}
+                      onChange={(e) => setNewAddr({ ...newAddr, address: e.target.value })}
+                      placeholder="e.g. 123 Main Street, Apt 4B, Thamel"
+                      style={styles.input}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    <div style={{ ...styles.inputGroup, flex: 1, minWidth: '180px' }}>
+                      <label style={styles.fieldLabel}>City / Area *</label>
+                      <input
+                        type="text"
+                        required={!selectedAddress}
+                        value={newAddr.city}
+                        onChange={(e) => setNewAddr({ ...newAddr, city: e.target.value })}
+                        placeholder="e.g. Kathmandu"
+                        style={styles.input}
+                      />
+                    </div>
+                    <div style={{ ...styles.inputGroup, flex: 1, minWidth: '180px' }}>
+                      <label style={styles.fieldLabel}>Landmark</label>
+                      <input
+                        type="text"
+                        value={newAddr.landmark}
+                        onChange={(e) => setNewAddr({ ...newAddr, landmark: e.target.value })}
+                        placeholder="e.g. Near City Center Mall"
+                        style={styles.input}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ ...styles.inputGroup, maxWidth: '280px' }}>
+                    <label style={styles.fieldLabel}>Phone Number *</label>
+                    <input
+                      type="tel"
+                      required={!selectedAddress}
+                      value={newAddr.phone}
+                      onChange={(e) => setNewAddr({ ...newAddr, phone: e.target.value })}
+                      placeholder="e.g. 9801234567"
+                      style={styles.input}
+                    />
+                  </div>
+                </div>
               )}
             </div>
 
@@ -172,7 +211,7 @@ const CheckoutPage = () => {
           </form>
         </div>
 
-        <div style={styles.summarySidebar}>
+        <div className="checkout-summary-col" style={{ backgroundColor: '#f8fafc', padding: '30px', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)', position: 'sticky', top: '90px' }}>
           <h3 style={styles.summaryTitle}>Final Order Summary</h3>
           <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '16px' }}>
             {items.map((item, idx) => (
@@ -201,9 +240,7 @@ const CheckoutPage = () => {
 
 const styles = {
   page: { padding: '40px 20px', minHeight: 'calc(100vh - 70px)' },
-  pageTitle: { fontSize: '2.5rem', margin: 0 },
-  content: { display: 'flex', gap: '30px', alignItems: 'flex-start' },
-  formSection: { flex: '1', display: 'flex', flexDirection: 'column', gap: '24px' },
+  pageTitle: { fontSize: '2rem', margin: 0 },
   card: { backgroundColor: 'var(--surface)', padding: '30px', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' },
   cardTitle: { fontSize: '1.4rem', marginBottom: '20px' },
   input: { width: '100%', padding: '16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', fontSize: '1rem', resize: 'vertical', fontFamily: 'inherit', outline: 'none', transition: 'var(--transition)' },
@@ -214,7 +251,9 @@ const styles = {
   summaryRow: { display: 'flex', justifyContent: 'space-between', marginBottom: '16px', color: 'var(--text-secondary)', fontWeight: '500' },
   divider: { height: '1px', backgroundColor: 'var(--border)', margin: '20px 0' },
   totalRow: { display: 'flex', justifyContent: 'space-between', fontSize: '1.6rem', fontWeight: '800', marginBottom: '30px' },
-  checkoutBtn: { width: '100%', padding: '18px', fontSize: '1.15rem', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)', borderRadius: 'var(--radius-md)' }
+  checkoutBtn: { width: '100%', padding: '18px', fontSize: '1.15rem', boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)', borderRadius: 'var(--radius-md)' },
+  inputGroup: { display: 'flex', flexDirection: 'column', gap: '6px' },
+  fieldLabel: { fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }
 };
 
 export default CheckoutPage;

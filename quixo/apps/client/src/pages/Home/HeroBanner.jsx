@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroBanner = ({ mode = 'quick' }) => {
   const isQuick = mode === 'quick';
+  const navigate = useNavigate();
 
   return (
     <div className="hero-section container" style={{
@@ -40,8 +42,9 @@ const HeroBanner = ({ mode = 'quick' }) => {
             ...styles.primaryBtn,
             backgroundColor: isQuick ? 'var(--primary)' : 'var(--secondary)',
             boxShadow: isQuick ? '0 4px 14px 0 rgba(249, 115, 22, 0.39)' : '0 4px 14px 0 rgba(20, 184, 166, 0.39)'
-          }}>
-            {isQuick ? 'Shop Groceries Now' : 'Start Browsing'}
+          }}
+            onClick={() => navigate('/products')}
+          >            {isQuick ? 'Shop Groceries Now' : 'Start Browsing'}
           </button>
         </div>
       </div>

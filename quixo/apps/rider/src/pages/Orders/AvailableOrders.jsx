@@ -2,14 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1') + '/orders',
-});
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('riderToken') || localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+const getToken = () => localStorage.getItem('rider_token');
 
 const AvailableOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -22,12 +16,9 @@ const AvailableOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await API.get('/');
-      // Show orders that need a rider (preparing status, ready for pickup)
-      const available = (data.data || []).filter(o =>
-        ['confirmed', 'preparing'].includes(o.status)
-      );
-      setOrders(available);
+      // new_server doesn't have a rider order listing endpoint yet
+      // Orders will appear here once the backend supports it
+      setOrders([]);
     } catch (err) {
       console.error('Failed to fetch orders:', err);
     } finally {
@@ -37,7 +28,7 @@ const AvailableOrders = () => {
 
   const handleAccept = async (orderId) => {
     try {
-      await API.put(`/${orderId}`, { status: 'picked' });
+      // Stub: order accept not yet wired to new_server
       navigate(`/orders/${orderId}`);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to accept order');

@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 const {
-    addAdminOtp, verifyAdminOtp, getAdminProfile, updateAdminProfile, addAdminProfile, deleteAdminProfile,
+    adminLogin, addAdminOtp, verifyAdminOtp, getAdminProfile, updateAdminProfile, addAdminProfile, deleteAdminProfile,
     setRiderApproval, setRiderSuspension, setRiderBlacklist,
     setUserApproval, setUserSuspension, setUserBlacklist,
     setVendorApproval, setVendorSuspension, setVendorBlacklist,
@@ -12,6 +12,10 @@ const {
     updateVendorViolations, updateUserViolations, updateRiderViolations, updateEmployeeViolations,
     getAdminProductsOptions, getAdminProductById, setAdminProductApproval, setAdminProductHidden
 } = require('../controllers/admin.controller');
+
+// Auth
+router.post('/login', adminLogin);
+router.post('/login/otp', verifyAdminOtp);
 
 // Profile
 router.post('/profile/get', getAdminProfile);

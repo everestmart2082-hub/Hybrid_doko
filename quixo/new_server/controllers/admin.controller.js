@@ -6,8 +6,20 @@ const Employee = require('../models/Employee.model');
 const { generateToken, generateOTP } = require('./auth.helper');
 const jwt = require('jsonwebtoken');
 
-// Assuming admin creation happens directly in DB or via a protected route, 
-// using typical admin OTP login
+// Admin Login — send OTP to admin phone
+const adminLogin = async (req, res) => {
+    try {
+        const { phone } = req.body;
+        const admin = await Admin.findOne({ phone });
+        if (!admin) return res.json({ success: false, message: "wrong phone number" });
+
+        admin.otp = generateOTP();
+        await admin.save();
+        res.json({ success: true, message: "verify otp" });
+    } catch (error) {
+        res.json({ success: false, message: "server error" });
+    }
+}
 
 // /api/admin/profile/add/otp  (based on prompt)
 const addAdminOtp = async (req, res) => {
@@ -340,6 +352,7 @@ const setAdminProductHidden = async (req, res) => {
 }
 
 module.exports = {
+    adminLogin,
     addAdminOtp,
     verifyAdminOtp,
     getAdminProfile,

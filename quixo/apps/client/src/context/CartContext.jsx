@@ -8,16 +8,38 @@ export const CartProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        fetchCart();
+        const token = localStorage.getItem('token');
+        if (token) fetchCart();
     }, []);
 
     const fetchCart = async () => {
         try {
             setLoading(true);
             const { data } = await cartAPI.get();
-            setCart(data.cart);
+            if (data.success) {
+                // new_server returns array of cart items on `message`
+                const items = (data.message || []).map(item => ({
+                    _id: item.cartId,
+                    productId: item.productId,
+                    name: item.name,
+                    image: item.image,
+                    price: item.pricePerUnit,
+                    qty: item.number,
+                    unit: item.unit,
+                    type: item.type,
+                    brand: item.brandName,
+                    product: {
+                        _id: item.productId,
+                        name: item.name,
+                        price: item.pricePerUnit,
+                        images: item.image ? [item.image] : [],
+                        deliveryType: item.deliveryCategory,
+                    }
+                }));
+                const total = items.reduce((sum, i) => sum + (i.price || 0) * (i.qty || 1), 0);
+                setCart({ items, total });
+            }
         } catch (error) {
-            // User may not be logged in — use local cart
             console.error('Cart fetch skipped:', error?.response?.status);
         } finally {
             setLoading(false);
@@ -26,9 +48,12 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = async (productId, quantity = 1) => {
         try {
-            const { data } = await cartAPI.add({ productId, quantity });
-            setCart(data.cart);
-            return { success: true };
+            const { data } = await cartAPI.add(productId, quantity);
+            if (data.success) {
+                await fetchCart(); // re-fetch to get the populated cart
+                return { success: true };
+            }
+            return { success: false, message: data.message };
         } catch (error) {
             return { success: false, message: error.response?.data?.message || 'Failed to add' };
         }
@@ -37,15 +62,18 @@ export const CartProvider = ({ children }) => {
     const removeFromCart = async (cartItemId) => {
         try {
             await cartAPI.remove(cartItemId);
-            fetchCart();
+            await fetchCart();
         } catch (error) {
             console.error('Failed to remove item:', error);
         }
     };
 
     const clearCart = async () => {
+        // Clear all items one by one (no dedicated clear endpoint)
         try {
-            await cartAPI.clear();
+            for (const item of cart.items) {
+                await cartAPI.remove(item.productId || item._id);
+            }
             setCart({ items: [], total: 0 });
         } catch (error) {
             console.error('Failed to clear cart:', error);

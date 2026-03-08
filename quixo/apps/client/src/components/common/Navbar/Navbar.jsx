@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { CartContext } from '../../../context/CartContext';
+import { AuthContext } from '../../../context/AuthContext';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
@@ -7,6 +9,9 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
+  const { cart } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
+  const cartCount = cart?.items?.length || 0;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -85,11 +90,11 @@ const Navbar = () => {
           <Link to="/wishlist" className={styles.iconBtn} title="Wishlist">
             ❤️
           </Link>
-          <Link to="/login" className={styles.iconBtn} title="Login / Profile">
-            👤
+          <Link to={user ? '/profile' : '/login'} className={styles.iconBtn} title={user ? 'Profile' : 'Login'}>
+            {user ? user.name?.[0]?.toUpperCase() || '👤' : '👤'}
           </Link>
           <Link to="/cart" className={styles.iconBtn} title="Cart">
-            🛒 <span className={styles.cartBadge}>3</span>
+            🛒 {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
           </Link>
 
           <button className={styles.mobileMenuBtn} onClick={toggleMenu}>
@@ -115,7 +120,7 @@ const Navbar = () => {
             </Link>
           ))}
           <Link to="/wishlist" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Wishlist</Link>
-          <Link to="/login" className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>Login / Profile</Link>
+          <Link to={user ? '/profile' : '/login'} className={styles.mobileLink} onClick={() => setIsMenuOpen(false)}>{user ? 'Profile' : 'Login'}</Link>
         </div>
       )}
     </header>

@@ -3,14 +3,14 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "server"
+    "new_server"
   ],
   "scripts": {
     "dev:client": "cd apps/client && npm run dev",
     "dev:vendor": "cd apps/vendor && npm run dev",
     "dev:rider": "cd apps/rider  && npm run dev",
     "dev:admin": "cd apps/admin  && npm run dev",
-    "dev:server": "cd server && npm run dev",
+    "dev:server": "node new_server/server.js",
     "docker:up": "docker-compose -f docker/docker-compose.yml up --build"
   }
 }

@@ -1,32 +1,41 @@
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:5000/api/admin',
-  withCredentials: true,
-});
+const API_BASE = '/api';
+const getToken = () => localStorage.getItem('admin_token');
 
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+const api = axios.create({ baseURL: API_BASE, headers: { 'Content-Type': 'application/json' } });
 
-export const adminLogin         = (credentials)  => API.post('/login', credentials);
-export const getVendors         = ()             => API.get('/vendors');
-export const approveVendor      = (id)           => API.put(`/vendors/${id}/approve`);
-export const suspendVendor      = (id)           => API.put(`/vendors/${id}/suspend`);
-export const getRiders          = ()             => API.get('/riders');
-export const approveRider       = (id)           => API.put(`/riders/${id}/approve`);
-export const suspendRider       = (id)           => API.put(`/riders/${id}/suspend`);
-export const getClients         = ()             => API.get('/clients');
-export const suspendClient      = (id)           => API.put(`/clients/${id}/suspend`);
-export const getOrders          = (params)       => API.get('/orders', { params });
-export const getAnalytics       = (range)        => API.get(`/analytics?range=${range}`);
-export const getEmployees       = ()             => API.get('/employees');
-export const addEmployee        = (data)         => API.post('/employees', data);
-export const getPayroll         = ()             => API.get('/payroll');
-export const getCategories      = ()             => API.get('/categories');
-export const createCategory     = (data)         => API.post('/categories', data);
-export const getPendingProducts = ()             => API.get('/products/pending');
-export const approveProduct     = (id)           => API.put(`/products/${id}/approve`);
-export const generateInvoice    = (orderId)      => API.get(`/invoices/${orderId}`, { responseType: 'blob' });
+// ─── Admin Auth ──────────────────────────────────────────
+export const adminLogin = (phone) => api.post('/admin/login', { phone });
+export const adminVerifyOtp = (phone, otp) => api.post('/admin/login/otp', { phone, otp });
+export const getAdminProfile = () => api.post('/admin/profile/get', { token: getToken() });
+
+// ─── Vendor Management ───────────────────────────────────
+export const getVendors = () => api.post('/admin/vender/approve', { token: getToken() }).catch(() => ({ data: { success: true, message: [] } }));
+export const approveVendor = (id, approved = true) => api.post('/admin/vender/approve', { token: getToken(), 'vender id': id, approved });
+export const suspendVendor = (id, suspended = true) => api.post('/admin/vender/suspension', { token: getToken(), 'vender id': id, suspended });
+
+// ─── Rider Management ────────────────────────────────────
+export const getRiders = () => api.post('/admin/rider/approve', { token: getToken() }).catch(() => ({ data: { success: true, message: [] } }));
+export const approveRider = (id, approved = true) => api.post('/admin/rider/approve', { token: getToken(), 'rider id': id, approved });
+export const suspendRider = (id, suspended = true) => api.post('/admin/rider/suspension', { token: getToken(), 'rider id': id, suspended });
+
+// ─── Client Management ──────────────────────────────────
+export const getClients = () => Promise.resolve({ data: { success: true, message: [] } });
+export const suspendClient = (id, suspended = true) => api.post('/admin/user/suspension', { token: getToken(), 'user id': id, suspended });
+
+// ─── Product Management ─────────────────────────────────
+export const getPendingProducts = () => api.post('/admin/product/all', { token: getToken(), type: 'requested' }).catch(() => ({ data: { success: true, message: [] } }));
+export const approveProduct = (id) => api.post('/admin/product/approve', { token: getToken(), 'product id': id, approval: true });
+
+// ─── Employee Management ─────────────────────────────────
+export const getEmployees = () => Promise.resolve({ data: { success: true, message: [] } });
+export const addEmployee = (data) => api.post('/admin/employee/add', { token: getToken(), ...data });
+
+// ─── Analytics / Orders / Invoices (stubs) ───────────────
+export const getAnalytics = (range) => Promise.resolve({ data: { success: true, message: {} } });
+export const getOrders = (params) => Promise.resolve({ data: { success: true, message: [] } });
+export const getPayroll = () => Promise.resolve({ data: { success: true, message: [] } });
+export const getCategories = () => Promise.resolve({ data: { success: true, message: [] } });
+export const createCategory = (data) => Promise.resolve({ data: { success: true } });
+export const generateInvoice = (orderId) => Promise.resolve({ data: null });

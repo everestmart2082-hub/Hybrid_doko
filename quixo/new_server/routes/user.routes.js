@@ -3,8 +3,9 @@ const router = express.Router();
 
 const {
     registerUser, loginUser, verifyRegistrationOtp, verifyLoginOtp, getUserProfile, updateUserProfile, deleteUserProfile, verifyUserProfileOtp,
-    addToCart, removeFromCart, checkoutCart, getPaymentLink, getAllUserOrders, cancelUserOrder, reorderUserOrder, setOrderDeliveredUser,
+    addToCart, removeFromCart, getCart, checkoutCart, getPaymentLink, getAllUserOrders, cancelUserOrder, reorderUserOrder, setOrderDeliveredUser,
     getAllAddresses, addUserAddress, deleteUserAddress, updateUserAddress,
+    addToWishlist, removeFromWishlist, getWishlist,
     getUserNotifications, submitReview, rateProduct, rateRider, getAllUsers
 } = require('../controllers/user.controller');
 
@@ -30,6 +31,7 @@ router.post('/rider/rating', rateRider);
 
 // Cart & Checkout & Orders
 router.post('/cart/add', addToCart);
+router.post('/cart/get', getCart);
 router.delete('/cart/remove', removeFromCart);
 router.post('/checkout', checkoutCart);
 router.get('/payment', getPaymentLink);
@@ -39,6 +41,11 @@ router.post('/order/all', getAllUserOrders); // for search/filters
 router.post('/order/delievered', setOrderDeliveredUser);
 router.delete('/order/cancel', cancelUserOrder);
 router.delete('/orders/reorder', reorderUserOrder);
+
+// Wishlist
+router.post('/wishlist/add', addToWishlist);
+router.post('/wishlist/remove', removeFromWishlist);
+router.post('/wishlist/get', getWishlist);
 
 // Address
 router.post('/address/all', getAllAddresses);

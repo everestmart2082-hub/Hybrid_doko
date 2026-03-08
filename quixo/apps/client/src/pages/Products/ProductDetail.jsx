@@ -1,25 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
-
-const mockProduct = {
-  id: 1,
-  name: 'Fresh Organic Apples',
-  price: 290,
-  oldPrice: 350,
-  weight: '1 kg',
-  image: '🍎',
-  category: 'Fruits',
-  description: 'Crisp, sweet, and locally sourced organic apples. Perfect for healthy snacking or baking. Delivered farm-fresh directly to your doorstep in under 15 minutes!',
-  nutritionalInfo: { Calories: '52', Carbs: '14g', Fiber: '2.4g' },
-  stock: 24
-};
+import { productAPI } from '../../services/api';
+import { CartContext } from '../../context/CartContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [addedMsg, setAddedMsg] = useState('');
+  const { addToCart } = useContext(CartContext);
 
-  // In a real app we would fetch the product by id
-  const product = mockProduct;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const { data } = await productAPI.getById(id);
+        setProduct(data.message || data.data || data.product || data);
+      } catch (err) {
+        setError('Product not found or failed to load.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  const handleAddToCart = async () => {
+    const result = await addToCart(product._id || id, quantity);
+    if (result?.success) {
+      setAddedMsg('✓ Added to cart!');
+      setTimeout(() => setAddedMsg(''), 2000);
+    } else {
+      setAddedMsg(result?.message || 'Please log in first');
+      setTimeout(() => setAddedMsg(''), 2000);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="container animate-fade-in" style={{ padding: '80px 20px', textAlign: 'center', minHeight: 'calc(100vh - 70px)' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>⏳</div>
+        <p style={{ color: 'var(--text-secondary)' }}>Loading product...</p>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="container animate-fade-in" style={{ padding: '80px 20px', textAlign: 'center', minHeight: 'calc(100vh - 70px)' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>😕</div>
+        <h2>{error || 'Product not found'}</h2>
+        <Link to="/products"><button className="btn btn-primary" style={{ marginTop: '20px' }}>Browse Products</button></Link>
+      </div>
+    );
+  }
+
+  const name = product.name || 'Product';
+  const price = product.pricePerUnit || product.price || 0;
+  const oldPrice = product.comparePrice || product.oldPrice;
+  const description = product.description || product.shortDescription || '';
+  const category = product.deliveryCategory || product.category || '';
+  const stock = product.stock ?? product.countInStock ?? 0;
+  const image = product.photos?.[0] || product.images?.[0];
 
   return (
     <div className="container animate-fade-in" style={styles.page}>
@@ -30,272 +75,101 @@ const ProductDetail = () => {
         <span style={styles.crumbSeparator}>/</span>
         <Link to="/products" style={styles.crumb}>Products</Link>
         <span style={styles.crumbSeparator}>/</span>
-        <span style={styles.crumbActive}>{product.name}</span>
+        <span style={styles.crumbActive}>{name}</span>
       </div>
 
-      <div style={styles.content}>
+      <div className="tracking-layout">
         {/* Visual Section */}
-        <div style={styles.visualSection}>
+        <div className="tracking-map-col">
           <div style={styles.mainImage}>
-            <span style={{ fontSize: '10rem' }}>{product.image}</span>
+            {image
+              ? <img src={image} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
+              : <span style={{ fontSize: '10rem' }}>📦</span>
+            }
           </div>
         </div>
 
         {/* Details Section */}
-        <div style={styles.detailsSection}>
-          <div style={styles.categoryBadge}>{product.category}</div>
-          <h1 style={styles.title}>{product.name}</h1>
-          <div style={styles.weight}>{product.weight}</div>
+        <div className="tracking-sidebar-col" style={{ backgroundColor: 'var(--surface)', padding: '30px', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
+          {category && <div style={styles.categoryBadge}>{category}</div>}
+          <h1 style={{ fontSize: '2rem', marginBottom: '8px' }}>{name}</h1>
+          {stock > 0 && <div style={{ color: 'var(--success)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '16px' }}>✓ In Stock ({stock} available)</div>}
+          {stock === 0 && <div style={{ color: 'var(--danger)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '16px' }}>Out of Stock</div>}
 
           <div style={styles.priceContainer}>
-            <div style={styles.currentPrice}>Rs. {product.price}</div>
-            {product.oldPrice && <div style={styles.oldPrice}>Rs. {product.oldPrice}</div>}
-            {product.oldPrice && (
+            <div style={styles.currentPrice}>Rs. {price}</div>
+            {oldPrice && <div style={styles.oldPrice}>Rs. {oldPrice}</div>}
+            {oldPrice && (
               <div style={styles.discountBadge}>
-                {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
+                {Math.round(((oldPrice - price) / oldPrice) * 100)}% OFF
               </div>
             )}
           </div>
 
-          <div style={styles.divider}></div>
+          <div style={{ height: '1px', backgroundColor: 'var(--border)', margin: '0 0 24px 0' }}></div>
 
-          <p style={styles.description}>{product.description}</p>
+          {description && <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.7', marginBottom: '30px' }}>{description}</p>}
 
-          <div style={styles.actions}>
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
             <div style={styles.quantityPicker}>
-              <button
-                style={styles.qtyBtn}
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              >-</button>
+              <button style={styles.qtyBtn} onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
               <span style={styles.qtyValue}>{quantity}</span>
-              <button
-                style={styles.qtyBtn}
-                onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-              >+</button>
+              <button style={styles.qtyBtn} onClick={() => setQuantity(Math.min(stock || 99, quantity + 1))}>+</button>
             </div>
-            <button className="btn btn-primary" style={styles.addToCartBtn}>
-              Add to Cart - Rs. {product.price * quantity}
+            <button className="btn btn-primary" style={{ flex: '1', fontSize: '1rem' }} onClick={handleAddToCart} disabled={stock === 0}>
+              {stock === 0 ? 'Out of Stock' : `Add to Cart — Rs. ${price * quantity}`}
             </button>
           </div>
 
-          <div style={styles.deliveryInfo}>
-            <div style={styles.deliveryItem}>
-              <span>⚡</span> 15-Minute Delivery
+          {addedMsg && (
+            <div style={{ padding: '10px 16px', backgroundColor: addedMsg.includes('✓') ? '#ecfdf5' : '#fef2f2', color: addedMsg.includes('✓') ? '#065f46' : '#dc2626', borderRadius: 'var(--radius-sm)', textAlign: 'center', fontWeight: '600', marginBottom: '16px' }}>
+              {addedMsg}
             </div>
-            <div style={styles.deliveryItem}>
-              <span>❄️</span> Temperature Controlled
-            </div>
+          )}
+
+          <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px dashed #cbd5e1', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: '500' }}>⚡ 15-Minute Delivery</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontWeight: '500' }}>❄️ Temperature Controlled</div>
           </div>
         </div>
       </div>
 
       {/* Reviews Section */}
-      <div style={{ marginTop: '40px', backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', padding: '40px', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '1.8rem' }}>Ratings & Reviews</h2>
-          <button className="btn btn-primary" style={{ padding: '10px 24px' }}>Write a Review</button>
-        </div>
-
-        {/* Rating Summary */}
-        <div style={{ display: 'flex', gap: '40px', marginBottom: '30px', padding: '24px', backgroundColor: '#f8fafc', borderRadius: 'var(--radius-md)' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', fontWeight: '800', color: 'var(--text-primary)' }}>4.5</div>
-            <div style={{ color: '#f59e0b', fontSize: '1.2rem' }}>⭐⭐⭐⭐⭐</div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '4px' }}>Based on 24 reviews</div>
-          </div>
-          <div style={{ flex: 1 }}>
-            {[5, 4, 3, 2, 1].map(star => (
-              <div key={star} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ fontSize: '0.85rem', width: '20px' }}>{star}⭐</span>
-                <div style={{ flex: 1, height: '8px', backgroundColor: '#e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', backgroundColor: '#f59e0b', borderRadius: '4px', width: star === 5 ? '60%' : star === 4 ? '25%' : star === 3 ? '10%' : '3%' }}></div>
-                </div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', width: '24px' }}>{star === 5 ? 14 : star === 4 ? 6 : star === 3 ? 3 : 1}</span>
+      <div style={{ marginTop: '40px', backgroundColor: 'var(--surface)', borderRadius: 'var(--radius-lg)', padding: '30px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Reviews ({reviews.length})</h2>
+        {reviews.length === 0 ? (
+          <p style={{ color: 'var(--text-secondary)', padding: '20px 0' }}>No reviews yet. Be the first to review this product!</p>
+        ) : (
+          reviews.map((review, i) => (
+            <div key={review._id || i} style={{ padding: '16px 0', borderBottom: i < reviews.length - 1 ? '1px solid var(--border)' : 'none' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <div style={{ fontWeight: '700' }}>{review.user?.name || 'Customer'}</div>
+                <div style={{ color: '#f59e0b' }}>{'⭐'.repeat(review.rating || 5)}</div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Individual Reviews */}
-        {[
-          { name: 'Sita R.', rating: 5, date: '2 days ago', text: 'Very fresh and crunchy! Delivered within 12 minutes. Will order again.' },
-          { name: 'Ramesh K.', rating: 4, date: '1 week ago', text: 'Good quality but one apple was slightly bruised. Overall happy with the purchase.' },
-          { name: 'Priya S.', rating: 5, date: '2 weeks ago', text: 'Best organic apples in Kathmandu. The Doko app is so convenient!' }
-        ].map((review, i) => (
-          <div key={i} style={{ padding: '20px 0', borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: '700', fontSize: '0.9rem' }}>{review.name[0]}</div>
-                <div>
-                  <div style={{ fontWeight: '700' }}>{review.name}</div>
-                  <div style={{ color: '#f59e0b', fontSize: '0.85rem' }}>{'⭐'.repeat(review.rating)}</div>
-                </div>
-              </div>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{review.date}</span>
+              <p style={{ color: 'var(--text-secondary)', lineHeight: '1.5' }}>{review.comment || review.text}</p>
             </div>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', marginLeft: '48px' }}>{review.text}</p>
-          </div>
-        ))}
+          ))
+        )}
       </div>
-
     </div>
   );
 };
 
 const styles = {
-  page: {
-    paddingTop: '20px',
-    paddingBottom: '80px',
-    minHeight: 'calc(100vh - 70px)'
-  },
-  breadcrumbs: {
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: '30px',
-    fontSize: '0.9rem'
-  },
-  crumb: {
-    color: 'var(--text-secondary)',
-    transition: 'color 0.2s'
-  },
-  crumbSeparator: {
-    margin: '0 8px',
-    color: '#d1d5db'
-  },
-  crumbActive: {
-    color: 'var(--text-primary)',
-    fontWeight: '500'
-  },
-  content: {
-    display: 'flex',
-    gap: '40px',
-    backgroundColor: 'var(--surface)',
-    borderRadius: 'var(--radius-lg)',
-    padding: '40px',
-    boxShadow: 'var(--shadow-md)',
-    border: '1px solid var(--border)'
-  },
-  visualSection: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  },
-  mainImage: {
-    width: '100%',
-    aspectRatio: '1 / 1',
-    backgroundColor: '#f3f4f6',
-    borderRadius: 'var(--radius-md)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    border: '1px solid var(--border)'
-  },
-  detailsSection: {
-    flex: '1',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  categoryBadge: {
-    display: 'inline-block',
-    backgroundColor: '#eff6ff',
-    color: '#2563eb',
-    padding: '4px 12px',
-    borderRadius: 'var(--radius-sm)',
-    fontSize: '0.85rem',
-    fontWeight: '600',
-    marginBottom: '16px',
-    alignSelf: 'flex-start'
-  },
-  title: {
-    fontSize: '2.5rem',
-    marginBottom: '8px'
-  },
-  weight: {
-    color: 'var(--text-secondary)',
-    fontSize: '1.1rem',
-    marginBottom: '24px'
-  },
-  priceContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    marginBottom: '32px'
-  },
-  currentPrice: {
-    fontSize: '2rem',
-    fontWeight: '800',
-    color: 'var(--primary-dark)'
-  },
-  oldPrice: {
-    fontSize: '1.2rem',
-    color: 'var(--text-secondary)',
-    textDecoration: 'line-through'
-  },
-  discountBadge: {
-    backgroundColor: 'var(--secondary)',
-    color: 'white',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    fontWeight: '700',
-    fontSize: '0.9rem'
-  },
-  divider: {
-    height: '1px',
-    backgroundColor: 'var(--border)',
-    margin: '0 0 32px 0'
-  },
-  description: {
-    color: 'var(--text-secondary)',
-    fontSize: '1.1rem',
-    lineHeight: '1.7',
-    marginBottom: '40px'
-  },
-  actions: {
-    display: 'flex',
-    gap: '20px',
-    marginBottom: '40px'
-  },
-  quantityPicker: {
-    display: 'flex',
-    alignItems: 'center',
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius-md)',
-    overflow: 'hidden'
-  },
-  qtyBtn: {
-    backgroundColor: '#f9fafb',
-    padding: '16px 24px',
-    fontSize: '1.2rem',
-    fontWeight: '600',
-    color: 'var(--text-primary)'
-  },
-  qtyValue: {
-    padding: '0 24px',
-    fontSize: '1.2rem',
-    fontWeight: '600'
-  },
-  addToCartBtn: {
-    flex: '1',
-    fontSize: '1.1rem'
-  },
-  deliveryInfo: {
-    marginTop: 'auto',
-    backgroundColor: '#f8fafc',
-    padding: '24px',
-    borderRadius: 'var(--radius-md)',
-    border: '1px dashed #cbd5e1',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px'
-  },
-  deliveryItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    fontWeight: '500',
-    color: 'var(--text-primary)'
-  }
+  page: { paddingTop: '20px', paddingBottom: '80px', minHeight: 'calc(100vh - 70px)' },
+  breadcrumbs: { display: 'flex', alignItems: 'center', marginBottom: '30px', fontSize: '0.9rem', flexWrap: 'wrap', gap: '4px' },
+  crumb: { color: 'var(--text-secondary)' },
+  crumbSeparator: { margin: '0 8px', color: '#d1d5db' },
+  crumbActive: { color: 'var(--text-primary)', fontWeight: '500' },
+  mainImage: { width: '100%', aspectRatio: '1 / 1', backgroundColor: '#f3f4f6', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid var(--border)', overflow: 'hidden' },
+  categoryBadge: { display: 'inline-block', backgroundColor: '#eff6ff', color: '#2563eb', padding: '4px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', fontWeight: '600', marginBottom: '16px' },
+  priceContainer: { display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' },
+  currentPrice: { fontSize: '2rem', fontWeight: '800', color: 'var(--primary-dark)' },
+  oldPrice: { fontSize: '1.2rem', color: 'var(--text-secondary)', textDecoration: 'line-through' },
+  discountBadge: { backgroundColor: 'var(--secondary)', color: 'white', padding: '4px 8px', borderRadius: '4px', fontWeight: '700', fontSize: '0.9rem' },
+  quantityPicker: { display: 'flex', alignItems: 'center', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden' },
+  qtyBtn: { backgroundColor: '#f9fafb', padding: '14px 20px', fontSize: '1.2rem', fontWeight: '600', color: 'var(--text-primary)' },
+  qtyValue: { padding: '0 20px', fontSize: '1.2rem', fontWeight: '600' }
 };
 
 export default ProductDetail;

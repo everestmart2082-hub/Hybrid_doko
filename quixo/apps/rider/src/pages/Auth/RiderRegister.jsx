@@ -1,15 +1,56 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { riderAuthAPI } from '../../services/riderApi';
 
 const RiderRegister = () => {
   const [formData, setFormData] = useState({ name: '', phone: '', vehicle: 'bike' });
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    console.log("Rider applying...", formData);
-    // Directly log them in or send to an 'Application Pending' screen for now
-    navigate('/');
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data } = await riderAuthAPI.register({
+        name: formData.name,
+        number: formData.phone,
+        type: formData.vehicle
+      });
+      if (data.success) {
+        setStep(2);
+      } else {
+        setError(data.message || 'Registration failed.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data } = await riderAuthAPI.verifyRegistrationOtp(formData.phone, otp);
+      if (data.success && data.token) {
+        localStorage.setItem('rider_token', data.token);
+        navigate('/');
+      } else {
+        setError(data.message || 'OTP verification failed.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'OTP verification failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,70 +65,105 @@ const RiderRegister = () => {
       </div>
 
       <div className="card" style={styles.card}>
-        <form onSubmit={handleRegister}>
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <div style={styles.roleBadge}>🛵 Rider Registration</div>
+        </div>
 
-          <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px' }}>Personal Info</h3>
-
-          <div className="form-group">
-            <label className="form-label">Full Name</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="e.g. Ramesh Thapa"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
+        {error && (
+          <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: 'var(--radius-sm)', marginBottom: '20px', fontSize: '0.9rem' }}>
+            {error}
           </div>
+        )}
 
-          <div className="form-group">
-            <label className="form-label">Mobile Number</label>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <span style={styles.countryCode}>+977</span>
+        {step === 1 ? (
+          <form onSubmit={handleRegister}>
+
+            <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px' }}>Personal Info</h3>
+
+            <div className="form-group">
+              <label className="form-label">Full Name</label>
               <input
-                type="tel"
+                type="text"
                 className="form-input"
-                placeholder="9800000000"
-                value={formData.phone}
-                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="e.g. Ramesh Thapa"
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
                 required
               />
             </div>
-          </div>
 
-          <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px', marginTop: '30px' }}>Vehicle Info</h3>
-
-          <div className="form-group" style={{ marginBottom: '30px' }}>
-            <label className="form-label">Vehicle Type</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <div
-                style={{ ...styles.vehicleCard, ...(formData.vehicle === 'bike' ? styles.vehicleCardActive : {}) }}
-                onClick={() => setFormData({ ...formData, vehicle: 'bike' })}
-              >
-                <div style={{ fontSize: '2rem' }}>🏍️</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Motorbike</div>
-              </div>
-              <div
-                style={{ ...styles.vehicleCard, ...(formData.vehicle === 'scooter' ? styles.vehicleCardActive : {}) }}
-                onClick={() => setFormData({ ...formData, vehicle: 'scooter' })}
-              >
-                <div style={{ fontSize: '2rem' }}>🛵</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Scooter</div>
-              </div>
-              <div
-                style={{ ...styles.vehicleCard, ...(formData.vehicle === 'bicycle' ? styles.vehicleCardActive : {}) }}
-                onClick={() => setFormData({ ...formData, vehicle: 'bicycle' })}
-              >
-                <div style={{ fontSize: '2rem' }}>🚲</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Bicycle</div>
+            <div className="form-group">
+              <label className="form-label">Mobile Number</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <span style={styles.countryCode}>+977</span>
+                <input
+                  type="tel"
+                  className="form-input"
+                  placeholder="9800000000"
+                  value={formData.phone}
+                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                  required
+                />
               </div>
             </div>
-          </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }}>
-            Submit Application
-          </button>
-        </form>
+            <h3 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px', marginTop: '30px' }}>Vehicle Info</h3>
+
+            <div className="form-group" style={{ marginBottom: '30px' }}>
+              <label className="form-label">Vehicle Type</label>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <div
+                  style={{ ...styles.vehicleCard, ...(formData.vehicle === 'bike' ? styles.vehicleCardActive : {}) }}
+                  onClick={() => setFormData({ ...formData, vehicle: 'bike' })}
+                >
+                  <div style={{ fontSize: '2rem' }}>🏍️</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Motorbike</div>
+                </div>
+                <div
+                  style={{ ...styles.vehicleCard, ...(formData.vehicle === 'scooter' ? styles.vehicleCardActive : {}) }}
+                  onClick={() => setFormData({ ...formData, vehicle: 'scooter' })}
+                >
+                  <div style={{ fontSize: '2rem' }}>🛵</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Scooter</div>
+                </div>
+                <div
+                  style={{ ...styles.vehicleCard, ...(formData.vehicle === 'bicycle' ? styles.vehicleCardActive : {}) }}
+                  onClick={() => setFormData({ ...formData, vehicle: 'bicycle' })}
+                >
+                  <div style={{ fontSize: '2rem' }}>🚲</div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Bicycle</div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }} disabled={loading}>
+              {loading ? 'Submitting...' : 'Submit & Send OTP'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp}>
+            <div className="form-group">
+              <label className="form-label">Phone Number</label>
+              <input type="tel" className="form-input" value={formData.phone} disabled style={{ backgroundColor: '#f1f5f9' }} />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '20px' }}>
+              <label className="form-label">Enter OTP</label>
+              <input type="text" className="form-input" placeholder="Enter 4-digit OTP" value={otp} onChange={e => setOtp(e.target.value)} maxLength={4} required autoFocus />
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                For testing, use OTP: <strong>1234</strong>
+              </p>
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }} disabled={loading}>
+              {loading ? 'Verifying...' : 'Verify & Join'}
+            </button>
+
+            <button type="button" onClick={() => { setStep(1); setOtp(''); setError(''); }} style={{ width: '100%', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', marginTop: '12px' }}>
+              ← Change Details
+            </button>
+          </form>
+        )}
 
         <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '20px' }}>
           By submitting, you agree to Doko's Terms and Conditions and acknowledge our Privacy Policy.
@@ -124,6 +200,17 @@ const styles = {
     padding: '30px 24px',
     borderRadius: 'var(--radius-lg)',
     boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
+  },
+  roleBadge: {
+    display: 'inline-block',
+    backgroundColor: '#ecfdf5',
+    color: '#059669',
+    padding: '6px 16px',
+    borderRadius: '100px',
+    fontWeight: '700',
+    fontSize: '0.85rem',
+    marginBottom: '12px',
+    border: '1px solid #a7f3d0'
   },
   countryCode: {
     display: 'flex',

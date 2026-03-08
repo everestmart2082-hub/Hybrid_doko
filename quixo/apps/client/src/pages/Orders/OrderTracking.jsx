@@ -54,14 +54,14 @@ const OrderTracking = () => {
 
   return (
     <div className="container animate-fade-in" style={styles.page}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>Track Order</h1>
-        <div style={styles.orderId}>Order #{order._id?.slice(-6).toUpperCase()}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '30px', flexWrap: 'wrap', gap: '8px' }}>
+        <h1 style={{ fontSize: '2rem' }}>Track Order</h1>
+        <div style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Order #{order._id?.slice(-6).toUpperCase()}</div>
       </div>
 
-      <div style={styles.content}>
+      <div className="tracking-layout">
         {/* Map Section */}
-        <div style={styles.mapSection}>
+        <div className="tracking-map-col">
           <div style={styles.mapPlaceholder}>
             <span style={{ fontSize: '4rem', marginBottom: '16px' }}>🗺️</span>
             <div style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Live Tracking Map</div>
@@ -89,7 +89,7 @@ const OrderTracking = () => {
         </div>
 
         {/* Timeline Section */}
-        <div style={styles.timelineSection}>
+        <div className="tracking-sidebar-col" style={{ backgroundColor: 'var(--surface)', padding: '30px', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
           <h3 style={{ fontSize: '1.4rem', marginBottom: '30px' }}>
             {isCancelled ? '❌ Order Cancelled' : 'Delivery Status'}
           </h3>

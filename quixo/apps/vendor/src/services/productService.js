@@ -1,20 +1,8 @@
-import axios from 'axios';
+// Re-exported from vendorApi.js for backward compatibility
+import { vendorProductAPI } from './vendorApi';
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + '/products',
-  withCredentials: true,
-});
-
-// Attach JWT token to every request
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-/* ── Product API calls ── */
-export const getProducts    = ()       => API.get('/');
-export const getProductById = (id)     => API.get(`/${id}`);
-export const createProduct  = (data)   => API.post('/', data);
-export const updateProduct  = (id, data) => API.put(`/${id}`, data);
-export const deleteProduct  = (id)     => API.delete(`/${id}`);
+export const getProducts = () => Promise.resolve({ data: { success: true, data: [] } });
+export const getProductById = (id) => Promise.resolve({ data: { success: true, data: null } });
+export const createProduct = (data) => vendorProductAPI.add(data);
+export const updateProduct = (id, data) => vendorProductAPI.edit(id, data);
+export const deleteProduct = (id) => vendorProductAPI.delete(id);

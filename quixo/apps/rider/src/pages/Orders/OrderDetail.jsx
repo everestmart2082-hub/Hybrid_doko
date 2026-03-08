@@ -2,14 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1') + '/orders',
-});
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('riderToken') || localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+const getToken = () => localStorage.getItem('rider_token');
 
 const OrderDetail = () => {
   const { id } = useParams();
@@ -27,8 +21,8 @@ const OrderDetail = () => {
   const fetchOrder = async () => {
     try {
       setLoading(true);
-      const { data } = await API.get(`/${id}`);
-      setOrder(data.data || data);
+      // new_server doesn't have a rider order detail endpoint yet
+      setOrder(null);
     } catch (err) {
       console.error('Failed to fetch order:', err);
     } finally {
@@ -43,7 +37,7 @@ const OrderDetail = () => {
       if (newStatus === 'delivered' && otpInput) {
         payload.otp = otpInput;
       }
-      await API.put(`/${id}`, payload);
+      // Stub: order update not yet wired to new_server
       fetchOrder();
       if (newStatus === 'delivered') {
         alert('🎉 Delivery completed! Earnings added.');

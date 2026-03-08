@@ -2,33 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:5000/api/admin',
-});
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+const API_BASE = '/api';
+const getToken = () => localStorage.getItem('admin_token');
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(null);
+  const [vendors, setVendors] = useState([]);
+  const [riders, setRiders] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get('/analytics/dashboard').then(res => {
-      setStats(res.data.data);
-    }).catch(err => console.error('Dashboard fetch failed:', err))
-      .finally(() => setLoading(false));
+    Promise.all([
+      axios.get(`${API_BASE}/vender/all`).catch(() => ({ data: { message: [] } })),
+      axios.get(`${API_BASE}/rider/all`).catch(() => ({ data: { message: [] } })),
+      axios.get(`${API_BASE}/user/all`).catch(() => ({ data: { message: [] } })),
+      axios.post(`${API_BASE}/admin/product/all`, { token: getToken(), type: 'normal' }).catch(() => ({ data: { message: [] } })),
+    ]).then(([vRes, rRes, uRes, pRes]) => {
+      setVendors(vRes.data.message || []);
+      setRiders(rRes.data.message || []);
+      setUsers(uRes.data.message || []);
+      setProducts(pRes.data.message || []);
+    }).finally(() => setLoading(false));
   }, []);
 
-  const kpis = stats ? [
-    { title: 'Total Revenue', value: `NPR ${(stats.totalRevenue || 0).toLocaleString()}`, icon: '💰' },
-    { title: 'Total Orders', value: String(stats.totalOrders || 0), icon: '📦' },
-    { title: 'Registered Vendors', value: String(stats.totalVendors || 0), icon: '🏪' },
-    { title: 'Total Users', value: String(stats.totalUsers || 0), icon: '👥' },
-    { title: 'Total Products', value: String(stats.totalProducts || 0), icon: '🏷️' },
-  ] : [];
+  const kpis = [
+    { title: 'Total Vendors', value: String(vendors.length), icon: '🏪', color: '#10b981' },
+    { title: 'Total Riders', value: String(riders.length), icon: '🛵', color: '#3b82f6' },
+    { title: 'Total Users', value: String(users.length), icon: '👥', color: '#6366f1' },
+    { title: 'Total Products', value: String(products.length), icon: '🏷️', color: '#f59e0b' },
+    { title: 'Pending Vendors', value: String(vendors.filter(v => !v.verified).length), icon: '⏳', color: '#ef4444' },
+  ];
 
   return (
     <div className="container animate-fade-in" style={styles.page}>
@@ -46,13 +50,13 @@ const AdminDashboard = () => {
       <div style={styles.kpiGrid}>
         {loading ? (
           [1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="card" style={{ ...styles.kpiCard(false), opacity: 0.5 }}>
+            <div key={i} className="card" style={{ ...styles.kpiCard('#ccc'), opacity: 0.5 }}>
               <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
             </div>
           ))
         ) : (
           kpis.map((kpi, idx) => (
-            <div key={idx} className="card" style={styles.kpiCard(false)}>
+            <div key={idx} className="card" style={styles.kpiCard(kpi.color)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: '600' }}>{kpi.title}</span>
                 <span style={{ fontSize: '1.5rem' }}>{kpi.icon}</span>
@@ -65,7 +69,6 @@ const AdminDashboard = () => {
 
       {/* Main Content Area */}
       <div style={styles.mainGrid}>
-        {/* Quick Links */}
         <div className="card" style={styles.chartSection}>
           <h3 style={{ fontSize: '1.2rem', marginBottom: '24px' }}>Quick Actions</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -87,7 +90,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Right Column: Links */}
         <div style={styles.sideGrid}>
           <div className="card" style={{ padding: '0' }}>
             <div style={{ padding: '20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
@@ -96,8 +98,8 @@ const AdminDashboard = () => {
             </div>
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {[
-                { label: 'Vendors', to: '/approvals/vendors' },
-                { label: 'Riders', to: '/approvals/riders' },
+                { label: `Vendors (${vendors.filter(v => !v.verified).length})`, to: '/approvals/vendors' },
+                { label: `Riders (${riders.filter(r => !r.verified).length})`, to: '/approvals/riders' },
                 { label: 'Products', to: '/products/approval' },
               ].map(item => (
                 <div key={item.to} style={styles.approvalRow}>
@@ -137,7 +139,7 @@ const styles = {
   pageTitle: { fontSize: '2rem', marginBottom: '8px' },
   headerActions: { display: 'flex', gap: '16px' },
   kpiGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px', marginBottom: '40px' },
-  kpiCard: (isWarning) => ({ borderLeft: isWarning ? '4px solid var(--danger)' : '4px solid var(--primary)', padding: '24px' }),
+  kpiCard: (color) => ({ borderLeft: `4px solid ${color}`, padding: '24px' }),
   mainGrid: { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' },
   chartSection: { minHeight: '400px' },
   sideGrid: { display: 'flex', flexDirection: 'column', gap: '24px' },

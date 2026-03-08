@@ -2,14 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1') + '/orders',
-});
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('riderToken') || localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+const getToken = () => localStorage.getItem('rider_token');
 
 const InProgress = () => {
   const navigate = useNavigate();
@@ -25,11 +19,8 @@ const InProgress = () => {
 
   const fetchActiveOrder = async () => {
     try {
-      const { data } = await API.get('/');
-      const active = (data.data || []).find(o =>
-        ['picked', 'out_for_delivery'].includes(o.status)
-      );
-      setOrder(active || null);
+      // new_server doesn't have a rider order listing endpoint yet
+      setOrder(null);
     } catch (err) {
       console.error('Failed to fetch active order:', err);
     } finally {
@@ -43,7 +34,7 @@ const InProgress = () => {
       setUpdating(true);
       const payload = { status: newStatus };
       if (newStatus === 'delivered' && otpInput) payload.otp = otpInput;
-      await API.put(`/${order._id}`, payload);
+      // Stub: order update not yet wired to new_server
       if (newStatus === 'delivered') {
         alert('🎉 Delivery completed! Earnings added to your wallet.');
         navigate('/');

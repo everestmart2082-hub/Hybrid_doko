@@ -1,15 +1,59 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { vendorAuthAPI } from '../../services/vendorApi';
 
 const VendorRegister = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', phone: '', storeName: '', address: '', businessType: '', description: '' });
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    console.log("Registering newly...", formData);
-    // After registration, vendors need to set up their store
-    navigate('/store-setup');
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data } = await vendorAuthAPI.register({
+        name: formData.name,
+        number: formData.phone,
+        storeName: formData.storeName,
+        address: formData.address,
+        businessType: formData.businessType,
+        description: formData.description
+      });
+      if (data.success) {
+        setStep(2);
+      } else {
+        setError(data.message || 'Registration failed.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data } = await vendorAuthAPI.verifyRegistrationOtp(formData.phone, otp);
+      if (data.success && data.token) {
+        localStorage.setItem('vendor_token', data.token);
+        navigate('/');
+      } else {
+        setError(data.message || 'OTP verification failed.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'OTP verification failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,66 +85,76 @@ const VendorRegister = () => {
       {/* Right Panel - Form */}
       <div style={styles.rightPanel}>
         <div className="card animate-fade-in" style={styles.loginCard}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+            <div style={styles.roleBadge}>🏪 Vendor Registration</div>
             <h2 style={{ fontSize: '2rem', marginBottom: '8px' }}>Create Partner Account</h2>
             <p className="text-secondary">It only takes a minute to get started</p>
           </div>
 
-          <form onSubmit={handleRegister}>
-            <div className="form-group">
-              <label className="form-label">Full Name</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
+          {error && (
+            <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: 'var(--radius-sm)', marginBottom: '20px', fontSize: '0.9rem' }}>
+              {error}
             </div>
+          )}
 
-            <div className="form-group">
-              <label className="form-label">Email Address (Optional)</label>
-              <input
-                type="email"
-                className="form-input"
-                placeholder="john@example.com"
-                value={formData.email}
-                onChange={e => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Mobile Number</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <span style={styles.countryCode}>+977</span>
-                <input
-                  type="tel"
-                  className="form-input"
-                  placeholder="9800000000"
-                  value={formData.phone}
-                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                  required
-                />
+          {step === 1 ? (
+            <form onSubmit={handleRegister}>
+              <div className="form-group">
+                <label className="form-label">Full Name</label>
+                <input type="text" className="form-input" placeholder="John Doe" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
               </div>
-            </div>
 
-            <div className="form-group" style={{ marginBottom: '30px' }}>
-              <label className="form-label">Create Password</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={e => setFormData({ ...formData, password: e.target.value })}
-                required
-              />
-            </div>
+              <div className="form-group">
+                <label className="form-label">Mobile Number</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span style={styles.countryCode}>+977</span>
+                  <input type="tel" className="form-input" placeholder="9800000000" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} required />
+                </div>
+              </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }}>
-              Create Account
-            </button>
-          </form>
+              <div className="form-group">
+                <label className="form-label">Store Name</label>
+                <input type="text" className="form-input" placeholder="My Store" value={formData.storeName} onChange={e => setFormData({ ...formData, storeName: e.target.value })} required />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Business Type</label>
+                <input type="text" className="form-input" placeholder="e.g. Grocery, Restaurant" value={formData.businessType} onChange={e => setFormData({ ...formData, businessType: e.target.value })} />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label">Address</label>
+                <input type="text" className="form-input" placeholder="Store Address" value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} />
+              </div>
+
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }} disabled={loading}>
+                {loading ? 'Registering...' : 'Register & Send OTP'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOtp}>
+              <div className="form-group">
+                <label className="form-label">Phone Number</label>
+                <input type="tel" className="form-input" value={formData.phone} disabled style={{ backgroundColor: '#f1f5f9' }} />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label">Enter OTP</label>
+                <input type="text" className="form-input" placeholder="Enter 4-digit OTP" value={otp} onChange={e => setOtp(e.target.value)} maxLength={4} required autoFocus />
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                  For testing, use OTP: <strong>1234</strong>
+                </p>
+              </div>
+
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }} disabled={loading}>
+                {loading ? 'Verifying...' : 'Verify & Create Account'}
+              </button>
+
+              <button type="button" onClick={() => { setStep(1); setOtp(''); setError(''); }} style={{ width: '100%', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', marginTop: '12px' }}>
+                ← Change Details
+              </button>
+            </form>
+          )}
 
           <div style={{ marginTop: '30px', textAlign: 'center', color: 'var(--text-secondary)' }}>
             Already have an account? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: '600' }}>Log In</Link>
@@ -135,7 +189,8 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     padding: '40px',
-    backgroundColor: '#ffffff'
+    backgroundColor: '#ffffff',
+    overflowY: 'auto'
   },
   brandBadge: {
     display: 'inline-block',
@@ -148,6 +203,17 @@ const styles = {
     fontSize: '1rem',
     marginBottom: '30px',
     border: '1px solid rgba(255,255,255,0.3)'
+  },
+  roleBadge: {
+    display: 'inline-block',
+    backgroundColor: '#fef3c7',
+    color: '#d97706',
+    padding: '6px 16px',
+    borderRadius: '100px',
+    fontWeight: '700',
+    fontSize: '0.85rem',
+    marginBottom: '16px',
+    border: '1px solid #fde68a'
   },
   loginCard: {
     width: '100%',

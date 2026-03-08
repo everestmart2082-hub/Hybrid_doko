@@ -1,7 +1,9 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 
@@ -22,20 +24,15 @@ app.use('/api/rider', riderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/product', productRoutes);
 
-// Health Check
-app.get('/', (req, res) => {
-    res.json({ message: "Welcome to Quixo Server API" });
-});
-
 // Database connection
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/quixo-new';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/quixo-new';
 
 mongoose.connect(MONGODB_URI)
     .then(() => {
-        console.log("Connected to MongoDB successfully");
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
+        console.log("Connected to MongoDB successfully for new_server");
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`🚀 Quixo new_server running on port ${PORT}`);
         });
     })
     .catch(err => {

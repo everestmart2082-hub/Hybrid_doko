@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-
-const API = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1') + '/orders',
-});
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('riderToken') || localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import { riderDashboardAPI } from '../../services/riderApi';
 
 const Dashboard = () => {
   const [isOnline, setIsOnline] = useState(false);
@@ -22,15 +13,14 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const { data } = await API.get('/');
-      const orders = data.data || [];
-      const today = new Date().toDateString();
-      const todayDelivered = orders.filter(o => o.status === 'delivered' && new Date(o.updatedAt).toDateString() === today);
-      const earnings = todayDelivered.length * 80; // NPR 80 per delivery estimated
-      const active = orders.find(o => ['picked', 'out_for_delivery', 'preparing'].includes(o.status));
-
-      setStats({ deliveries: todayDelivered.length, earnings });
-      setActiveOrder(active || null);
+      const { data } = await riderDashboardAPI.get();
+      if (data.success && data.message) {
+        const cards = data.message.cards || {};
+        setStats({
+          deliveries: cards['orders deliverd'] || 0,
+          earnings: cards.earnings || 0
+        });
+      }
     } catch (err) {
       console.error('Failed to fetch stats:', err);
     }

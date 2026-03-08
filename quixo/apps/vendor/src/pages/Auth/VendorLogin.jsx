@@ -1,14 +1,52 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { vendorAuthAPI } from '../../services/vendorApi';
 
 const VendorLogin = () => {
-  const [credentials, setCredentials] = useState({ phone: '', password: '' });
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    console.log("Vendor Logging in...", credentials);
-    navigate('/');
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data } = await vendorAuthAPI.login(phone);
+      if (data.success) {
+        setStep(2);
+      } else {
+        setError(data.message || 'Login failed. Phone number not found.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data } = await vendorAuthAPI.verifyLoginOtp(phone, otp);
+      if (data.success && data.token) {
+        localStorage.setItem('vendor_token', data.token);
+        navigate('/');
+      } else {
+        setError(data.message || 'OTP verification failed.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'OTP verification failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,45 +84,71 @@ const VendorLogin = () => {
       <div style={styles.rightPanel}>
         <div className="card animate-fade-in" style={styles.loginCard}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <div style={styles.roleBadge}>🏪 Vendor Login</div>
             <h2 style={{ fontSize: '2rem', marginBottom: '8px' }}>Store Login</h2>
             <p className="text-secondary">Welcome back to your partner dashboard</p>
           </div>
 
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label className="form-label">Registered Phone Number</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <span style={styles.countryCode}>+977</span>
+          {error && (
+            <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', borderRadius: 'var(--radius-sm)', marginBottom: '20px', fontSize: '0.9rem' }}>
+              {error}
+            </div>
+          )}
+
+          {step === 1 ? (
+            <form onSubmit={handleSendOtp}>
+              <div className="form-group">
+                <label className="form-label">Registered Phone Number</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <span style={styles.countryCode}>+977</span>
+                  <input
+                    type="tel"
+                    className="form-input"
+                    placeholder="9800000000"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem', marginTop: '20px' }} disabled={loading}>
+                {loading ? 'Sending OTP...' : 'Send OTP'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOtp}>
+              <div className="form-group">
+                <label className="form-label">Phone Number</label>
+                <input type="tel" className="form-input" value={phone} disabled style={{ backgroundColor: '#f1f5f9' }} />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label">Enter OTP</label>
                 <input
-                  type="tel"
+                  type="text"
                   className="form-input"
-                  placeholder="9800000000"
-                  value={credentials.phone}
-                  onChange={e => setCredentials({ ...credentials, phone: e.target.value })}
+                  placeholder="Enter 4-digit OTP"
+                  value={otp}
+                  onChange={e => setOtp(e.target.value)}
+                  maxLength={4}
                   required
+                  autoFocus
                 />
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                  For testing, use OTP: <strong>1234</strong>
+                </p>
               </div>
-            </div>
 
-            <div className="form-group" style={{ marginBottom: '30px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <label className="form-label" style={{ marginBottom: 0 }}>Password</label>
-                <a href="#" style={{ color: 'var(--primary)', fontSize: '0.9rem', textDecoration: 'none', fontWeight: '600' }}>Forgot password?</a>
-              </div>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="••••••••"
-                value={credentials.password}
-                onChange={e => setCredentials({ ...credentials, password: e.target.value })}
-                required
-              />
-            </div>
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }} disabled={loading}>
+                {loading ? 'Verifying...' : 'Verify & Access Dashboard'}
+              </button>
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }}>
-              Access Dashboard
-            </button>
-          </form>
+              <button type="button" onClick={() => { setStep(1); setOtp(''); setError(''); }} style={{ width: '100%', background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', marginTop: '12px' }}>
+                ← Change Phone Number
+              </button>
+            </form>
+          )}
 
           <div style={{ marginTop: '30px', textAlign: 'center', color: 'var(--text-secondary)' }}>
             Are you a new store owner? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '600' }}>Apply Now</Link>
@@ -132,6 +196,17 @@ const styles = {
     fontSize: '1rem',
     marginBottom: '30px',
     border: '1px solid rgba(255,255,255,0.3)'
+  },
+  roleBadge: {
+    display: 'inline-block',
+    backgroundColor: '#fef3c7',
+    color: '#d97706',
+    padding: '6px 16px',
+    borderRadius: '100px',
+    fontWeight: '700',
+    fontSize: '0.85rem',
+    marginBottom: '16px',
+    border: '1px solid #fde68a'
   },
   featureGrid: {
     display: 'flex',

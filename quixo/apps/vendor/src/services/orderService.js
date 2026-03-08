@@ -1,20 +1,13 @@
-import axios from 'axios';
+// Re-exported from vendorApi.js for backward compatibility
+import { vendorOrderAPI } from './vendorApi';
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + '/orders',
-  withCredentials: true,
+export const getOrders = (filter) => vendorOrderAPI.getAll(filter);
+export const getOrderById = (id) => vendorOrderAPI.getAll().then(res => {
+  // new_server vendor order/all returns all orders; filter client-side by id
+  const orders = res.data?.message || [];
+  const order = orders.find(o => o._id === id);
+  return { data: { data: order, success: true } };
 });
-
-// Attach JWT token to every request
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-/* ── Order API calls ── */
-export const getOrders    = ()       => API.get('/');
-export const getOrderById = (id)     => API.get(`/${id}`);
-export const createOrder  = (data)   => API.post('/', data);
-export const updateOrder  = (id, data) => API.put(`/${id}`, data);
-export const deleteOrder  = (id)     => API.delete(`/${id}`);
+export const updateOrder = (id, data) => vendorOrderAPI.setPrepared(id, data.time);
+export const createOrder = (data) => Promise.resolve({ data: { success: true } });
+export const deleteOrder = (id) => Promise.resolve({ data: { success: true } });

@@ -362,6 +362,80 @@ const getAllUsers = async (req, res) => {
     } catch (err) { res.json({ success: false }); }
 }
 
+// ─── Cart Get ────────────────────────────────────────────
+const getCart = async (req, res) => {
+    try {
+        const { token, page, limit } = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const cartItems = await Cart.find({ userId: decoded.id })
+            .populate('productId', 'name photos pricePerUnit unit deliveryCategory productCategory brand')
+            .limit(parseInt(limit) || 50)
+            .skip(((parseInt(page) || 1) - 1) * (parseInt(limit) || 50));
+
+        const formatted = cartItems.map(item => ({
+            cartId: item._id,
+            productId: item.productId?._id,
+            name: item.productId?.name,
+            image: item.productId?.photos?.[0],
+            number: item.number,
+            pricePerUnit: item.productId?.pricePerUnit,
+            unit: item.productId?.unit,
+            deliveryCategory: item.productId?.deliveryCategory,
+            productCategory: item.productId?.productCategory,
+            brandName: item.productId?.brand,
+            type: item.type
+        }));
+        res.json({ success: true, message: formatted });
+    } catch (err) { res.json({ success: false, message: "server error" }); }
+}
+
+// ─── Wishlist ────────────────────────────────────────────
+const Wishlist = require('../models/Wishlist.model');
+
+const addToWishlist = async (req, res) => {
+    try {
+        const { token, productId } = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const exists = await Wishlist.findOne({ userId: decoded.id, productId });
+        if (exists) return res.json({ success: false, message: "already in wishlist" });
+        await Wishlist.create({ userId: decoded.id, productId });
+        res.json({ success: true, message: "successfully added to cart" }); // spec message
+    } catch (err) { res.json({ success: false, message: "server error" }); }
+}
+
+const removeFromWishlist = async (req, res) => {
+    try {
+        const { token, wishlistId } = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        await Wishlist.findOneAndDelete({ _id: wishlistId, userId: decoded.id });
+        res.json({ success: true, message: "successfully added to cart" }); // spec message
+    } catch (err) { res.json({ success: false, message: "server error" }); }
+}
+
+const getWishlist = async (req, res) => {
+    try {
+        const { token, page, limit } = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const items = await Wishlist.find({ userId: decoded.id })
+            .populate('productId', 'name photos pricePerUnit unit deliveryCategory productCategory brand')
+            .limit(parseInt(limit) || 50)
+            .skip(((parseInt(page) || 1) - 1) * (parseInt(limit) || 50));
+
+        const formatted = items.map(item => ({
+            wishlistId: item._id,
+            productId: item.productId?._id,
+            name: item.productId?.name,
+            image: item.productId?.photos?.[0],
+            pricePerUnit: item.productId?.pricePerUnit,
+            unit: item.productId?.unit,
+            deliveryCategory: item.productId?.deliveryCategory,
+            productCategory: item.productId?.productCategory,
+            brandName: item.productId?.brand
+        }));
+        res.json({ success: true, message: formatted });
+    } catch (err) { res.json({ success: false, message: "server error" }); }
+}
+
 module.exports = {
     registerUser,
     verifyRegistrationOtp,
@@ -371,8 +445,9 @@ module.exports = {
     updateUserProfile,
     deleteUserProfile,
     verifyUserProfileOtp,
-    addToCart, removeFromCart, checkoutCart, getPaymentLink,
+    addToCart, removeFromCart, getCart, checkoutCart, getPaymentLink,
     getAllUserOrders, cancelUserOrder, reorderUserOrder, setOrderDeliveredUser,
     getAllAddresses, addUserAddress, deleteUserAddress, updateUserAddress,
+    addToWishlist, removeFromWishlist, getWishlist,
     submitReview, rateProduct, rateRider, getUserNotifications, getAllUsers
 };

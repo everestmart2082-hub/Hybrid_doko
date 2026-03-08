@@ -26,13 +26,14 @@ router.post('/product/edit', editVendorProduct);
 router.delete('/product/delete', deleteVendorProduct);
 
 // Orders
-router.post('/order/all', (req, res) => res.json({ success: true, message: "Route reached" }));
-router.post('/order/prepared', (req, res) => res.json({ success: true, message: "Route reached" }));
+router.get('/orders', getAllVendorOrders);
+router.post('/order/all', getAllVendorOrders); // keeping both given payload ambiguity
+router.post('/order/prepared', setOrderPrepared);
 
-// All Vendors (Admin?)
-router.get('/all', (req, res) => res.json({ success: true, message: "Route reached" }));
+// All Vendors
+router.get('/all', getAllVendors);
 
 // Chart
-router.get('/chart', (req, res) => res.json({ success: true, message: "Route reached" }));
+router.get('/chart', getVendorChart);
 
 module.exports = router;

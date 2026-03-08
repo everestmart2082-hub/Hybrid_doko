@@ -20,8 +20,8 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const { data } = await getOrders();
-      const allOrders = data.data || [];
+      const res = await getOrders();
+      const allOrders = res.data?.message || res.data?.data || [];
       setOrders(allOrders);
 
       const today = new Date().toDateString();
