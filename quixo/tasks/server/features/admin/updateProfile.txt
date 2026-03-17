@@ -1,0 +1,11 @@
+/api/admin/profile/update
+Post
+token
+number
+name
+description
+address
+Response
+success - true/false
+message
+“verify otp”

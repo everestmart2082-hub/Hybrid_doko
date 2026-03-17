@@ -1,0 +1,12 @@
+/api/user/order/all
+Get
+token
+page
+limit
+search
+status
+delivary category
+Response
+success
+message
+[{order id, product name, product id, status, delivary category,  rider name, rider number, }]s

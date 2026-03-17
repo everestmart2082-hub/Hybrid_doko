@@ -1,0 +1,15 @@
+Employee
+position : string
+salary
+name
+address
+email
+phone
+citizenship file 
+bank name
+account number
+pan file
+violations : []
+
+Notes
+- vilations are of the form {type: string, date: string, description: string}

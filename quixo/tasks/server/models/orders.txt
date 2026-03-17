@@ -1,0 +1,12 @@
+orders
+[order id]s
+user id
+delivary charge
+total
+otp
+
+Notes
+- delivary charge is the charge for delivary
+- total is the total amount to be paid by user
+- order ids refer to the order each created
+- so, delivary charges will be applied separately to total of each of quick and standard 

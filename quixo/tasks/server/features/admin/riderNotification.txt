@@ -1,0 +1,9 @@
+/api/admin/rider/notification
+Post
+token
+rider id
+message
+Response
+success
+message:
+successfully deleted

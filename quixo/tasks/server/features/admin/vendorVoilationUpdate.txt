@@ -1,0 +1,9 @@
+/api/admin/vender/violations/update
+post
+token
+rider id
+violations[]
+Response
+success
+message:
+successfully deleted

@@ -1,0 +1,11 @@
+api/admin/vender/suspension
+Post
+token
+vender id
+suspended: true/false
+response
+success
+message
+successfully suspended
+removed from suspension
+

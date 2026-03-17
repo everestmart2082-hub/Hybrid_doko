@@ -1,0 +1,9 @@
+/api/user/order/cancel
+delete
+token
+order id
+Response
+success
+message
+“successfully cancelled”
+“already on delivary”

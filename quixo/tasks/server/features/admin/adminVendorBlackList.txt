@@ -1,0 +1,11 @@
+api/admin/vender/blacklist
+Post
+token
+vender id
+blacklisted: true/false
+response
+success
+message
+successfully balcklisted
+removed from blacklist
+

@@ -1,0 +1,12 @@
+/api/vender/order/all
+Post
+page
+limit
+token
+search text
+status
+delivary category
+Response
+success
+message:
+[{order id, order status, product category, delivary category, order time, product id, product number,  rider name, rider number, }]

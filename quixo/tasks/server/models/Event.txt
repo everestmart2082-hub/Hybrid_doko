@@ -1,0 +1,11 @@
+Event
+id
+{order prearing, order pending, cancelled, returned, order delivered, kahlti, esewa }
+order id
+status - running/ completed
+if completed → event id
+
+Notes
+- events corrosponds to how order is progressing
+- and also payment is processing, like khalti that needs manual checking of process
+

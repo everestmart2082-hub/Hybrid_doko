@@ -1,0 +1,14 @@
+order
+status : preparing, pending, delivered, cancelledByUser, cancelledByVender, returned
+product id: number
+type : grocery / ecommerce
+dateoforder
+dateofdelivary
+
+Notes
+- preparing means order is being prepared by vender
+- pending means order is pending and is with rider
+- delivered means order is delivered means received by user
+- cancelled means order is cancelled by user or vender
+- returned means order is returned means received by vender
+- each of these are separate order for each product

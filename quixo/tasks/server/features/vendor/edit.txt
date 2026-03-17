@@ -1,0 +1,19 @@
+/api/vender/product/edit
+/api/vender/product/add
+Post
+Name
+brand
+description
+short descriptions
+price per unit
+unit ( kg, .. ) string
+discount
+product catagory
+delivary categpory
+stock : num
+Photos [“”,///]
+Response
+success
+message
+“successfully submitted”
+“server error”

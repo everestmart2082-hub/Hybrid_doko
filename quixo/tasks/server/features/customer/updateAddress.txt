@@ -1,0 +1,17 @@
+/api/user/address/update
+Post
+token
+address id
+label : {Home, work, office}
+city
+state
+pincode
+landmark
+phone number
+email
+default : true,false
+response
+success
+message
+successfully updated
+not available

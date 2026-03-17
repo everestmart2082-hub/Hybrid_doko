@@ -1,0 +1,10 @@
+/api/user/profile/otp
+Post
+token
+otp
+phone
+response
+success
+message
+“successfully updated”
+“otp verification failure”

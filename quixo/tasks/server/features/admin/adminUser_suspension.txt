@@ -1,0 +1,11 @@
+api/admin/user/suspension
+Post
+token
+user id
+suspended: true/false
+response
+success
+message
+successfully suspended
+removed from suspension
+

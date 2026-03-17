@@ -1,0 +1,11 @@
+api/admin/rider/suspension
+Post
+token
+rider id
+suspended: true/false
+response
+success
+message
+successfully suspended
+removed from suspension
+

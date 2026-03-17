@@ -1,0 +1,18 @@
+/api/admin/product/all
+Get
+page
+limit
+min price
+max price
+product category
+delivery category
+vender id
+search text
+stock
+brand
+rating
+hidden
+Response
+success
+message:
+[{Product id, name, short description, price per unit, product category, delivary category, stock, brand name }]

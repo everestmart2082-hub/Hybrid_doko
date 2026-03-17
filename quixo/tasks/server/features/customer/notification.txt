@@ -1,0 +1,9 @@
+/api/user/notification
+Post
+token
+page
+limit
+Response
+success
+message:
+[message, date]

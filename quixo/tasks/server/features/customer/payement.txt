@@ -1,0 +1,9 @@
+/api/user/payment
+Get
+user id
+payment method
+response
+success
+message
+order placed
+payment in process

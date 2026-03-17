@@ -1,0 +1,11 @@
+/api/user/registration/
+Post request
+phone
+email
+Response
+success - true/false
+message 
+“success”
+“otp verification failure”
+“already registered”
+“suspended account”

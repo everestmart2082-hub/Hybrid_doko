@@ -1,0 +1,8 @@
+/api/admin/employee/delete
+delete
+token
+employee id
+Response
+success
+message:
+successfully deleted

@@ -258,27 +258,52 @@ const getAllVendorOrders = async (req, res) => {
         let query = { vendorId: decoded.id };
         if (filter) query.status = filter;
 
-        const orders = await Order.find(query);
+        const orders = await Order.find(query)
+            .populate('customerId', 'name number')
+            .populate('products.productId', 'name photos pricePerUnit')
+            .sort({ createdAt: -1 });
         res.json({ success: true, message: orders });
     } catch (error) {
         res.json({ success: false, message: "server error" });
     }
 }
 
+// Mark a SINGLE product inside an order as prepared.
+// When ALL products are prepared → auto-mark order as 'prepared'.
 const setOrderPrepared = async (req, res) => {
     try {
-        const { token, "order id": orderId, time } = req.body;
+        const { token, "order id": orderId, "product id": productId, time } = req.body;
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const order = await Order.findOneAndUpdate(
-            { _id: orderId, vendorId: decoded.id },
-            { status: 'prepared', deliveryDetails: { preparedTime: time } },
-            { new: true }
-        );
+        const order = await Order.findOne({ _id: orderId, vendorId: decoded.id });
+        if (!order) return res.json({ success: false, message: "order not found" });
 
-        if (!order) return res.json({ success: false, message: "server error" });
+        if (productId) {
+            // Mark specific product as prepared
+            let found = false;
+            order.products.forEach(p => {
+                if (p.productId.toString() === productId) {
+                    p.status = 'prepared';
+                    found = true;
+                }
+            });
+            if (!found) return res.json({ success: false, message: "product not found in order" });
+
+            // Check if ALL products are now prepared
+            const allPrepared = order.products.every(p => p.status === 'prepared');
+            if (allPrepared) {
+                order.status = 'prepared';
+            }
+        } else {
+            // Legacy: no productId → mark entire order as prepared
+            order.products.forEach(p => { p.status = 'prepared'; });
+            order.status = 'prepared';
+        }
+
+        await order.save();
         res.json({ success: true, message: "success" });
     } catch (error) {
+        console.error("setOrderPrepared Error:", error);
         res.json({ success: false, message: "server error" });
     }
 }

@@ -1,0 +1,9 @@
+/api/user/checkout
+address id
+token
+[cart ids]
+payment method
+response
+success
+message
+“in progress”

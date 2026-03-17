@@ -1,0 +1,11 @@
+api/admin/user/approve
+Post
+token
+user id
+approved: true/false
+response
+success
+message
+successfully approved
+desapproved
+

@@ -1,0 +1,11 @@
+api/admin/product/hide
+Post
+token
+product id
+hide: true/false
+response
+success
+message
+successfully approved
+desapproved
+

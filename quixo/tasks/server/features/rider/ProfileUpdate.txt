@@ -1,0 +1,11 @@
+/api/rider/profile/update
+Post
+token
+number
+description
+default address
+Response
+success - true/false
+message 
+“successfully submitted”
+“suspended account”

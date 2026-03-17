@@ -1,0 +1,12 @@
+/api/user/profile/update
+Post
+token
+number
+name
+description
+default address
+Response
+success - true/false
+message 
+“success”
+“suspended account”

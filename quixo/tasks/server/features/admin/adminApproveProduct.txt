@@ -1,0 +1,11 @@
+api/admin/product/approve
+Post
+token
+product id
+approved: true/false
+response
+success
+message
+successfully approved
+desapproved
+

@@ -1,0 +1,15 @@
+/api/user/address/all
+Post
+token
+page
+limit
+response
+success
+message
+[{address id, - label : {Home, work, office}
+city
+state
+pincode
+landmark
+phone number
+email}]

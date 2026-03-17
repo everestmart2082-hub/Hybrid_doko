@@ -7,14 +7,19 @@ const orderSchema = new mongoose.Schema({
     products: [{
         productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
         number: { type: Number, default: 1 },
-        pricePerUnit: { type: Number } // Snapshot at the time of purchase
+        pricePerUnit: { type: Number }, // Snapshot at purchase (after discount)
+        status: {
+            type: String,
+            enum: ['preparing', 'prepared', 'cancelled'],
+            default: 'preparing'
+        }
     }],
     status: {
         type: String,
-        enum: ['preparing', 'pending', 'delivered', 'cancelled', 'returned'],
+        enum: ['preparing', 'prepared', 'pending', 'delivered', 'cancelled', 'returned'],
         default: 'preparing'
     },
-    deliveryCategory: { type: String, enum: ['quick', 'ecommerce', '1 dAY'] },
+    deliveryCategory: { type: String, enum: ['quick', 'ecommerce'] },
     dateOfOrder: { type: Date, default: Date.now },
     dateOfDelivery: { type: Date },
     deliveryCharge: { type: Number, default: 0 },
@@ -22,7 +27,12 @@ const orderSchema = new mongoose.Schema({
     tax: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
     otp: { type: String },
-    deliveryAddress: { type: String }, // or ObjectId ref to Address
+    deliveryAddress: {
+        address: String,
+        city: String,
+        landmark: String,
+        phone: String
+    },
     paymentMethod: { type: String, enum: ['esewa', 'khalti', 'fonepay', 'cash on delivary'] }
 }, { timestamps: true });
 

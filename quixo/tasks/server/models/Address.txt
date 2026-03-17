@@ -1,0 +1,13 @@
+Address
+label : {Home, work, office}
+city
+state
+pincode
+landmark
+phone number
+email
+userid
+geolocatiuon
+
+Notes
+- geolocation is of the form {lat,long}

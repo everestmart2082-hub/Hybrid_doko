@@ -1,0 +1,8 @@
+Admin
+name
+phone
+email
+otp
+
+Notes
+- Each admin is directly registered in database

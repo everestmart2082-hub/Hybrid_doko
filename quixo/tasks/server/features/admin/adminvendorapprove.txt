@@ -1,0 +1,11 @@
+api/admin/vender/approve
+Post
+token
+vender id
+approved: true/false
+response
+success
+message
+successfully approved
+desapproved
+

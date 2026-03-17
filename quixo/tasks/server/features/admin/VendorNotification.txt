@@ -1,0 +1,9 @@
+/api/admin/vender/notification
+Post
+token
+vender id
+message
+Response
+success
+message:
+successfully deleted

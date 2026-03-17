@@ -1,0 +1,10 @@
+/api/vender/login/otp
+Post
+otp
+phone
+response
+success
+message
+“success”
+“otp verification failure”
+token

@@ -1,0 +1,9 @@
+/api/rider/profile/otp
+Post
+otp
+phone
+response
+success
+message
+“successfully updated”
+“otp verification failure”

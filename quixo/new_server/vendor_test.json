@@ -1,0 +1,26 @@
+{
+  "geolocation": {
+    "type": "Point",
+    "coordinates": [
+      0,
+      0
+    ]
+  },
+  "_id": "69b03c433b733822797e6348",
+  "name": "Dummy Vendor",
+  "number": "9800000002",
+  "storeName": "Dummy Store",
+  "address": "123 Dummy St",
+  "businessType": "Grocery",
+  "description": "",
+  "companyRegistrationCertificate": "/uploads/1773157442958-854096508.png",
+  "panCertificate": "/uploads/1773157442959-411799288.png",
+  "verified": false,
+  "suspended": false,
+  "revenue": 0,
+  "violations": [],
+  "otp": null,
+  "createdAt": "2026-03-10T15:44:03.028Z",
+  "updatedAt": "2026-03-10T15:44:11.213Z",
+  "__v": 0
+}

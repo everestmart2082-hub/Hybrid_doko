@@ -1,0 +1,17 @@
+/api/admin/employee/add
+Post
+token
+position : string
+salary
+name
+address
+email
+phone
+citizenship
+bank name
+account number
+pan
+Response
+success
+message:
+successfully added

@@ -1,0 +1,9 @@
+/api/user/product/rating
+Post
+token
+product id
+rating
+response
+success
+message
+“successfully added”

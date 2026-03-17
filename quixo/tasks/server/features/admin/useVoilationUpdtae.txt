@@ -1,0 +1,9 @@
+/api/admin/user/violations/update
+post
+token
+user id
+violations[]
+Response
+success
+message:
+successfully deleted

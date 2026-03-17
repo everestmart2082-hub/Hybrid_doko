@@ -1,0 +1,9 @@
+/api/rider/notification
+Post
+token
+page
+limit
+Response
+success
+message:
+[message, date]

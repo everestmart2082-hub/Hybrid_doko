@@ -1,0 +1,9 @@
+/api/user/address/delete
+delete
+token
+address id
+response
+success
+message
+successfully deleted
+not available

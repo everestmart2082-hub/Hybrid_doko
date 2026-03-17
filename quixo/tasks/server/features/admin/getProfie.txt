@@ -1,0 +1,12 @@
+/api/admin/profile/get
+Post
+token
+Response
+{sucess : true or false,
+message:  
+name
+number
+[company paper]
+Address
+email
+wrong phone number

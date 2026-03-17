@@ -1,0 +1,18 @@
+Vender
+name
+number
+Pan file
+store Name
+Address
+email
+Business Type {textile, garment ....} : string
+Description
+verified
+suspended
+revenue
+geolocatiuon
+violations : []
+otp
+
+Notes
+- violations are of the form {type: string, date: string, description: string}

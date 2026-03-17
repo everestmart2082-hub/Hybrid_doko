@@ -1,0 +1,9 @@
+/api/user/order/delievered/
+Post
+token
+otp
+response
+success
+message
+“order delvered”
+“server error”

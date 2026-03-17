@@ -1,0 +1,9 @@
+/api/admin/user/notification
+Post
+token
+user id
+message
+Response
+success
+message:
+successfully deleted

@@ -1,0 +1,8 @@
+Payment
+type - esewa/fonepay/cash on delivary
+transansaction id ?
+amount
+order id
+
+Notes
+- payment is done on all orders altogether including discount and delivary charges

@@ -1,0 +1,11 @@
+/api/user/wishlist/get
+post
+token
+page
+limit
+Response
+success
+message
+“successfully added to cart”
+“server error”
+[{product id, name, image, number, priceperunit, unit, delivary category, product category, brandname}]

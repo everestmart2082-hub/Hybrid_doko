@@ -1,0 +1,11 @@
+user
+name
+number
+email
+suspend
+deactivate
+otp
+violations : []
+
+Notes
+- violations are of the form {type: string, date: string, description: string}

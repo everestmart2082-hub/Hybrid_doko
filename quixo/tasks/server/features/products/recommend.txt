@@ -1,0 +1,6 @@
+/api/product/recommended
+Get
+Response
+success
+message:
+[{Product id, name, short description, price per unit, product category, delivary category, stock, brand name }]

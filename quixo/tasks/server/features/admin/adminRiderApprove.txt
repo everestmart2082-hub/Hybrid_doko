@@ -1,0 +1,11 @@
+api/admin/rider/approve
+Post
+token
+rider id
+approved: true/false
+response
+success
+message
+successfully approved
+desapproved
+

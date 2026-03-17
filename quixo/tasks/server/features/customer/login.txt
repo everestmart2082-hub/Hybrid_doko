@@ -1,0 +1,8 @@
+/api/user/login/
+Post request
+phone
+Response
+success - true/false
+message 
+“success”
+“otp verification failure”

@@ -1,0 +1,9 @@
+/api/user/wishlist/add
+post
+token
+final String productId
+Response
+success
+message
+“successfully added to cart”
+“server error”

@@ -1,0 +1,14 @@
+/api/vender/registration/
+Post
+name
+number
+Pan
+store Name
+Address
+email
+Business Type {textile, garment ....} : string
+Description
+geolocation
+
+Response
+success - true/false

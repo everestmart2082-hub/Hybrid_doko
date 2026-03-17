@@ -1,0 +1,7 @@
+/api/rider/generate_otp
+Post
+token
+order id
+response
+sucess
+message

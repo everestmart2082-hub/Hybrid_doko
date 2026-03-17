@@ -1,0 +1,22 @@
+/api/product/id
+Get
+product id
+Response
+success
+message
+id
+Name
+brand
+description
+short descriptions
+price per unit
+unit ( kg, .. ) string
+discount
+product catagory
+delivary categpory
+stock : num
+Photos [“”,///]
+vender id
+vender name
+rating
+server error, product not found

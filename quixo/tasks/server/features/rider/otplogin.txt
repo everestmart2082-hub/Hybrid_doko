@@ -1,0 +1,10 @@
+/api/rider/login/otp
+Post
+otp
+phone
+response
+{success: true
+message}
+“success”
+“otp verification failure”
+token

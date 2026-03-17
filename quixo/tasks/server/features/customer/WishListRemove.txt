@@ -1,0 +1,9 @@
+/api/user/wishlist/remove
+post
+token
+final String wishlistid
+Response
+success
+message
+“successfully added to cart”
+“server error”

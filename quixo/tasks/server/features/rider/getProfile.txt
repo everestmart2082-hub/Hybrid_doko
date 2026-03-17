@@ -1,0 +1,16 @@
+/api/rider/profile/get
+Post
+token
+Response
+{sucess : true or false,
+message:  
+name
+number
+default address
+email
+blue book
+bike detail
+insurance paper
+pan card
+citizenship
+“token has expire”, “account has been suspended + violation...”,“account has been blacklisted+ violation...”

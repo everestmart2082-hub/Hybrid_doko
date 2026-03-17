@@ -1,0 +1,8 @@
+/api/vender/order/prepared/
+Post
+token
+response
+success
+message
+“order prepared”
+“server error”

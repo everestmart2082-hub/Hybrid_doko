@@ -1,0 +1,26 @@
+Product
+id
+Name
+brand
+short descriptions
+description
+price per unit
+unit ( kg, liter .. ) string
+discount
+product catagory (link to category id)
+stock : num
+Photos [“”,///]
+vender id
+rating
+approved
+[review ids]
+reason for admin hidden
+hidden
+admin hidden
+
+Notes
+- approved is a boolean value by admin only
+- only vendor can add product
+- brand is the products company brand
+- hidden can be done by vendor
+- and admin hidden takes preference over hidden

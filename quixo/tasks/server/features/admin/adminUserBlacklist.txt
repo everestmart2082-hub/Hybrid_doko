@@ -1,0 +1,11 @@
+api/admin/user/blacklist
+Post
+token
+user id
+blacklisted: true/false
+response
+success
+message
+successfully balcklisted
+removed from blacklist
+

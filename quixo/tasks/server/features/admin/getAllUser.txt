@@ -1,0 +1,10 @@
+/api/user/all
+Get
+page
+limit
+rating
+status {approved, suspended, blacklisted}
+Response
+success
+message:
+[{rider id, name, violations[] }]
