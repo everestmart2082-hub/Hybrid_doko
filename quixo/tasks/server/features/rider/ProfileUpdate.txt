@@ -1,11 +1,12 @@
 /api/rider/profile/update
 Post
-token
-number
-description
-default address
+- token in authentication bearer
+- number
+- description
+- default address
+
 Response
-success - true/false
-message 
-“successfully submitted”
-“suspended account”
+{
+success: true/false,
+message: "verify otp” / “server error”
+}

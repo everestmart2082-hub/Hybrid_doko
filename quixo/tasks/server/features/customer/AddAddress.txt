@@ -1,16 +1,16 @@
 /api/user/address/add
 Post
-token
-label : {Home, work, office}
-city
-state
-pincode
-landmark
-phone number
-email
-response
-success
-message
-successfully added
-already exists
-server error
+- token in authentication bearer
+- label : {Home, work, office}
+- city
+- state
+- pincode
+- landmark
+- phone number
+- email
+
+Response
+{
+success: true/false,
+message: "successfully added" / "already exists" / "server error"
+}

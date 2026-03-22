@@ -1,10 +1,11 @@
 /api/rider/login/otp
 Post
-otp
-phone
+- otp
+- phone
+
 response
-{success: true
-message}
-“success”
-“otp verification failure”
-token
+{
+success: true,
+message: “successfully logged in” / “otp verification failure”,
+token : token
+}

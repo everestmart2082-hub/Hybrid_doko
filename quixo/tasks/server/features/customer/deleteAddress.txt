@@ -1,9 +1,13 @@
 /api/user/address/delete
 delete
-token
-address id
-response
-success
-message
-successfully deleted
-not available
+- token in authentication bearer
+- address id
+
+Response
+{
+success: true/false,
+message:
+“successfully deleted” /
+“not available” /
+“server error”
+}

@@ -1,9 +1,13 @@
 /api/user/review
 Post
-token
-message
-product id
-response
-success
-message
-“successfully added”
+- token in authentication bearer
+- message
+- product id
+
+Response
+{
+success: true/false,
+message:
+“successfully added” /
+“server error”
+}

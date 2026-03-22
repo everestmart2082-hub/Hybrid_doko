@@ -1,11 +1,16 @@
 api/admin/product/hide
 Post
-token
-product id
-hide: true/false
-response
-success
-message
-successfully approved
-desapproved
+- token in authentication bearer
+- product id
+- hide: true/false
+- update : true/false
+
+Response
+{
+success: true/false,
+message:
+“successfully approved” /
+“desapproved” /
+“server error”
+}
 

@@ -3,8 +3,10 @@ name
 quick/normal
 required [{name:description, hint}]
 others [{name:description, hint}]
+hidden
 
 Notes
 - required are the fields that are required for the product to be listed
 - others are the fields that are optional for the product to be listed
 - quick automatically refers to deliver withing certain time , like 15 mins can be adjusted
+- hidden , since categories cannot be deleted

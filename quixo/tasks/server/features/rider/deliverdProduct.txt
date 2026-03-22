@@ -1,9 +1,10 @@
 /api/user/order/delievered/
 Post
-token
-otp
+- token in authentication bearer
+- otp
+
 response
-success
-message
-“order delvered”
-“server error”
+{
+success: true/false,
+message: “order delvered” / “server error”
+}

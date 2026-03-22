@@ -1,8 +1,12 @@
 /api/user/orders/reorder
 delete
-token
-order id
+- token in authentication bearer
+- order id
+
 Response
-success
-message
-“successfully added to cart”
+{
+success: true/false,
+message:
+“successfully added to cart” /
+“server error”
+}

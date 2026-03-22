@@ -1,0 +1,16 @@
+/api/user/profile/delete
+delete
+- token in authentication bearer
+- reason
+- options {pause, delete}
+
+Response
+{
+success: true or false,
+message:
+“successfully paused/delete” /
+“server error”
+}
+
+Note:
+- Never parmanently delete an account, just put a flag in the database to indicate that the account is deleted, and when they try to remake account with the same number just reactivate the account

@@ -4,6 +4,7 @@ product id: number
 type : grocery / ecommerce
 dateoforder
 dateofdelivary
+rider id
 
 Notes
 - preparing means order is being prepared by vender
@@ -12,3 +13,4 @@ Notes
 - cancelled means order is cancelled by user or vender
 - returned means order is returned means received by vender
 - each of these are separate order for each product
+- each rider can carry an order

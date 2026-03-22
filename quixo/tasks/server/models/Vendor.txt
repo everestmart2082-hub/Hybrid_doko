@@ -5,14 +5,16 @@ Pan file
 store Name
 Address
 email
-Business Type {textile, garment ....} : string
+Business Type {textile, garment ....} : enum string
 Description
 verified
 suspended
 revenue
-geolocatiuon
+geolocatiuon : string
 violations : []
 otp
+updation requested
 
 Notes
 - violations are of the form {type: string, date: string, description: string}
+- updation requested is a boolean value to tell admin if an update request is done

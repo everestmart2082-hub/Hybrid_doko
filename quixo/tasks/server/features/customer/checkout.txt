@@ -1,9 +1,13 @@
 /api/user/checkout
-address id
-token
-[cart ids]
-payment method
-response
-success
+- address id
+- token in authentication bearer
+- [cart ids]
+- payment method
+
+Response    
+{
+success: true/false,
 message
-“in progress”
+“in progress” / 
+“server error”
+}

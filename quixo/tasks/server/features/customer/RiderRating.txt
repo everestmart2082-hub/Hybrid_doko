@@ -1,0 +1,13 @@
+/api/user/rider/rating
+Post
+- token in authentication bearer
+- rider id
+- rating
+
+Response
+{
+success: true/false,
+message:
+“successfully added” /
+“server error”
+}

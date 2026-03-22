@@ -1,9 +1,13 @@
 /api/admin/profile/otp
 Post
-otp
-phone
-response
-success
-message
-“success”
-“otp verification failure”
+- otp
+- phone
+
+Response
+{
+success: true/false,
+message:
+“success” /
+“otp verification failure” /
+“server error”
+}

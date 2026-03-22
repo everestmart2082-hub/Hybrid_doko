@@ -1,9 +1,0 @@
-/api/user/rider/rating
-Post
-token
-rider id
-rating
-response
-success
-message
-“successfully added”

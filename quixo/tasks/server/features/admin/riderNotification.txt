@@ -1,9 +1,13 @@
 /api/admin/rider/notification
 Post
-token
-rider id
-message
+- token in authentication bearer
+- rider id
+- message
+
 Response
-success
+{
+success: true/false,
 message:
-successfully deleted
+“successfully deleted” /
+“server error”
+}

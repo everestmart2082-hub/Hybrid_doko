@@ -1,0 +1,13 @@
+/api/user/cart/add
+Post
+- token in authentication bearer
+- product id
+- number
+
+Response
+{
+success: true/false,
+message:
+“successfully added to cart” /
+“server error”
+}

@@ -1,9 +1,13 @@
 /api/user/product/rating
 Post
-token
-product id
-rating
-response
-success
-message
-“successfully added”
+- token in authentication  bearer
+- product id
+- rating
+
+Response
+{
+success: true/false,
+message:
+“successfully added” /
+“server error”
+}

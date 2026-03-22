@@ -1,6 +1,12 @@
 /api/product/recommended
 Get
+- token in authentication bearer
 Response
-success
+{
+success: true/false,
 message:
-[{Product id, name, short description, price per unit, product category, delivary category, stock, brand name }]
+[{Product id, name, short description, price per unit, unit, product catagory, delivary category, stock, brand name, photos, rating, discount, vender name, vender id, iswishlisted }]
+}
+
+Notes
+- iswishlisted is a boolean value only when token is not null

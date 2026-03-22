@@ -1,9 +1,13 @@
 /api/admin/user/notification
 Post
-token
-user id
-message
+- token in authentication bearer
+- user id
+- message
+
 Response
-success
+{
+success: true/false,
 message:
-successfully deleted
+“successfully deleted” /
+“server error”
+}

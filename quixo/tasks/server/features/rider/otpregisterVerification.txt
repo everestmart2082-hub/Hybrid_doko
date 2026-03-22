@@ -1,0 +1,11 @@
+/api/rider/registration/otp
+Post
+- otp
+- phone
+
+response
+{
+success: true/false,
+message: “application submitted” / “otp verification failure”
+token : token
+}

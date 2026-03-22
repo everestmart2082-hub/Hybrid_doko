@@ -1,0 +1,4 @@
+Logs
+- type - Customer/Admin/Vendor/rider
+- message
+- date

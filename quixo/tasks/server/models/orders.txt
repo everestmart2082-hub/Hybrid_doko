@@ -4,6 +4,7 @@ user id
 delivary charge
 total
 otp
+status - ongoing/completed
 
 Notes
 - delivary charge is the charge for delivary

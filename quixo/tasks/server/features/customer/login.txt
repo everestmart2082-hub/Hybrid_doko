@@ -1,8 +1,11 @@
 /api/user/login/
-Post request
-phone
+Post
+- phone
+
 Response
-success - true/false
-message 
-“success”
-“otp verification failure”
+{
+success: true/false,
+message: 
+“verify otp” /
+“suspended account”
+}

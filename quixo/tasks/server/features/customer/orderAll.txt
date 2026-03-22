@@ -1,12 +1,22 @@
 /api/user/order/all
 Get
-token
-page
-limit
-search
-status
-delivary category
+- token in authentication bearer
+- page
+- limit
+- search
+- status
+- delivary category
+
 Response
-success
-message
-[{order id, product name, product id, status, delivary category,  rider name, rider number, }]s
+{
+success: true/false,
+message:
+    [
+        {order id,
+        product name,
+        product id,
+        rider name,
+        rider number,
+        }
+    ]
+}

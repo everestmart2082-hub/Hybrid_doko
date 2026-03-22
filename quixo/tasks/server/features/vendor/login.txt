@@ -1,8 +1,9 @@
 /api/vender/login/
 Post request
-phone
+- phone
+
 Response
-success - true/false
-message 
-“success”
-“otp verification failure”
+{success : true/false
+message :
+"success"/"otp verification failure"
+}

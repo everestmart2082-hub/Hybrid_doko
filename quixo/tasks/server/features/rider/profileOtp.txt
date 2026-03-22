@@ -1,9 +1,10 @@
 /api/rider/profile/otp
 Post
-otp
-phone
+- otp
+- phone
+
 response
-success
-message
-“successfully updated”
-“otp verification failure”
+{
+success: true/false,
+message: “successfully sent for updation” / “otp verification failure”
+}

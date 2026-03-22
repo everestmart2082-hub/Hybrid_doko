@@ -1,10 +1,15 @@
 /api/user/all
 Get
-page
-limit
-rating
-status {approved, suspended, blacklisted}
+- page
+- limit
+- rating
+- status {approved, suspended, blacklisted}
+
 Response
-success
+{
+success: true/false,
 message:
-[{rider id, name, violations[] }]
+    [
+        {user id, name, violations[] , rating, status, updateRequest}
+    ]
+}

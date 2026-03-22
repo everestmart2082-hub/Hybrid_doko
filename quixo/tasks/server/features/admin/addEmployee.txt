@@ -1,17 +1,21 @@
 /api/admin/employee/add
 Post
-token
-position : string
-salary
-name
-address
-email
-phone
-citizenship
-bank name
-account number
-pan
+- token in authentication bearer
+- position : string
+- salary
+- name
+- address
+- email
+- phone
+- citizenship
+- bank name
+- account number
+- pan
+
 Response
-success
+{
+success: true/false,
 message:
-successfully added
+“successfully added” /
+“server error”
+}

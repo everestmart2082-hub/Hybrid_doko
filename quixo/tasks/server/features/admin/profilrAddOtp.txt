@@ -2,8 +2,12 @@
 Post
 otp
 phone
-response
-success
-message
-“success”
-“otp verification failure”
+
+Response
+{
+success: true/false,
+message:
+“success” /
+“otp verification failure” /
+“server error”
+}

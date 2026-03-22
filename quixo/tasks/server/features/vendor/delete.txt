@@ -1,8 +1,0 @@
-/api/vender/product/delete
-delete
-product id
-Response
-success
-message
-“successfully deleted”
-“server error”

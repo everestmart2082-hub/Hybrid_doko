@@ -1,9 +1,15 @@
 /api/rider/dashboard
 Post
-token
+- token in authentication bearer
+
 Response
-success
-message
-earning
-order delivered number
-order ongoing number
+{success: true/false
+message:
+{earning: number,
+order delivered number: number,
+order ongoing number: number}}
+
+Notes
+- earning is the total earning of the rider
+- order delivered number is the number of orders delivered by the rider
+- order ongoing number is the number of orders ongoing by the rider

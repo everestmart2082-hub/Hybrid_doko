@@ -1,5 +1,5 @@
 Payment
-type - esewa/fonepay/cash on delivary
+type - esewa/fonepay/cash on delivary/fonepay
 transansaction id ?
 amount
 order id

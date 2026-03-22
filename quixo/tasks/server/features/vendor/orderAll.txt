@@ -1,12 +1,15 @@
 /api/vender/order/all
 Post
-page
-limit
-token
-search text
-status
-delivary category
+- page
+- limit
+- search text
+- status
+- delivary category
+- token in authentication bearer
 Response
-success
+{success: true/false,
 message:
-[{order id, order status, product category, delivary category, order time, product id, product number,  rider name, rider number, }]
+[{order id, product name,  product category,order time, product id, product number,  rider name, rider number, }]
+}
+
+- note treate order and orders as suggested in Model folder, 

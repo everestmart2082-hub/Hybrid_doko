@@ -1,11 +1,13 @@
 /api/user/registration/
 Post request
-phone
-email
+- phone
+- email
+
 Response
-success - true/false
-message 
-“success”
-“otp verification failure”
-“already registered”
+{
+success: true/false,
+message: 
+“verify otp”/ 
+“already registered” / 
 “suspended account”
+}

@@ -1,17 +1,21 @@
 /api/admin/employee/update
 Post
-token
-position : string
-salary
-name
-address
-email
-phone
-citizenship
-bank name
-account number
-ifsc code
+- token in authentication bearer
+- position : string
+- salary
+- name
+- address
+- email
+- phone
+- citizenship file
+- bank name
+- account number
+- ifsc code
+
 Response
-success
+{
+success: true/false,
 message:
-successfully updated
+“successfully updated” /
+“server error”
+}

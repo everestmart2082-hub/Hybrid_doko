@@ -1,9 +1,13 @@
 /api/admin/vender/notification
 Post
-token
-vender id
-message
+- token in authentication bearer
+- vender id
+- message
+
 Response
-success
+{
+success: true/false,
 message:
-successfully deleted
+“successfully deleted” /
+“server error”
+}

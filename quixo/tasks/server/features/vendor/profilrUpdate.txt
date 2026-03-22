@@ -1,0 +1,14 @@
+/api/vender/profile/update
+Post
+- in authenticationbearer token
+- number
+- name
+- description
+- address
+- geolocation
+
+Response
+{
+success: true/false,
+message: “verify for otp”/"server error”
+}

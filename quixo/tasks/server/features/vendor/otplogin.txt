@@ -1,10 +1,10 @@
 /api/vender/login/otp
 Post
-otp
-phone
+- otp
+- phone
+
 response
-success
-message
-“success”
-“otp verification failure”
-token
+{success: true/false,
+message: “success” / “otp verification failure”
+token: token
+}

@@ -1,9 +1,13 @@
 /api/user/order/cancel
 delete
-token
-order id
+- token in authentication bearer
+- order id
+
 Response
-success
-message
-“successfully cancelled”
-“already on delivary”
+{
+success: true/false,
+message:
+“successfully cancelled” /
+“already on delivary” /
+“server error”
+}

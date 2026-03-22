@@ -13,6 +13,7 @@ bike color
 type: bike/scooter
 bike insurance paper file
 verified
+updation requested
 suspended
 revenue
 violations : []
@@ -20,3 +21,4 @@ otp
 
 Notes
 - violations are of the form {type: string, date: string, description: string}
+- updation requested is a boolean value to tell admin if an update request is done

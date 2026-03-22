@@ -1,0 +1,11 @@
+/api/user/profile/otp
+Post
+- token in authentication bearer
+- otp
+- phone
+
+Response
+{
+success: true/false,
+message: “successfully updated” / “otp verification failure”
+}

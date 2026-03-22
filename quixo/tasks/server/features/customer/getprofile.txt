@@ -1,11 +1,18 @@
 /api/user/profile/get
 Post
-token
+- token in authentication bearer
+
 Response
-{sucess : true or false,
+{
+success: true or false,
 message:  
-name
-number
-default address
-email\
-“token has expire”, “account has been suspended + violation...”,“account has been blacklisted+ violation...”
+    {
+    name: string,
+    number: string,
+    default address: string,
+    email: string
+    }
+    “token has expire” /
+    “account has been suspended + violation...” /
+    “account has been blacklisted+ violation...”
+}

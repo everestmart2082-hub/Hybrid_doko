@@ -1,9 +1,13 @@
 /api/admin/vender/violations/update
 post
-token
-rider id
-violations[]
+- token in authentication bearer
+- vender id
+- violations[]
+
 Response
-success
+{
+success: true/false,
 message:
-successfully deleted
+“successfully deleted” /
+“server error”
+}

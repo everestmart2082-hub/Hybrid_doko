@@ -1,13 +1,32 @@
 /api/user/order/all
 Post
-page
-limit
-token
-search text
-status
-delivary category
+- page
+- limit
+- search text
+- status
+- delivary category
+- token in authentication bearer
+
 Response
-success
+{
+success: true/false,
 message:
 [orders id
-[{order id, order status, product category, delivary category, order time, product id, product number, }]] -- basically means a list of orders ids and inner list of all the orders present in it
+[{order id, product category, order time, product id, product number, }]] -- basically means a list of orders ids and inner list of all the orders present in it
+}
+
+Notes
+- orders id as in the orders model
+- order id is the id of the order
+- product id is the id of the product
+- product number is the number of the product
+- order time is the time of the order
+- product category is the category of the product
+- order status is the status of the order
+- delivary category is the category of the delivary
+- search text is the text to search for
+- status is the status to filter by
+- delivary category is the category to filter by
+- token is the token of the user
+- page is the page number
+- limit is the number of items per page

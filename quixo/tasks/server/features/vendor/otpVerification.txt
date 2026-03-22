@@ -1,10 +1,10 @@
 /api/vender/registration/otp
 Post
-otp
-phone
+- otp
+- phone
+
 response
-success
-message
-“application submitted”
-“otp verification failure”
-token
+{success: true/false,
+message:  “application submitted” / “otp verification failure”
+token : token
+}

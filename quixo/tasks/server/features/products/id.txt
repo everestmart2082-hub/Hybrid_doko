@@ -1,0 +1,12 @@
+/api/product/id
+Get
+product id
+- token in authentication bearer
+
+Response
+{ success: true/false,
+message:{
+id,Name, brand, short description,price per unit, unit, product catagory, delivary category, stock, brand name, photos, rating, discount, vender name, vender id, iswishlisted
+} or 
+server error, product not found
+}

@@ -1,10 +1,13 @@
 /api/admin/profile/delete
 delete
-token
-reason
-options {pause, delete}
+- token in authentication bearer
+- reason
+- options {pause, delete}
+
 Response
-sucess: true or false
-message
-“successfully paused/delete”
+{
+success: true/false,
+message:
+“successfully paused/delete” /
 “server error”
+}

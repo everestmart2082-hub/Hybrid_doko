@@ -1,12 +1,16 @@
 /api/admin/profile/get
 Post
-token
+token in authentication bearer
+
 Response
-{sucess : true or false,
+{
+success: true/false,
 message:  
-name
-number
-[company paper]
-Address
-email
-wrong phone number
+    {
+        name,
+        number,
+        [company paper],
+        Address,
+        email,
+    }
+}

@@ -1,9 +1,12 @@
 /api/user/wishlist/remove
 post
-token
-final String wishlistid
+- token in authentication bearer
+- wishlist id
+
 Response
-success
-message
-“successfully added to cart”
+{
+success: true/false,
+message:
+“successfully added to cart” /
 “server error”
+}

@@ -1,0 +1,15 @@
+/api/user/profile/update
+Post
+- token in authentication bearer
+- number
+- name
+- description
+- default address
+
+Response
+{
+success: true/false,
+message: 
+“verify otp” / 
+“suspended account”
+}

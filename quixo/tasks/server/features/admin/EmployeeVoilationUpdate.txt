@@ -1,9 +1,13 @@
 /api/admin/employee/violations/update
 post
-token
-rider id
-violations[]
+- token in authentication bearer
+- employee id
+- violations[]
+
 Response
-success
+{
+success: true/false,
 message:
-successfully deleted
+“successfully updated” /
+“server error”
+}

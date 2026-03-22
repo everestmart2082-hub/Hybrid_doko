@@ -1,10 +1,11 @@
 /api/user/login/otp
 Post
-otp
-phone
-response
-success
-message
-“success”
-“otp verification failure”
-token
+- otp
+- phone
+
+Response
+{
+success: true/false,
+message: “success” / “otp verification failure” / “suspended account”,
+token : token
+}

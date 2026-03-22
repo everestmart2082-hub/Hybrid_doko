@@ -1,11 +1,15 @@
 api/admin/user/suspension
 Post
-token
-user id
-suspended: true/false
-response
-success
-message
-successfully suspended
-removed from suspension
+- token in authentication bearer
+- user id
+- suspended: true/false
+
+Response
+{
+success: true/false,
+message:
+“successfully suspended” /
+“removed from suspension” /
+“server error”
+}
 

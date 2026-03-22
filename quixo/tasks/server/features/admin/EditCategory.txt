@@ -1,0 +1,16 @@
+/api/admin/categories/edit
+Post
+token
+category id
+name
+quick/normal
+required [{name:description, hint}]
+others [{name:description, hint}]
+
+Response
+{
+success: true/false,
+message:
+“successfully edited” /
+“server error”
+}

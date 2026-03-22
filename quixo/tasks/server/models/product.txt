@@ -17,6 +17,8 @@ approved
 reason for admin hidden
 hidden
 admin hidden
+submitted for deletion
+submitted for update
 
 Notes
 - approved is a boolean value by admin only
@@ -24,3 +26,4 @@ Notes
 - brand is the products company brand
 - hidden can be done by vendor
 - and admin hidden takes preference over hidden
+- subbmitted for deletion and update will be used by vendor to update or delete product and then admin can finally decide

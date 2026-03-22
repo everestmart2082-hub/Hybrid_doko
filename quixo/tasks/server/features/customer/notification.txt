@@ -1,9 +1,15 @@
 /api/user/notification
 Post
-token
-page
-limit
+- token in authentication bearer
+- page
+- limit
+
 Response
-success
+{
+success: true/false,
 message:
-[message, date]
+    [
+        {message: string,
+        date: string}
+    ]
+}

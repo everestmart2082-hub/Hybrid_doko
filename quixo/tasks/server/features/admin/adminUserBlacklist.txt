@@ -1,11 +1,15 @@
 api/admin/user/blacklist
 Post
-token
-user id
-blacklisted: true/false
-response
-success
-message
-successfully balcklisted
-removed from blacklist
+- token in authentication bearer
+- user id
+- blacklisted: true/false
+
+Response
+{
+success: true/false,
+message:
+“successfully balcklisted” /
+“removed from blacklist” /
+“server error”
+}
 

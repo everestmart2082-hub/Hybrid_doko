@@ -1,9 +1,13 @@
 /api/user/payment
 Get
-user id
-payment method
-response
-success
-message
-order placed
-payment in process
+- token in authentication bearer
+- payment method {khalti, esewa, fonepay, cash on delivary}
+
+Response
+{
+success: true/false,
+message:
+“order placed” /
+“payment in process” /
+“server error”
+}

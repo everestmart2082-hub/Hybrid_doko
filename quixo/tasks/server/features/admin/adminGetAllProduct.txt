@@ -1,18 +1,31 @@
 /api/admin/product/all
 Get
-page
-limit
-min price
-max price
-product category
-delivery category
-vender id
-search text
-stock
-brand
-rating
-hidden
+- page
+- limit
+- min price
+- max price
+- product category
+- delivery category
+- vender id
+- search text
+- stock
+- brand
+- rating
+- hidden,toupdate,approved
+
 Response
-success
+{
+success: true/false,
 message:
-[{Product id, name, short description, price per unit, product category, delivary category, stock, brand name }]
+    [
+        {Product id,
+        name,
+        short description,
+        price per unit,
+        product category,
+        delivary category,
+        stock,
+        brand name
+        }
+    ]
+}

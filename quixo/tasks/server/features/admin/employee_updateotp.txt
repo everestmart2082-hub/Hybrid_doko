@@ -1,0 +1,14 @@
+/api/admin/employee/update/otp
+Post
+- token in authentication bearer
+- otp
+- phone
+
+Response
+{
+success: true/false,
+message:
+“success” /
+“otp verification failure” /
+“server error”
+}

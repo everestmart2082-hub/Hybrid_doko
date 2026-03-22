@@ -1,0 +1,22 @@
+/api/product/all
+Get
+- page
+- limit
+- min price
+- max price
+- product category
+- delivery category
+- vender id
+- search text
+- stock
+- brand
+- rating
+- token as authentication bearer
+Response
+{ success: true/false,
+message:
+[{Product id, name, short description, price per unit, unit, product catagory, delivary category, stock, brand name, photos, rating, discount, vender name, vender id, iswishlisted }]
+}
+
+Notes
+- iswishlisted is a boolean value only when token is not null

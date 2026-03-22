@@ -1,8 +1,12 @@
 /api/admin/employee/delete
 delete
-token
-employee id
+- token in authentication bearer
+- employee id
+
 Response
-success
+{
+success: true/false,
 message:
-successfully deleted
+“successfully deleted” /
+“server error”
+}

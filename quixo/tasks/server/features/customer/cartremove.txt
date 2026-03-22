@@ -1,0 +1,12 @@
+/api/user/cart/remove
+delete
+- cart id
+- token in authentication bearer
+
+Response
+{
+success: true/false,
+message:
+“success” /
+“server error”
+}

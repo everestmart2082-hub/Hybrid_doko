@@ -1,9 +1,15 @@
 /api/rider/notification
 Post
-token
-page
-limit
+- token
+- page
+- limit
+
 Response
-success
+{
+success: true/false,
 message:
-[message, date]
+[
+{message: string,
+date: string}
+]
+}

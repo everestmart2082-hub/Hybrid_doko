@@ -1,0 +1,20 @@
+/api/vender/product/add
+Post
+- Name
+- brand
+- description
+- short descriptions
+- price per unit
+- unit ( kg, .. ) string
+- discount
+- product catagory
+- delivary categpory
+- stock : num
+- Photos [“”,///]
+- in authentication bearer token
+
+Response
+{
+success: true/false,
+message: “successfully submitted for verification” / “server error”
+}

@@ -1,0 +1,13 @@
+/api/admin/categories/hide
+Post
+token
+category id
+hidden - true/false
+
+Response
+{
+success: true/false,
+message:
+“successfully hidden” /
+“server error”
+}

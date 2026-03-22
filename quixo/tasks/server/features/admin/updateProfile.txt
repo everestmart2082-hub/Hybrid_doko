@@ -1,11 +1,15 @@
 /api/admin/profile/update
 Post
-token
-number
-name
-description
-address
+- token in authentication bearer
+- number
+- name
+- description
+- address
+
 Response
-success - true/false
+{
+success: true/false,
 message
-“verify otp”
+“verify otp”/
+“server error”
+}

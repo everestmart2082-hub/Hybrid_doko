@@ -6,9 +6,14 @@ Pan
 store Name
 Address
 email
-Business Type {textile, garment ....} : string
+Business Type {textile, garment ....} : enum string
 Description
-geolocation
+geolocation : string
 
 Response
-success - true/false
+{success: true/false,
+message: "application submitted" | "application submission failed"
+}
+
+
+

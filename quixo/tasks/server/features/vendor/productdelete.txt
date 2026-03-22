@@ -1,0 +1,10 @@
+/api/vender/product/delete
+delete
+- product id
+- in authentication bearer token
+
+Response
+{
+success: true/false,
+message: “successfully submitted for deletion” / “server error”
+}

@@ -1,11 +1,16 @@
 api/admin/vender/approve
 Post
-token
-vender id
-approved: true/false
-response
-success
-message
-successfully approved
-desapproved
+- token in authentication bearer
+- vender id
+- approved: true/false
+- update : true/false
+
+Response
+{
+success: true/false,
+message:
+“successfully approved” /
+“desapproved” /
+“server error”
+}
 

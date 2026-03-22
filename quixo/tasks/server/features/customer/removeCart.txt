@@ -1,9 +1,0 @@
-/api/user/cart/remove
-delete
-cart id
-token
-Response
-success
-message
-“success”
-“server error”

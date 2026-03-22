@@ -1,0 +1,10 @@
+/api/vender/profile/otp
+Post
+- otp
+- phone
+
+response
+{
+success: true/false,
+message: “successfully applied for verification” / "server error"
+}

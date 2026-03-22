@@ -1,7 +1,10 @@
 /api/rider/generate_otp
 Post
-token
-order id
+- token in authentication bearer
+- order id
+
 response
-sucess
-message
+{
+success: true/false,
+message: “successfully generated otp” / “server error”
+}

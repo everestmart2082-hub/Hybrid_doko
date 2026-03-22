@@ -1,0 +1,16 @@
+/api/admin/categories/add
+Post
+token
+name
+quick/normal
+required [{name:description, hint}]
+others [{name:description, hint}]
+
+
+Response
+{
+success: true/false,
+message:
+“successfully added” /
+“server error”
+}

@@ -1,9 +1,12 @@
 /api/user/wishlist/add
 post
-token
-final String productId
+- token in authentication bearer
+- product id
+
 Response
-success
-message
-“successfully added to cart”
+{
+success: true/false,
+message:
+“successfully added to cart” /
 “server error”
+}
