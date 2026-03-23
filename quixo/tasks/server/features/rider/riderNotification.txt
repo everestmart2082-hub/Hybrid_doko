@@ -1,6 +1,6 @@
 /api/rider/notification
 Post
-- token
+- token in authentication bearer
 - page
 - limit
 

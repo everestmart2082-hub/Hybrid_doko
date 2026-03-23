@@ -1,0 +1,20 @@
+
+
+
+-----------------------
+
+Name ______________________
+brand ______________________
+short descriptions ______________________ multiline upto 50 words
+description ______________________ multiline
+price per unit ______________________
+unit [select from kg....]
+discount % ______________________
+product catagory [select from categories from /api/category/all]
+stock _______________
+Photos [choose file] [Add more]
+
+            [Add product / Send For Update] [Delete product if already exists]
+
+
+-------------------------

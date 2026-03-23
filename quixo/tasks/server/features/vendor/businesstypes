@@ -1,0 +1,18 @@
+/api/vendor/businessTypes 
+Get
+
+Response
+{
+    success: true/false,
+    message: "business types fetched successfully" | "business types fetch failed",
+    data: [
+        {
+            id: 1,
+            name: "textile"
+        },
+        {
+            id: 2,
+            name: "garment"
+        }
+    ]
+}

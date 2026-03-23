@@ -1,0 +1,25 @@
+
+-----------------------------------------------
+
+------------------
+    |                 | name   brandname
+    |  product image |  price unit
+    |                | vendor name 
+                        short description
+    <..1 2 3 .... >     Delivary category     Product category
+                        Long Description
+                        Required Items list
+                            item 1
+                            item 2
+                            item 3
+                            ...
+                        Optional items list
+                            item 1
+                            item 2
+                            item 3
+                            ...
+    ------------------  [Edit Product only if this belongs to this vendor]
+
+
+    - every detail comes in the /api/product/id ...
+    after clicking edit go to productEditorAdd page

@@ -1,6 +1,8 @@
 /api/vender/order/prepared/
 Post
 - token in authentication bearer
+- vendor id
+- order id
 
 Response
 {

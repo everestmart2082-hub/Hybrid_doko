@@ -1,0 +1,19 @@
+/api/category/all
+Get
+- query
+
+Response
+{
+    success: true/false,
+    message: "category fetched successfully" | "category fetch failed",
+    data: [
+        {
+            id: 1,
+            name: "category 1"
+        },
+        {
+            id: 2,
+            name: "category 2"
+        }
+    ]
+}

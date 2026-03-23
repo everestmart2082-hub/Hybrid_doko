@@ -2,7 +2,7 @@
 Post
 name
 number
-Pan
+Pan file
 store Name
 Address
 email

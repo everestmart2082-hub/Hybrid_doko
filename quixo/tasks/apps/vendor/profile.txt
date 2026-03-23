@@ -1,0 +1,62 @@
+
+
+
+--------------------------------------
+
+name
+number
+Pan file
+store Name
+Address
+email
+Business Type
+Description
+verified [green tick if yes]
+suspended [red cross if yes]
+revenue [total revenue]
+geolocatiuon : string
+violations 
+    ...violation 1
+    ...violation 2
+    ...
+Update Requested [green tick if yes]
+EDIT BUTTON
+
+------------------------------------
+
+- after clicking Edit open below Screen
+
+--------------------------------------
+
+- number _______________
+- name ______________________
+- description _________________...multiline...
+- address ______________________
+- geolocation [use autolocation]
+
+Update profile
+--------------------------------------
+
+- After clicking update profile show a dialog box to give otp
+
+
+------------------------------
+
+    OTP _________________
+    Okay
+--------------------------
+
+- phone number is of 10 digits, keep the check 
+- otp is of 6 digits, keep the check
+- check email correctness
+- from server fetch the options for the Business Type (/api/vendor/businessTypes get)
+
+Then finally show , Success message 
+
+------------------------------
+
+    according to the api message show
+    Okay
+--------------------------
+
+- after clicking Okay, close the dialog box , return to the dashboard Screen and in profile green tick UpdateRequested

@@ -1,0 +1,124 @@
+
+
+
+- only show orders that don't have rider accepted
+------------------------------------------
+    [Preparing]    Pending   Delivered   CancelledByUser   CancelledByVender   Returned
+
+    orders id      [Accept Order]
+        ------------------
+        |                |  product name  product category
+        |  product image |  vendor name
+        |                |  order id     order date    delivary category
+        ------------------  number of products ordered
+        |                |  
+        |                |  
+        |                |   
+
+
+        
+        ------------------
+        |                |  product name  product category
+        |  product image |  vendor name
+        |                |  order id     order date    delivary category
+        ------------------  number of products ordered
+        |                |  
+        |                |  
+        |                |    
+
+
+    orders id     [Accept Order]
+        ------------------
+        |                |  product name  product category
+        |  product image |  vendor name
+        |                |  order id     order date    delivary category
+        ------------------  number of products ordered
+        |                |  
+        |                |  
+        |                |    
+
+
+        
+        ------------------
+        |                |  product name  product category
+        |  product image |  vendor name
+        |                |  order id     order date    delivary category
+        ------------------  number of products ordered
+        |                |  
+        |                |  
+        |                |   
+
+
+
+    
+
+            Prev 1 2 ...N next
+
+
+-----------------------------------------------
+
+- when accept is pressed the order goes to this rider for delivary
+
+
+show only this rider devery items
+------------------------------------------
+    [Preparing]    Pending   Delivered   CancelledByUser   CancelledByVender   Returned
+
+    Orders id         [Deliver Button] [Reject Order]
+            ------------------
+            |                |  product name  product category
+            |  product image |  vendor name
+            |                |  order id     order date    delivary category
+            ------------------  number of products ordered
+            |                |  
+            |                |  
+            |                | 
+
+
+            
+            ------------------
+            |                |  product name  product category
+            |  product image |  vendor name
+            |                |    order id     order date    delivary category
+            ------------------  number of products ordered
+            |                |  
+            |                |  
+            |                | 
+
+
+
+    Orders id        [Deliver Button] [Reject Order]
+            ------------------
+            |                |  product name  product category
+            |  product image |  vendor name
+            |                |  order id     order date    delivary category
+            ------------------  number of products ordered
+            |                |  
+            |                |  
+            |                | 
+
+
+            
+            ------------------
+            |                |  product name  product category
+            |  product image |  vendor name
+            |                |    order id     order date    delivary category
+            ------------------  number of products ordered
+            |                |  
+            |                |  
+            |                |
+
+    
+
+            Prev 1 2 ...N next
+
+
+-----------------------------------------------
+
+- when deliver is pressed, the customer will receive an otp, that the rider has to fill thus marking order as delivered , call generateOtp api and then deliver api
+- when reject is pressed , ask for reason in a dialogbox and then move the order again for the riders to accept by removing rider for that order 
+
+
+
+and such for other tabs as well
+only preparing tab has a button to respond...

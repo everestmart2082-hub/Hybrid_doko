@@ -1,7 +1,6 @@
 /api/user/order/delievered/
 Post
 - token in authentication bearer
-- otp
 - orders id
 
 response

@@ -1,0 +1,12 @@
+-------------------
+            notifications
+
+    1 Message           date
+    2 Message           date
+    3 Message           date
+    4 Message           date
+    5 Message           date
+
+
+    Prev 1 2 ...N next
+--------------------------

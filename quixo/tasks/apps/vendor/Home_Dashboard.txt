@@ -1,0 +1,23 @@
+
+
+
+----------------------------------
+    Total Orders 
+        Preparing
+        Prepared
+        Delivered
+        CancelledByUser
+        CancelledByVender
+        Returned
+
+    Total revenue
+    Chart
+        
+    Product
+        Total products
+        Out of stock
+        Low stock
+        Active
+        Inactive
+
+-----------------------------------

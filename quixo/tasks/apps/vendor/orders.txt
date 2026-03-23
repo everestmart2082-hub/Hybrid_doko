@@ -1,0 +1,87 @@
+
+
+
+
+------------------------------------------
+    [Preparing]    Pending   Delivered   CancelledByUser   CancelledByVender   Returned
+
+    Search _______________
+    delivery categories
+        Normal 
+        Quick
+
+    ------------------
+    |                |  product name  product category
+    |  product image |  vendor name
+    |                |  order id     order date    delivary category
+    ------------------  number of products ordered
+    |                |  rider name
+    |                |  rider number
+    |                |  [Prepared Buton]    
+
+
+    
+    ------------------
+    |                |  product name  product category
+    |  product image |  vendor name
+    |                |  order id     order date    delivary category
+    ------------------  number of products ordered
+    |                |  rider name
+    |                |  rider number
+    |                |  [Prepared Buton]    
+
+
+
+    
+
+            Prev 1 2 ...N next
+
+
+-----------------------------------------------
+
+
+
+Another tab "Prepared"
+
+
+
+------------------------------------------
+    [Preparing]    Pending   Delivered   CancelledByUser   CancelledByVender   Returned
+
+    Search _______________
+    delivery categories
+        Normal 
+        Quick
+
+    ------------------
+    |                |  product name  product category
+    |  product image |  vendor name
+    |                |  order id     order date    delivary category
+    ------------------  number of products ordered
+    |                |  rider name
+    |                |  rider number
+    |                |  Order status 
+
+
+    
+    ------------------
+    |                |  product name  product category
+    |  product image |  vendor name
+    |                |  order id     order date    delivary category
+    ------------------  number of products ordered
+    |                |  rider name
+    |                |  rider number
+    |                |  Order status  
+
+
+
+    
+
+            Prev 1 2 ...N next
+
+
+-----------------------------------------------
+
+
+and such for other tabs as well
+only preparing tab has a button to respond...

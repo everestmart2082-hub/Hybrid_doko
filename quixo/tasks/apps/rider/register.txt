@@ -4,15 +4,19 @@ below is the layout of this Screen
 ---------------------------------------------------
                     Register
 
-        name ______________________
-        phone(+997) ______________________
-        email ______________________
-        pan [choose file]
-        store Name ______________________
-        Address ______________________
-        Business Type [options : textile, garment ....]
-        Description _________________...multiline...
-        geolocation [use autolocation]
+                
+        name  _________________
+        phone(+977)  _________________
+        email  _________________
+        Rc Book file  [select file]
+        Citizenship file  [select file]
+        pan card file  [select file]
+        Address  _________________
+        bike model  _________________
+        bike number  _________________
+        bike color  _________________
+        type: [bike/scooter/cycle]
+        bike insurance paper file  [select file]
 
                 Register Button
 

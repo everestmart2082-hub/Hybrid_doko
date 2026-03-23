@@ -1,7 +1,7 @@
 /api/rider/generate_otp
 Post
 - token in authentication bearer
-- order id
+- orders id
 
 response
 {
