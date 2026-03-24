@@ -1,0 +1,38 @@
+
+
+--------------------------------
+App Name            search ______________________
+|                    |    
+|                    |  
+|                    |  
+|     Hero section               |  
+|                    |  
+|                    |  
+|                    |  
+
+Recommendations
+
+
+    ------------------                      ------------------
+    |          Wishlist icon |            |          Wishlist icon |
+    |  product image |                    |  product image |
+    |                |                    |                |
+    ------------------                      ------------------
+    name     price/price-discount unit      name     price/price-discount unit     ...... [More]
+    brand name                              brand name
+    short Description                       short Description
+    vendor name                             vendor name
+    rating                                  rating
+     [Add To Cart]                         [Add To Cart]
+ [Prev]------------------                      ------------------                 [Next]
+
+Footer
+COntact
+email
+location
+
+
+------------------------------
+
+on clicking item go to product details page
+on clicking search go to productlist page

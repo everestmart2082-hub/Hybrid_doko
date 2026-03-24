@@ -1,0 +1,32 @@
+
+
+
+----------------------------
+Wishlist
+
+------------------                 
+|                |  name     price/price-discount unit          
+|  product image |   brand name                 
+|                |   short Description          
+------------------    [Remove From Wishlist]
+
+
+------------------                 
+|                |  name     price/price-discount unit          
+|  product image |   brand name                 
+|                |   short Description          
+------------------    [Remove From Wishlist]
+
+
+------------------                 
+|                |  name     price/price-discount unit          
+|  product image |   brand name                 
+|                |   short Description          
+------------------    [Remove From Wishlist]
+....
+
+
+
+------------------------------
+
+on clicking the listItem , will open in productDetails page

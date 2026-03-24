@@ -1,0 +1,31 @@
+Register Screen
+
+below is the layout of this Screen
+---------------------------------------------------
+                    Register
+
+                
+        name  _________________
+        phone(+977)  _________________
+        email  _________________
+
+                Register Button
+
+        Already have an account? Login
+
+-----------------------------------------------------
+
+
+- After clicking Register button open a dialogbox to enter otp
+
+
+------------------------------
+
+    OTP _________________
+    Okay
+--------------------------
+
+- phone number is of 10 digits, keep the check 
+- otp is of 6 digits, keep the check
+- check email correctness
+- from server fetch the options for the Business Type (/api/vendor/businessTypes get)

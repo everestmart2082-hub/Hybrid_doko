@@ -6,6 +6,7 @@ suspend
 deactivate
 otp
 violations : []
+messages : []
 
 Notes
 - violations are of the form {type: string, date: string, description: string}

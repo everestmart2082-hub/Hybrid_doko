@@ -1,0 +1,80 @@
+
+
+
+----------------------------------------------------
+
+
+------------------                 
+|                |  name     total price after discount          
+|  product image |   brand name                 
+|                |   short Description          
+------------------  
+
+
+
+------------------                 
+|                |  name     total price after discount          
+|  product image |   brand name                 
+|                |   short Description          
+------------------  
+
+
+
+------------------                 
+|                |  name     total price after discount          
+|  product image |   brand name                 
+|                |   short Description          
+------------------  
+...
+
+
+Select Address
+
+[Address 1]
+
+[Address 2]
+
+[Address 3]
+
+...
+[Create Address Button]
+
+
+Total Amount                _______________
+Delivary Charge             _______________ 
+Total including vat                       _______________
+
+Select Payment method
+    Khalti
+    Esewa
+    Fonepay
+    Cash on Delivery
+
+[Place Order Button]
+------------------------------------------------------
+
+
+
+On clicking create address button in addressPage page
+if delivary category is quick then
+delivary charrge will be 50 if lessa than 500 otherwise 0
+
+if delivary category is normal then
+delivary charrge will be 100 if lessa than 1000 otherwise 0
+
+
+
+Then payment page on the basis of selection of payment method 
+--------------------
+----------------------
+
+
+Finally after payment or after cash on delivary chosen
+-------------------------
+
+    Cart Added to order 
+     [Return to home]
+
+-----------------------------
+
+o clicking Return to home button move to home page

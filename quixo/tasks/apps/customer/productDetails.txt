@@ -1,0 +1,61 @@
+
+-----------------------------------------------
+
+------------------
+    |                 | name   brandname
+    |  product image |  price / price-discount unit
+    |                | vendor name 
+                        short description
+    <..1 2 3 .... >     Delivary category     Product category
+                        Long Description
+                        Required Items list
+                            item 1
+                            item 2
+                            item 3
+                            ...
+                        Optional items list
+                            item 1
+                            item 2
+                            item 3
+                            ...
+    ------------------  [-]  1 [+] unit     [Add To Cart]
+
+    Reviews      (total rating average)  [Add Review stars]
+    Userid   message  rating
+    userid   message rating
+    [Add Review]
+
+
+    Recommendations
+    ---------------------------------------------
+    ------------------                      ------------------
+    |          Wishlist icon |            |          Wishlist icon |
+    |  product image |                    |  product image |
+    |                |                    |                |
+    ------------------                      ------------------
+    name     price/price-discount unit      name     price/price-discount unit
+    brand name                              brand name
+    short Description                       short Description
+    vendor name                             vendor name
+    rating                                  rating
+     [Add To Cart]                         [Add To Cart]
+    ------------------                      ------------------
+    ------------------                      ------------------
+    |          Wishlist icon |            |          Wishlist icon |
+    |  product image |                    |  product image |
+    |                |                    |                |
+    ------------------                      ------------------
+    name     price/price-discount unit      name     price/price-discount unit
+    brand name                              brand name
+    short Description                       short Description
+    vendor name                             vendor name
+    rating                                  rating
+     [Add To Cart]                         [Add To Cart]
+    ------------------                      ------------------
+
+------------------------------------------------------------------
+
+
+
+    - every detail comes in the /api/product/id ...
+    after clicking Addtocart , add the product to cart

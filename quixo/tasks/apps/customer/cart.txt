@@ -1,0 +1,48 @@
+
+
+-----------------------------------------------
+Cart
+
+[Quick products]    Normal Products
+
+------------------                 
+|                |  name     price/price-discount unit          
+|  product image |   brand name                 
+|                |   short Description          
+------------------   [-] (number) [+] unit    [Remove From Cart]      
+
+
+------------------                 
+|                |  name     price/price-discount unit          
+|  product image |   brand name                 
+|                |   short Description          
+------------------   [-] (number) [+] unit    [Remove From Cart]      
+
+
+------------------                 
+|                |  name     price/price-discount unit          
+|  product image |   brand name                 
+|                |   short Description          
+------------------   [-] (number) [+] unit    [Remove From Cart]      
+
+
+------------------                 
+|                |  name     price/price-discount unit          
+|  product image |   brand name                 
+|                |   short Description          
+------------------   [-] (number) [+] unit    [Remove From Cart]      
+  
+                                    
+------------------       
+
+                [Checkout Button]
+
+---------------------------------------------
+
+- on clicking the cart open the product in productDetails page
+- on clicking remove from cart remove the product from cart
+- on clicking + or - increase or decrease the number of units
+- on clicking checkout move to checkout page
+
+- Quick Products only contain product of delivery category quick 
+- Normal Products only contain product of delivery category normal

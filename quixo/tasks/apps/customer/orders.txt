@@ -1,0 +1,95 @@
+
+
+
+---------------------------------------
+Filter
+    preparing ,pending
+    delivered
+    cancelledByUser,cancelledByVender,returned
+
+[Quick] [Normal]
+
+Orders ID                   [cancel All]
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description   
+                            order status       
+        ------------------  [cancel this order]   
+
+        
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description        
+                            order status     
+        ------------------  [cancel this order]
+
+        
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description       
+                            order status      
+        ------------------  [cancel this order]
+        ....
+
+
+
+Orders ID                   [cancel All]
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description        
+                            order status     
+        ------------------  [cancel this order]
+
+        
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description       
+                            order status      
+        ------------------  [cancel this order]
+
+        
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description       
+                            order status      
+        ------------------  [cancel this order]
+        ....
+
+Orders ID                   [cancel All]
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description       
+                            order status      
+        ------------------  [cancel this order]
+
+        
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description          
+        ------------------  [cancel this order]
+
+        
+        ------------------     
+        |                |  name     OrderId         
+        |  product image |   brand name                 
+        |                |   short Description       
+                            order status      
+        ------------------  [cancel this order]
+        ....
+
+....
+
+
+
+
+-----------------------------------------
+
+- orders can oly be cancelled at preparing phase, cannot cancel order after delivery status is pending

@@ -1,0 +1,44 @@
+
+
+-----------------------------------
+
+Name : 
+Email : 
+Phone : 
+
+Default Address
+    Address 
+    [Change]
+
+Other Addresses
+    Address 
+    Address 
+    ...
+    [Add address]
+
+[Edit profile]
+
+----------------------------------------
+- default address id is stired in sharedprefereeences
+
+
+Edit profile
+------------------------
+
+Name : _______________ 
+Email : _______________
+Phone : _______________
+
+[Verify otp]
+-------------------------
+
+
+------------------------------
+
+    OTP _________________
+    Okay
+--------------------------
+
+- phone number is of 10 digits, keep the check 
+- otp is of 6 digits, keep the check
+- 

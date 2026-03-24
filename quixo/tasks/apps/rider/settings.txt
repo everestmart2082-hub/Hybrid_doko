@@ -1,0 +1,25 @@
+
+
+
+-----------------------------
+        Settings
+
+    Theme
+        amberDark
+        amberLight
+        orangeDark
+        orangeLight
+        ...
+
+    Language
+        English
+        Nepali
+        ...
+
+    About
+        version
+        developer
+        license
+        ...
+
+---------------------------
