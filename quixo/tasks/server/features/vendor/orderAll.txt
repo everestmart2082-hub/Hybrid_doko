@@ -7,6 +7,8 @@ Post
 - delivary category
 - token in authentication bearer
 - vendor id
+
+
 Response
 {success: true/false,
 message:

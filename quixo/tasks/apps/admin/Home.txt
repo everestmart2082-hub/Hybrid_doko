@@ -1,0 +1,11 @@
+
+
+---------------------------
+
+| Total Revenue
+| Total Orders preparing , prepared , delivered, CancelledByUser, CancelledByVender, Returned
+| Total Riders verified, suspended, upaderequested, waitingforverification
+| Total Vendors verified, suspended, upaderequested, waitingforverification
+| Total Employees verified, suspended, upaderequested, waitingforverification
+| Total Products hidden, approved, toupdate, waitingforverification
+| Total categories

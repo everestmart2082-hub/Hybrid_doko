@@ -11,6 +11,7 @@ Post
 - delivary categpory
 - stock : num
 - Photos [“”,///]
+- vendor id
 - in authentication bearer token
 
 Response

@@ -18,7 +18,10 @@ suspended
 revenue
 violations : []
 otp
+updatesproposed : {name:"",Address:"",email:"",Description:"",geolocatiuon:""}
+message : []
 
 Notes
 - violations are of the form {type: string, date: string, description: string}
 - updation requested is a boolean value to tell admin if an update request is done
+- message is an array of objects of the form {type: string, date: string, description: string}

@@ -1,0 +1,29 @@
+
+
+Login Screen
+
+below is the layout of this Screen
+---------------------------------------------------
+                    Login
+
+        phone(+977) ______________________
+
+                Login Button
+
+        Don't have an account? Register
+
+-----------------------------------------------------
+
+
+- After clicking Login button open a dialogbox to enter otp
+
+
+------------------------------
+
+    OTP _________________
+    Okay
+--------------------------
+
+- phone number is of 10 digits, keep the check 
+- otp is of 6 digits, keep the check
+- 

@@ -1,0 +1,28 @@
+
+-----------------------------------------------
+
+------------------
+    |                 | name   brandname
+    |  product image |  price / price-discount unit
+    |                | vendor name 
+                        short description
+    <..1 2 3 .... >     Delivary category     Product category
+                        Long Description
+                        Required Items list
+                            item 1
+                            item 2
+                            item 3
+                            ...
+                        Optional items list
+                            item 1
+                            item 2
+                            item 3
+                            ...
+    ------------------ hidden approved toupdate
+    [Hide/Unhide Product] [Approve/Unapprove Product] [check update proposal] [update/remove update]
+------------------------------------------------------------------
+
+
+
+    - every detail comes in the /api/product/id ...
+    after clicking Addtocart , add the product to cart

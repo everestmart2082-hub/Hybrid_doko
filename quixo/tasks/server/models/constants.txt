@@ -1,0 +1,11 @@
+name
+types list[]
+
+
+
+- example 
+    Business type
+        - texxtile
+        - garment
+        - ...
+    

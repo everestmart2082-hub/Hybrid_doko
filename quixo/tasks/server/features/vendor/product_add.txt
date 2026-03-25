@@ -12,6 +12,7 @@ Post
 - stock : num
 - Photos [“”,///]
 - in authentication bearer token
+- vendor id
 
 Response
 {

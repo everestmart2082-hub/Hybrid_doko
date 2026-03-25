@@ -3,6 +3,7 @@ post
 - token in authentication bearer
 - page
 - limit
+- user id
 
 Response
 {

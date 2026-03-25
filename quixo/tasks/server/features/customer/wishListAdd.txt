@@ -2,6 +2,7 @@
 post
 - token in authentication bearer
 - product id
+- user id
 
 Response
 {

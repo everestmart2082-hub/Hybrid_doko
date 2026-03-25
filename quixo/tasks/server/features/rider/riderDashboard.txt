@@ -1,6 +1,7 @@
 /api/rider/dashboard
 Post
 - token in authentication bearer
+- rider id
 
 Response
 {success: true/false

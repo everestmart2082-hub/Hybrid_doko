@@ -1,6 +1,7 @@
 /api/admin/product/id
 Get
 product id
+token in authentication bearer
 
 Response
 {

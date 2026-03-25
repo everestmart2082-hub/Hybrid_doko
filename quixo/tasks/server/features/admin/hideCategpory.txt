@@ -1,6 +1,6 @@
 /api/admin/categories/hide
 Post
-token
+token in authentication bearer
 category id
 hidden - true/false
 

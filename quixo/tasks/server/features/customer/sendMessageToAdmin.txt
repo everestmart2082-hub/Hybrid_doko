@@ -8,3 +8,4 @@ Response:
 {status: true/false,
 message: "message sent successfully"/"message not sent"}
 
+- it should be placed in customer mode . messages

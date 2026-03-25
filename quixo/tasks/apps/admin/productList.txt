@@ -1,0 +1,78 @@
+
+
+
+left side of the page and is a scrollable
+----------------------------------------
+                search ______________________    
+
+Filter
+sort By 
+    default
+    price low to high
+    price high to low
+    rating
+    discount 
+    newest
+    oldest
+vender
+    all
+    ---names of vendors from /api/vendor/all get
+ratings    
+    1 star
+    2 star
+    3 star
+    4 star
+    5 star
+catagory
+    all
+    --names of all catagory from /api/category/all get
+price range
+    min price _______________
+    max price _______________
+
+hidden [checkbox] 
+toupdate [checkbox]
+approved [checkbox]
+
+
+-------------------------------
+
+body of the page and right side 
+-------------------------------------
+    ------------------                      ------------------
+    |          Wishlist icon |            |          Wishlist icon |
+    |  product image |                    |  product image |
+    |                |                    |                |
+    ------------------                      ------------------
+    name     price/price-discount unit      name     price/price-discount unit
+    brand name                              brand name
+    short Description                       short Description
+    vendor name                             vendor name
+    rating                                  rating
+     hidden approved toupdate                 hidden approved toupdate
+     [Hide/Unhide Product]                  [Hide/Unhide Product]
+     [Approve/Unapprove Product]            [Approve/Unapprove Product]
+     [check update proposal] [update/remove update] [check update proposal] [update/remove update]
+    ------------------                      ------------------
+    ------------------                      ------------------
+    |          Wishlist icon |            |          Wishlist icon |
+    |  product image |                    |  product image |
+    |                |                    |                |
+    ------------------                      ------------------
+    name     price/price-discount unit      name     price/price-discount unit
+    brand name                              brand name
+    short Description                       short Description
+    vendor name                             vendor name
+    rating                                  rating
+     hidden approved toupdate                 hidden approved toupdate
+     [Hide/Unhide Product]                  [Hide/Unhide Product]
+     [Approve/Unapprove Product]            [Approve/Unapprove Product]
+     [check update proposal] [update/remove update] [check update proposal] [update/remove update]
+    ------------------                      ------------------
+...
+
+
+        prev <--- 1 2 3 ... N ---> next
+-------------------------------------
+
+- after clicking on the card move to product details page

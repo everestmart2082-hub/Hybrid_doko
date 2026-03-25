@@ -1,6 +1,7 @@
 /api/vender/product/delete
 delete
 - product id
+- vendor id
 - in authentication bearer token
 
 Response

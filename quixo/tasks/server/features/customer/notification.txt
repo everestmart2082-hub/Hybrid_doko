@@ -3,6 +3,7 @@ Post
 - token in authentication bearer
 - page
 - limit
+- user id
 
 Response
 {
@@ -13,3 +14,5 @@ message:
         date: string}
     ]
 }
+
+- use notification model for this purpose

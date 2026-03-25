@@ -3,6 +3,7 @@ delete
 - authentication bearer token
 - reason
 - options : {pause, delete}
+- vendor id
 
 Response
 {

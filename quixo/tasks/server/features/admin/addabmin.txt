@@ -1,0 +1,12 @@
+/api/admin/addAdmin
+- name
+- email
+- number 
+- token in authentication bearer
+
+Response
+{
+success: true/false,
+message:  
+    "verify otp" / "admin already exists"/"server error"
+}

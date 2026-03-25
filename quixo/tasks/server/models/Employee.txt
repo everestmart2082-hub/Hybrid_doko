@@ -9,6 +9,7 @@ citizenship file
 bank name
 account number
 pan file
+suspended
 violations : []
 
 Notes

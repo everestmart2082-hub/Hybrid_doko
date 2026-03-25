@@ -11,3 +11,5 @@ message:
 “successfully deleted” /
 “server error”
 }
+
+- use the notification model for this purpose

@@ -3,6 +3,7 @@ Post
 - token in authentication bearer
 - page
 - limit
+- rider id
 
 Response
 {
@@ -13,3 +14,5 @@ message:
 date: string}
 ]
 }
+
+- use the notification model for this purpose

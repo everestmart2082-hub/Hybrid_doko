@@ -3,6 +3,7 @@ Post
 - token in authentication bearer
 - rider id
 - rating
+- user id
 
 Response
 {

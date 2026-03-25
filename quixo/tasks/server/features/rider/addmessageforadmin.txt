@@ -1,0 +1,12 @@
+/api/rider/message
+- token in authentication bearer
+- message
+- rider id
+
+Response
+{
+success: true/false,
+message: “message sent successfully” / “server error”
+}
+
+- add this message in rider model.messages

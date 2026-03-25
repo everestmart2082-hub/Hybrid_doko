@@ -2,6 +2,7 @@
 Get
 - token in authentication bearer
 - payment method {khalti, esewa, fonepay, cash on delivary}
+- user id
 
 Response
 {

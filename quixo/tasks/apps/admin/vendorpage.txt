@@ -1,0 +1,67 @@
+
+
+
+-----------------------------
+Vendor            
+
+
+
+| name
+| number
+| Pan file
+| store Name
+| Address
+| email
+| Business Type
+| Description
+| verified
+| suspended
+| revenue
+| geolocatiuon
+| violations 
+    - violation 1 [delete]
+    - violation 2 [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend] [verify/unverify]
+
+
+
+
+
+| name
+| number
+| Pan file
+| store Name
+| Address
+| email
+| Business Type
+| Description
+| verified
+| suspended
+| blacklisted
+| revenue
+| geolocatiuon
+| messages
+    - message 1 date description 
+    - message 2 date description
+    ...
+| violations 
+    - violation 1 [delete]
+    - violation 2 [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend] [verify/unverify]
+
+
+
+....
+
+Prev   1 2 3 ...    Next
+
+---------------------------------
+
+
+
+
+

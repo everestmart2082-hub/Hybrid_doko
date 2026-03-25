@@ -1,0 +1,12 @@
+/api/admin/addAdminOtp
+- number
+- otp
+
+Response
+{
+success: true/false,
+message:  
+    "success" / "otp verification failure" / "server error"
+    
+token: token
+}

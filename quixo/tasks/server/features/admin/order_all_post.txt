@@ -1,4 +1,4 @@
-/api/vender/order/all
+/api/admin/order/all
 Post
 - page
 - limit

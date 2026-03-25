@@ -19,6 +19,7 @@ hidden
 admin hidden
 submitted for deletion
 submitted for update
+updatesproposed - {name:"",brand:"",short descriptions:"",description:"",price per unit:"",unit:"",discount:"",product catagory:"",stock:"",Photos:[],vender id:"",rating:"",approved:"",review ids:[],reason for admin hidden:"",hidden:"",admin hidden:"",submitted for deletion:"",submitted for update:""}
 
 Notes
 - approved is a boolean value by admin only

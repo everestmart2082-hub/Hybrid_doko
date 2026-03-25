@@ -2,6 +2,7 @@
 delete
 - token in authentication bearer
 - order id
+- user id
 
 Response
 {

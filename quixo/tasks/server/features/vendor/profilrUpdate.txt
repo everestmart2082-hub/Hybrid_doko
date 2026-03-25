@@ -6,6 +6,7 @@ Post
 - description
 - address
 - geolocation
+- vendor id
 
 Response
 {

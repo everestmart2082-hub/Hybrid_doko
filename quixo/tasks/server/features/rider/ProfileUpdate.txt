@@ -4,6 +4,7 @@ Post
 - number
 - description
 - default address
+- rider id
 
 Response
 {

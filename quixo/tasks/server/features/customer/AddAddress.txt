@@ -8,6 +8,7 @@ Post
 - landmark
 - phone number
 - email
+- user id
 
 Response
 {

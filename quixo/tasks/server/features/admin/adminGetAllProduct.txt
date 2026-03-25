@@ -25,7 +25,10 @@ message:
         product category,
         delivary category,
         stock,
-        brand name
+        brand name,
+        hidden,
+        approved,
+        toupdate
         }
     ]
 }

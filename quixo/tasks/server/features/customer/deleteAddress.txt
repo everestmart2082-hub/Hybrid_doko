@@ -2,6 +2,7 @@
 delete
 - token in authentication bearer
 - address id
+- user id
 
 Response
 {

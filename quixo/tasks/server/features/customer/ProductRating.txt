@@ -3,6 +3,7 @@ Post
 - token in authentication  bearer
 - product id
 - rating
+- user id
 
 Response
 {

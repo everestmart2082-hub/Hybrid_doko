@@ -1,0 +1,13 @@
+/api/vendor/chart/month
+- vendor id
+
+Response
+{
+    success : true,
+    message : "success",
+    chart: {
+        day ,
+        revenue,
+        orders,
+    }
+}

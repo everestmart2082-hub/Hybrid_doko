@@ -3,6 +3,7 @@ delete
 - token in authentication bearer
 - reason
 - options {pause, delete}
+- rider id
 
 Response
 {

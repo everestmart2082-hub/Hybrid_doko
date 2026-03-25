@@ -1,0 +1,15 @@
+/api/admin/changeConstants
+Post
+- token in authentication bearer
+- name
+- type list []
+- admin id
+- doingwhat = add, remove, update
+
+Response
+{
+    success: true/false,
+    message: "success"/"failure"
+}
+
+- use the contants models

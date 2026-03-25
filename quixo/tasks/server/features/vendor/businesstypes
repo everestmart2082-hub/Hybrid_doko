@@ -1,6 +1,7 @@
 /api/vendor/businessTypes 
 Get
 
+
 Response
 {
     success: true/false,

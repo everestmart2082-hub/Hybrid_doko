@@ -1,6 +1,6 @@
 /api/admin/categories/add
 Post
-token
+token in authentication bearer
 name
 quick/normal
 required [{name:description, hint}]

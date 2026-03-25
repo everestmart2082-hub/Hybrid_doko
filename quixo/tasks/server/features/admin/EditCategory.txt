@@ -1,6 +1,6 @@
 /api/admin/categories/edit
 Post
-token
+token in authentication bearer
 category id
 name
 quick/normal

@@ -2,6 +2,7 @@
 Post
 - otp
 - phone
+- rider id
 
 response
 {

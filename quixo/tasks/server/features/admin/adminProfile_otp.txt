@@ -2,6 +2,7 @@
 Post
 - otp
 - phone
+- token in authentication bearer
 
 Response
 {

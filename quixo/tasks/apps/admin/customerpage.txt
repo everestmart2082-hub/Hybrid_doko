@@ -1,0 +1,58 @@
+
+
+
+-----------------------------
+customer            
+
+| name
+| number
+| email
+| suspend
+| blacklisted
+| deactivated
+| messages
+    - message 1 date description 
+    - message 2 date description
+    ...
+| violations 
+    - violation 1 date description [delete]
+    - violation 2 date description [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend] [verify/unverify]
+
+
+
+
+user
+name
+number
+email
+suspend
+deactivate
+otp
+| messages
+    - message 1 date description 
+    - message 2 date description
+    ...
+| violations 
+    - violation 1 date description [delete]
+    - violation 2 date description [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend] [verify/unverify]
+
+
+
+
+
+....
+
+Prev   1 2 3 ...    Next
+
+---------------------------------
+
+
+
+
+

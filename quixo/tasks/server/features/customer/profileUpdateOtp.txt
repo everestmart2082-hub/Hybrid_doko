@@ -3,6 +3,7 @@ Post
 - token in authentication bearer
 - otp
 - phone
+- user id
 
 Response
 {

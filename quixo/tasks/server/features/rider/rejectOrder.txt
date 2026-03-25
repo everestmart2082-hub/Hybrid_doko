@@ -2,6 +2,7 @@
 Post
 - token in authentication bearer
 - orders id
+- rider id
 
 response
 {

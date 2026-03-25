@@ -2,6 +2,7 @@
 post
 - token in authentication bearer
 - wishlist id
+- user id
 
 Response
 {

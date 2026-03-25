@@ -2,6 +2,7 @@
 delete
 - cart id
 - token in authentication bearer
+- user id
 
 Response
 {

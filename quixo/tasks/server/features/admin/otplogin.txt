@@ -1,0 +1,10 @@
+/api/admin/login/otp
+Post
+- otp
+- phone
+
+response
+{success: true/false,
+message: “success” / “otp verification failure”
+token: token
+}

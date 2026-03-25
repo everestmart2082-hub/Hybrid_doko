@@ -1,10 +1,28 @@
 /api/rider/profile/get
 Post
 - token in authentication bearer
+- rider id
 
 Response
 {sucess : true or false,
 message: { 
-name,number,default address,email,blue book,bike detail,insurance paper,pan card,citizenship} orrr
+name
+number
+email
+rating
+Rc Book file
+Citizenship file
+pan card file
+Address 
+bike model
+bike number
+bike color
+type: bike/scooter
+bike insurance paper file
+verified
+updation requested
+suspended
+revenue
+violations : []} orrr
 “token has expire”/ “account has been suspended + violation...”/“account has been blacklisted+ violation...”
 }

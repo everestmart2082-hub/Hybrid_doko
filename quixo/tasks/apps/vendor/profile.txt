@@ -59,4 +59,4 @@ Then finally show , Success message
     Okay
 --------------------------
 
-- after clicking Okay, close the dialog box , return to the dashboard Screen and in profile green tick UpdateRequested
+- after clicking Okay, close the dialog box , return to the dashboard Screen and in profile green tick UpdateRequested and disable edit profile

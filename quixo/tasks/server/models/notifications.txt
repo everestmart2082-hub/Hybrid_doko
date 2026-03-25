@@ -1,0 +1,8 @@
+Type - {for customer, for vendor, for rider, for admin}
+message 
+id of the user/vendor/rider/admin
+date
+received - boolean
+
+- those that rae marked received will not be forwarded
+- used as a queue for sending notifications

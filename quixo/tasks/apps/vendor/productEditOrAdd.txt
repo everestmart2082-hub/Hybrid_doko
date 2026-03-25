@@ -18,3 +18,6 @@ Photos [choose file] [Add more]
 
 
 -------------------------
+
+
+after clicking update , turn on the (submittdd for update update) and disable Edit Product button for that product

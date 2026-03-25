@@ -5,6 +5,7 @@ Post
 - name
 - description
 - default address
+- user id
 
 Response
 {

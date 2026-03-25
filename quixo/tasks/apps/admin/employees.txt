@@ -1,0 +1,113 @@
+
+
+
+-----------------------------
+Employees            [Add Employee]
+
+| name
+| email
+| phone
+| position
+| salary
+| address
+| citizenship
+| bank name
+| account number
+| pan file
+| violations 
+    - violation 1 [delete]
+    - violation 2 [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend]
+
+
+
+
+| name
+| email
+| phone
+| position
+| salary
+| address
+| citizenship
+| bank name
+| account number
+| pan file
+| violations 
+    - violation 1 [delete]
+    - violation 2 [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend] 
+
+....
+
+Prev   1 2 3 ...    Next
+
+---------------------------------
+
+
+
+
+
+
+
+Add Employee page
+--------------------------
+
+
+position _______________ 
+salary _______________
+name _______________
+address _______________
+email _______________
+phone _______________
+citizenship [select file]
+bank name _______________
+account number _______________
+pan file [select file]
+
+[Verify Otp]
+-------------------
+
+
+
+
+---------------
+
+otp _______________
+[okay]
+
+------------------
+
+
+
+
+
+
+
+Edit Employee page
+-------------------
+
+
+position _______________ 
+salary _______________
+name _______________
+address _______________
+email _______________
+phone _______________
+bank name _______________
+account number _______________
+
+[Verify Otp]
+------------------
+
+
+
+---------------
+
+otp _______________
+[okay]
+
+------------------

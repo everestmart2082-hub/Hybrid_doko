@@ -1,0 +1,72 @@
+
+
+
+-----------------------------
+Rider            
+
+
+| name
+| number
+| email
+| rating
+| Rc Book file
+| Citizenship file
+| pan card file
+| Address 
+| bike model
+| bike number
+| bike color
+| type: bike/scooter
+| bike insurance paper file
+| verified
+| suspended
+| revenue
+| blacklisted
+| messages
+    - message 1 date description 
+    - message 2 date description
+    ...
+| violations 
+    - violation 1 [delete]
+    - violation 2 [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend] [verify/unverify]
+
+
+
+
+
+| name
+| number
+| email
+| rating
+| Rc Book file
+| Citizenship file
+| pan card file
+| Address 
+| bike model
+| bike number
+| bike color
+| type: bike/scooter
+| bike insurance paper file
+| verified
+| suspended
+| revenue
+| violations 
+    - violation 1 [delete]
+    - violation 2 [delete]
+    ...
+    [Add violation]
+| [Edit] [suspend/unsuspend] [verify/unverify]
+
+....
+
+Prev   1 2 3 ...    Next
+
+---------------------------------
+
+
+
+
+
