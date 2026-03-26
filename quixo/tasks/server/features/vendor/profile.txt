@@ -1,0 +1,22 @@
+/api/vendor/profile
+Post
+- token in authentication bearer
+- vendor id
+
+Response
+{
+    success: true,
+    message: "success",
+    data: {
+        id: "<vendor id>",
+        name: "<vendor name>",
+        number: "<vendor number>",
+        storeName: "<vendor store name>",
+        Address: "<vendor address>",
+        email: "<vendor email>",
+        BusinessType: "<vendor business type>",
+        Description: "<vendor description>",
+        geolocation: "<vendor geolocation>",
+        Pan file: "<vendor pan file>"
+    }
+}

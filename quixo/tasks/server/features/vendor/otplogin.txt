@@ -5,7 +5,7 @@ Post
 
 response
 {success: true/false,
-message: “success” / “otp verification failure”
+message: “success” / “otp verification failure”/"server error
 token: token
 id: id
 }

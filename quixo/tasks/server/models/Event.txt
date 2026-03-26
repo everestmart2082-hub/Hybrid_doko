@@ -1,6 +1,6 @@
 Event
 id
-{order prearing, order pending, cancelled, returned, order delivered, kahlti, esewa }
+{order prearing, order pending, cancelledbycustomer, cancelledbyvendor, returned, order delivered, kahlti, esewa }
 order id
 status - running/ completed
 if completed → event id

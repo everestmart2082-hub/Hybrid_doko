@@ -12,7 +12,7 @@ geolocation : string
 
 Response
 {success: true/false,
-message: "application submitted" | "application submission failed"
+message: "verify otp" | "server error"
 }
 
 

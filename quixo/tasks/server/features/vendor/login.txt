@@ -5,5 +5,5 @@ Post request
 Response
 {success : true/false
 message :
-"success"/"otp verification failure"
+"verify otp"/"server error"
 }

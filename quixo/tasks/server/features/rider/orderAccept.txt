@@ -1,0 +1,8 @@
+/api/rider/order/accept
+- token in authentication bearer
+- orders id 
+
+Response{
+    success: true,
+    message: "order accepted"/"server error"
+}
