@@ -13,28 +13,28 @@ class AuthRemote {
   AuthRemote({required this.dio});
 
   Future<AuthToken> verifyRegisterOtp(OtpVerifyModel otpf) async{
-    Map<String, dynamic> map = await dio.post(ApiEndpoints.userRegistrationOtp, otpf.toJson());
+    Map<String, dynamic> map = await dio.post(ApiEndpoints.userRegistrationOtp, otpf.toFormData());
     checkSuccess(map);
-    AuthToken t = AuthToken.fromJson(map["message"]);
+    AuthToken t = AuthToken(token: map["token"]);
     return t;
   }
 
   Future<bool> register(AuthModel m) async{
-    Map<String, dynamic> map = await dio.post(ApiEndpoints.userRegister, m.toJson());
+    Map<String, dynamic> map = await dio.post(ApiEndpoints.userRegister, m.toFormData());
     var b = checkSuccess(map);
     return b;
   }
 
   Future<AuthToken> verifyLoginOtp(OtpVerifyModel otpf) async{
-    Map<String, dynamic> map = await dio.post(ApiEndpoints.userLoginOtp, otpf.toJson());
+    Map<String, dynamic> map = await dio.post(ApiEndpoints.userLoginOtp, otpf.toFormData());
     checkSuccess(map);
     AuthToken t = AuthToken(token: map["token"]);
     return t;
   }
 
   Future<bool> login(AuthModel m) async{
-    Map<String, dynamic> map = await dio.post(ApiEndpoints.userLogin, m.toJson());
+    Map<String, dynamic> map = await dio.post(ApiEndpoints.userLogin, m.toFormData());
     var b = checkSuccess(map);
     return b;
   }
-}
+}

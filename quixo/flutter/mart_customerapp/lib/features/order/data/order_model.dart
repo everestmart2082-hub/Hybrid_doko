@@ -21,13 +21,13 @@ class OrderModel extends Equatable {
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
-      orderId: json["order_id"] ?? "",
-      productName: json["product_name"] ?? "",
-      productId: json["product_id"] ?? "",
+      orderId: (json["order id"] ?? json["_id"] ?? "").toString(),
+      productName: json["product name"] ?? "",
+      productId: (json["product id"] ?? json["product_id"] ?? "").toString(),
       status: json["status"] ?? "",
-      deliveryCategory: json["delivery_category"] ?? "",
-      riderName: json["rider_name"] ?? "",
-      riderNumber: json["rider_number"] ?? "",
+      deliveryCategory: json["delivery category"] ?? "",
+      riderName: json["rider name"] ?? "",
+      riderNumber: json["rider number"] ?? "",
     );
   }
 

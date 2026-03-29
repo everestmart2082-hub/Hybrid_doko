@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:dio/dio.dart';
 
 class CartAddRequestModel extends Equatable {
   final String productId;
@@ -14,6 +15,13 @@ class CartAddRequestModel extends Equatable {
       "product_id": productId,
       "number": number,
     };
+  }
+
+  FormData toFormData() {
+    return FormData.fromMap({
+      "product id": productId,
+      "number": number.toString(),
+    });
   }
 
   @override

@@ -2,11 +2,29 @@ import 'package:equatable/equatable.dart';
 
 class SettingsState extends Equatable {
   final String theme;
+  final bool isLoading;
+  final String? successMessage;
+  final String? errorMessage;
 
-  const SettingsState({required this.theme});
+  const SettingsState({
+    required this.theme,
+    this.isLoading = false,
+    this.successMessage,
+    this.errorMessage,
+  });
 
-  SettingsState copyWith({String? theme}) {
-    return SettingsState(theme: theme ?? "amber-red");
+  SettingsState copyWith({
+    String? theme,
+    bool? isLoading,
+    String? successMessage,
+    String? errorMessage,
+  }) {
+    return SettingsState(
+      theme: theme ?? this.theme,
+      isLoading: isLoading ?? this.isLoading,
+      successMessage: successMessage ?? this.successMessage,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -14,9 +32,9 @@ class SettingsState extends Equatable {
   }
 
   factory SettingsState.fromMap(Map<String, dynamic> map) {
-    return SettingsState(theme: map['theme'] ?? false);
+    return SettingsState(theme: map['theme'] ?? "amber-red");
   }
 
   @override
-  List<Object?> get props => [theme];
+  List<Object?> get props => [theme, isLoading, successMessage, errorMessage];
 }

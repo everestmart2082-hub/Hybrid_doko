@@ -1,81 +1,34 @@
 import 'package:quickmartcustomer/core/constants/api_constants.dart';
 import 'package:quickmartcustomer/core/failures/failures.dart';
 import 'package:quickmartcustomer/core/network/dio_client.dart';
-import 'package:quickmartcustomer/core/network/shared_pref.dart';
+
 import '../data/profile_model.dart';
 import '../data/profile_delete_model.dart';
 import '../data/profile_otp_model.dart';
 
 class ProfileRemote {
   final DioClient dio;
-  final SharedPreferencesProvider s = SharedPreferencesProvider();
 
-  ProfileRemote({
-    required this.dio,
-  });
-
-  Future<String> _getToken() async {
-    final token = await s.getKey(prefs.token.name);
-
-    if (token == null || token.isEmpty) {
-      throw AuthFailure("Token not found");
-    }
-
-    return token;
-  }
+  ProfileRemote({required this.dio});
 
   Future<ProfileModel> getProfile() async {
-    final token = await _getToken();
-
-    final map = await dio.post(
-      ApiEndpoints.baseUrl + ApiEndpoints.profileGet,
-      {"token": token},
-    );
-
+    final map = await dio.get(ApiEndpoints.profileGet);
     checkSuccess(map);
-
     return ProfileModel.fromMap(map["message"]);
   }
 
   Future<bool> updateProfile(ProfileModel model) async {
-    final token = await _getToken();
-
-    final body = model.toMap();
-    body["token"] = token;
-
-    final map = await dio.post(
-      ApiEndpoints.baseUrl + ApiEndpoints.profileUpdate,
-      body,
-    );
-
+    final map = await dio.post(ApiEndpoints.profileUpdate, model.toFormData());
     return checkSuccess(map);
   }
 
   Future<bool> deleteProfile(ProfileDeleteModel model) async {
-    final token = await _getToken();
-
-    final body = model.toMap();
-    body["token"] = token;
-
-    final map = await dio.delete(
-      ApiEndpoints.baseUrl + ApiEndpoints.profileDelete,
-      body,
-    );
-
+    final map = await dio.post(ApiEndpoints.profileDelete, model.toFormData());
     return checkSuccess(map);
   }
 
   Future<bool> verifyProfileOtp(ProfileOtpModel model) async {
-    final token = await _getToken();
-
-    final body = model.toMap();
-    body["token"] = token;
-
-    final map = await dio.post(
-      ApiEndpoints.baseUrl + ApiEndpoints.profileOtp,
-      body,
-    );
-
+    final map = await dio.post(ApiEndpoints.profileOtp, model.toFormData());
     return checkSuccess(map);
   }
-}
+}

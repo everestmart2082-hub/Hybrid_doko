@@ -1,4 +1,4 @@
-import 'package:quickmartcustomer/core/constants/api_constants.dart';
+
 import 'package:quickmartcustomer/core/failures/failures.dart';
 import 'package:quickmartcustomer/core/network/dio_client.dart';
 import '../data/product_list_item_model.dart';
@@ -10,7 +10,7 @@ class ProductGuestRemote {
   ProductGuestRemote({required this.dio});
 
   Future<ProductModel> getProductById(String id) async {
-    final map = await dio.get("${ApiEndpoints.baseUrl}/product/$id");
+    final map = await dio.get("/api/product/id", query: {"product id": id});
     _checkSuccess(map);
     return ProductModel.fromMap(map['message'] as Map<String, dynamic>);
   }
@@ -33,16 +33,16 @@ class ProductGuestRemote {
       'limit': limit,
       if (minPrice != null) 'minPrice': minPrice,
       if (maxPrice != null) 'maxPrice': maxPrice,
-      if (productCategory != null) 'productCategory': productCategory,
+      if (productCategory != null) 'product category': productCategory,
       if (deliveryCategory != null) 'deliveryCategory': deliveryCategory,
-      if (vendorId != null) 'vendorId': vendorId,
+      if (vendorId != null) 'vender id': vendorId,
       if (searchText != null) 'searchText': searchText,
       if (stock != null) 'stock': stock,
       if (brand != null) 'brand': brand,
       if (rating != null) 'rating': rating,
     };
 
-    final map = await dio.get("${ApiEndpoints.baseUrl}/product/all", query: query);
+    final map = await dio.get("/api/product/all", query: query);
     _checkSuccess(map);
 
     final list = (map['message'] as List)
@@ -52,7 +52,7 @@ class ProductGuestRemote {
   }
 
   Future<List<ProductListItem>> getRecommendedProducts() async {
-    final map = await dio.get("${ApiEndpoints.baseUrl}/product/recommended");
+    final map = await dio.get("/api/product/recommended");
     _checkSuccess(map);
 
     final list = (map['message'] as List)
@@ -63,7 +63,7 @@ class ProductGuestRemote {
 
   void _checkSuccess(Map<String, dynamic> map) {
     if (!(map['success'] as bool)) {
-      throw UnknownFailure( map['message'] ?? "Something went wrong");
+      throw UnknownFailure( map['message']?.toString() ?? "Something went wrong");
     }
   }
-}
+}

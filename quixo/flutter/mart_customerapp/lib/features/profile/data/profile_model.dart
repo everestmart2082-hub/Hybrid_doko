@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 
 class ProfileModel extends Equatable {
@@ -56,12 +57,19 @@ class ProfileModel extends Equatable {
       name: map["name"] ?? "",
       phone: map["number"] ?? "",
       email: map["email"] ?? "",
-      defaultAddress: map["default_address"] ?? "",
+      defaultAddress: map["default address"] ?? map["default_address"] ?? "",
       description: map["description"] ?? "",
     );
   }
 
   String toJson() => json.encode(toMap());
+
+  FormData toFormData() {
+    return FormData.fromMap({
+      'name': name,
+      'number': phone,
+    });
+  }
 
   factory ProfileModel.fromJson(String source) =>
       ProfileModel.fromMap(json.decode(source));

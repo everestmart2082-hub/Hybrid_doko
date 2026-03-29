@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:dio/dio.dart';
 
 class AddressRequestModel extends Equatable {
   final String? addressId;
@@ -35,6 +36,19 @@ class AddressRequestModel extends Equatable {
       "email": email,
       if (isDefault != null) "default": isDefault,
     };
+  }
+
+  FormData toFormData() {
+    return FormData.fromMap({
+      if (addressId != null) "address id": addressId,
+      "label": label,
+      "city": city,
+      "state": state,
+      "pincode": pincode,
+      "landmark": landmark,
+      "phone number": phoneNumber,
+      "email": email,
+    });
   }
 
   @override

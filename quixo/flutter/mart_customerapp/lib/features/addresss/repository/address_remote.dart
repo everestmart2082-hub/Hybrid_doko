@@ -1,4 +1,4 @@
-import 'package:quickmartcustomer/core/constants/api_constants.dart';
+import 'package:dio/dio.dart';
 
 import '../../../core/network/dio_client.dart';
 import '../data/address_model.dart';
@@ -15,19 +15,19 @@ class AddressRemote {
     required int page,
     required int limit,
   }) async {
-    final response = await dio.post(
-      ApiEndpoints.getAllAddresses,
-      {
+    final response = await dio.get(
+      '/api/user/address/all',
+      query: {
         "page": page,
         "limit": limit,
       },
     );
 
-    final data = response.data;
+    final data = response.data ?? response;
 
     if (data["success"] == true) {
       return (data["message"] as List)
-          .map((e) => AddressModel.fromJson(e))
+          .map((e) => AddressModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } else {
       throw Exception(data["message"]);
@@ -35,35 +35,33 @@ class AddressRemote {
   }
 
   // ADD
-  Future<SimpleResponseModel> addAddress(
-      AddressRequestModel address) async {
+  Future<SimpleResponseModel> addAddress(AddressRequestModel address) async {
     final response = await dio.post(
-      ApiEndpoints.addAddress,
-      address.toJson(),
+      '/api/user/address/add',
+      address.toFormData(),
     );
 
-    return SimpleResponseModel.fromJson(response.data);
+    return SimpleResponseModel.fromJson(response.data ?? response);
   }
 
   // UPDATE
-  Future<SimpleResponseModel> updateAddress(
-      AddressRequestModel address) async {
+  Future<SimpleResponseModel> updateAddress(AddressRequestModel address) async {
     final response = await dio.post(
-      ApiEndpoints.updateAddress,
-      address.toJson(),
+      '/api/user/address/update',
+      address.toFormData(),
     );
 
-    return SimpleResponseModel.fromJson(response.data);
+    return SimpleResponseModel.fromJson(response.data ?? response);
   }
 
   // DELETE
-  Future<SimpleResponseModel> deleteAddress(
-      String addressId) async {
-    final response = await dio.delete(
-      ApiEndpoints.deleteAddress,
-      {"address_id": addressId},
+  Future<SimpleResponseModel> deleteAddress(String addressId) async {
+    final formData = FormData.fromMap({"address id": addressId});
+    final response = await dio.post(
+      '/api/user/address/delete',
+      formData,
     );
 
-    return SimpleResponseModel.fromJson(response.data);
+    return SimpleResponseModel.fromJson(response.data ?? response);
   }
-}
+}

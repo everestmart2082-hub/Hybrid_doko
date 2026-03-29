@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 
 import 'package:equatable/equatable.dart';
 
@@ -41,6 +42,13 @@ class OtpVerifyModel extends Equatable {
   }
 
   String toJson() => json.encode(toMap());
+
+  FormData toFormData() {
+    return FormData.fromMap({
+      'otp': otp,
+      'phone': phone,
+    });
+  }
 
   factory OtpVerifyModel.fromJson(String source) => OtpVerifyModel.fromMap(json.decode(source) as Map<String, dynamic>);
 

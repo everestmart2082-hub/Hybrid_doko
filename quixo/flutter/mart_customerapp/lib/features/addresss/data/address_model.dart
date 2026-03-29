@@ -25,13 +25,13 @@ class AddressModel extends Equatable {
 
   factory AddressModel.fromJson(Map<String, dynamic> json) {
     return AddressModel(
-      id: json["address_id"] ?? "",
+      id: (json["address id"] ?? json["address_id"] ?? json["_id"] ?? "").toString(),
       label: json["label"] ?? "",
       city: json["city"] ?? "",
       state: json["state"] ?? "",
       pincode: json["pincode"] ?? "",
       landmark: json["landmark"] ?? "",
-      phoneNumber: json["phone_number"] ?? "",
+      phoneNumber: json["phone number"] ?? json["phone_number"] ?? "",
       email: json["email"] ?? "",
       isDefault: json["default"] ?? false,
     );

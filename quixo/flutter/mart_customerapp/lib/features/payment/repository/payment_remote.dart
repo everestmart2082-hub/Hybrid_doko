@@ -9,24 +9,22 @@ class PaymentRemote {
   PaymentRemote({required this.dio});
 
   /// CHECKOUT
-  Future<SimpleResponseModel> checkout(
-      CheckoutRequestModel request) async {
+  Future<SimpleResponseModel> checkout(CheckoutRequestModel request) async {
     final response = await dio.post(
-      '/user/checkout',
-      request.toJson(),
+      '/api/user/checkout',
+      request.toFormData(),
     );
 
-    return SimpleResponseModel.fromJson(response.data);
+    return SimpleResponseModel.fromJson(response.data ?? response);
   }
 
   /// PAYMENT STATUS
-  Future<SimpleResponseModel> checkPaymentStatus(
-      PaymentQueryModel query) async {
+  Future<SimpleResponseModel> checkPaymentStatus(PaymentQueryModel query) async {
     final response = await dio.get(
-      '/user/payment',
+      '/api/user/payment',
       query: query.toQuery(),
     );
 
-    return SimpleResponseModel.fromJson(response.data);
+    return SimpleResponseModel.fromJson(response.data ?? response);
   }
-}
+}

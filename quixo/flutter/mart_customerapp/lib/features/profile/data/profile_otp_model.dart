@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 
 class ProfileOtpModel extends Equatable {
@@ -21,6 +22,13 @@ class ProfileOtpModel extends Equatable {
   }
 
   String toJson() => json.encode(toMap());
+
+  FormData toFormData() {
+    return FormData.fromMap({
+      'otp': otp,
+      'phone': phone,
+    });
+  }
 
   factory ProfileOtpModel.fromJson(String source) =>
       ProfileOtpModel.fromMap(json.decode(source));

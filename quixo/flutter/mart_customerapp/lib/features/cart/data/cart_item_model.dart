@@ -27,16 +27,16 @@ class CartItemModel extends Equatable {
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     return CartItemModel(
-      productId: json["product_id"] ?? "",
+      id: (json["cart id"] ?? json["id"] ?? "").toString(),
+      productId: json["product id"] ?? json["product_id"] ?? "",
       name: json["name"] ?? "",
       image: json["image"] ?? "",
-      number: json["number"] ?? 0,
-      pricePerUnit: (json["priceperunit"] ?? 0).toDouble(),
+      number: (json["number"] as num?)?.toInt() ?? 0,
+      pricePerUnit: (json["priceperunit"] as num?)?.toDouble() ?? 0.0,
       unit: json["unit"] ?? "",
-      deliveryCategory: json["delivary_category"] ?? "",
-      productCategory: json["product_category"] ?? "",
+      deliveryCategory: json["delivary category"] ?? json["delivary_category"] ?? "",
+      productCategory: json["product category"] ?? json["product_category"] ?? "",
       brandName: json["brandname"] ?? "",
-      id: json["id"]??""
     );
   }
 

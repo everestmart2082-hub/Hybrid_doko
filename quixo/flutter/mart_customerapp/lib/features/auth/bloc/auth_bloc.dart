@@ -31,10 +31,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     bool b = (await s.getKey(prefs.token.name))?.isNotEmpty ?? false;
     if(!b){
-      emit(AuthFailed(message: "Token not found"));
+      emit(AuthUnAuthenticated());
+    } else {
+      emit(AuthAuthenticated(authenticated: true));
     }
-
-    emit(AuthAuthenticated(authenticated: b));
   }
 
   FutureOr<void> _onLogin(AuthLogin event, Emitter<AuthState> emit) async{
@@ -43,8 +43,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       bool b = await authRemote.login(
         event.input
       );
-
-      emit(AuthAuthenticated(authenticated: false));
+      if (b) {
+        emit(const AuthAuthenticated(authenticated: false)); // false indicates OTP step
+      } else {
+        emit(const AuthFailed(message: "Login failed"));
+      }
     } catch (e) {
       emit(_mapError(e));
     }
@@ -71,8 +74,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       bool b = await authRemote.register(
         event.input
       );
-
-      emit(AuthAuthenticated(authenticated: false));
+      if (b) {
+        emit(const AuthAuthenticated(authenticated: false));
+      } else {
+        emit(const AuthFailed(message: "Registration failed"));
+      }
     } catch (e) {
       emit(_mapError(e));
     }

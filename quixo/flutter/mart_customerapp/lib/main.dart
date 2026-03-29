@@ -10,8 +10,8 @@ import 'package:quickmartcustomer/features/addresss/repository/address_remote.da
 import 'package:quickmartcustomer/features/addresss/ui/addressListMainpage.dart';
 import 'package:quickmartcustomer/features/auth/bloc/auth_bloc.dart';
 import 'package:quickmartcustomer/features/auth/repository/auth_remote.dart';
-import 'package:quickmartcustomer/features/auth/ui/login_page.dart';
-import 'package:quickmartcustomer/features/auth/ui/register_page.dart';
+import 'package:quickmartcustomer/ui/web/auth/login_screen.dart';
+import 'package:quickmartcustomer/ui/web/auth/register_screen.dart';
 import 'package:quickmartcustomer/features/cart/bloc/cart_bloc.dart';
 import 'package:quickmartcustomer/features/cart/repository/cart_remote.dart';
 import 'package:quickmartcustomer/features/cart/ui/cart_page.dart';
@@ -39,6 +39,7 @@ import 'package:quickmartcustomer/features/settings/ui/contact_us_page.dart';
 import 'package:quickmartcustomer/features/settings/ui/settings_page.dart';
 import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_bloc.dart';
 import 'package:quickmartcustomer/features/wishlist/repository/wishlist_remote.dart';
+import 'package:quickmartcustomer/features/settings/repository/settings_remote.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'core/network/dio_client.dart';
@@ -128,13 +129,12 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context)=>ProductGuestRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>WishlistRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>NotificationRemote(dio: dioClient)),
-        RepositoryProvider(create: (context)=>ProfileRemote(dio: dioClient)),
-        
+        RepositoryProvider(create: (context)=>SettingsRemote(dio: dioClient)),
       ],
       child: 
       MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context)=> SettingsBloc()),
+          BlocProvider(create: (context)=> SettingsBloc(context.read<SettingsRemote>())),
           BlocProvider(create: (context)=>AuthBloc(context.read<AuthRemote>())),
           BlocProvider(create: (context)=>AddressBloc(context.read<AddressRemote>())),
           BlocProvider(create: (context)=>OrderBloc(context.read<OrderRemote>())),
@@ -152,21 +152,21 @@ class MyApp extends StatelessWidget {
               title: AppConstants.appName,
               debugShowCheckedModeBanner: false,
               theme: themeData,
-              home: MainApp(),
+              initialRoute: '/mainapp',
               routes: {
                 '/mainapp': (context) => const MainApp(),
                 '/settings': (context) => const SettingsPage(),
                 '/contact': (context) => const ContactUsPage(),
-                '/login': (context) => const LoginPage(),
-                '/register': (context) => const RegisterPage(),
+                '/login': (context) => const LoginScreen(),
+                '/register': (context) => const RegisterScreen(),
                 '/profile': (context) => const ProfilePage(),
                 '/productsGuest': (context) => const ProductGuestListPage(),
-                '/product': (context) => const ProductListPage(),
+                '/products': (context) => const ProductListPage(),
                 '/cart': (context) => const CartPage(),
-                '/order': (context) => const OrderPage(),
+                '/orders': (context) => const OrderPage(),
                 '/payment': (context) => const CheckoutPage(),
-                '/address': (context) => const AddressPage(),
-                '/notification': (context) => const NotificationPage()
+                '/addresses': (context) => const AddressPage(),
+                '/notifications': (context) => const NotificationPage()
               },
             );
           }

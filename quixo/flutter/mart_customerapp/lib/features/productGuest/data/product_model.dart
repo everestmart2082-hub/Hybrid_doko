@@ -113,21 +113,21 @@ class ProductModel extends Equatable {
 
   factory ProductModel.fromMap(Map<String, dynamic> map) {
     return ProductModel(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      brand: map['brand'] as String,
-      description: map['description'] as String,
-      shortDescription: map['shortDescription'] as String,
-      pricePerUnit: (map['pricePerUnit'] as num).toDouble(),
-      unit: map['unit'] as String,
-      discount: (map['discount'] as num).toDouble(),
-      productCategory: map['productCategory'] as String,
-      deliveryCategory: map['deliveryCategory'] as String,
-      stock: map['stock'] as int,
+      id: (map['id'] ?? '').toString(),
+      name: map['Name'] as String? ?? '',
+      brand: map['brand'] as String? ?? '',
+      description: map['short description'] as String? ?? '', // API only sends short_description
+      shortDescription: map['short description'] as String? ?? '',
+      pricePerUnit: (map['price per unit'] as num?)?.toDouble() ?? 0.0,
+      unit: map['unit'] as String? ?? '',
+      discount: (map['discount'] as num?)?.toDouble() ?? 0.0,
+      productCategory: map['product catagory'] as String? ?? '',
+      deliveryCategory: map['delivary category'] as String? ?? '',
+      stock: (map['stock'] as num?)?.toInt() ?? 0,
       photos: List<String>.from(map['photos'] ?? []),
-      vendorId: map['vendorId'] as String,
-      vendorName: map['vendorName'] as String,
-      rating: (map['rating'] as num).toDouble(),
+      vendorId: map['vender id'] as String? ?? '',
+      vendorName: map['vender name'] as String? ?? '',
+      rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
     );
   }
 

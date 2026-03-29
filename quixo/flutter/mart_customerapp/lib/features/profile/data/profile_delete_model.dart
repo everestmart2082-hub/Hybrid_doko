@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 
 class ProfileDeleteModel extends Equatable {
@@ -21,6 +22,13 @@ class ProfileDeleteModel extends Equatable {
   }
 
   String toJson() => json.encode(toMap());
+
+  FormData toFormData() {
+    return FormData.fromMap({
+      'reason': reason,
+      'options': option,
+    });
+  }
 
   factory ProfileDeleteModel.fromJson(String source) =>
       ProfileDeleteModel.fromMap(json.decode(source));

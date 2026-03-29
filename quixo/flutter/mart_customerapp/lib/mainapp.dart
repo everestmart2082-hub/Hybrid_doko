@@ -10,7 +10,6 @@ import 'package:quickmartcustomer/features/cart/bloc/cart_bloc.dart';
 import 'package:quickmartcustomer/features/product/bloc/product_event.dart';
 import 'package:quickmartcustomer/features/product/bloc/product_state.dart';
 import 'package:quickmartcustomer/features/product/data/product_list_item_model.dart';
-import 'package:quickmartcustomer/features/product/data/product_model.dart';
 
 import 'drawer.dart';
 
@@ -59,9 +58,31 @@ class _MainAppState extends State<MainApp> {
               const SizedBox(height: 24),
               _featuresSection(),
               const SizedBox(height: 32),
+              _footerSection(context),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _footerSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: Colors.black,
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            "Contact",
+            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          Text("Email: support@quickmart.com", style: TextStyle(color: Colors.white70)),
+          SizedBox(height: 4),
+          Text("Location: Kathmandu, Nepal", style: TextStyle(color: Colors.white70)),
+        ],
       ),
     );
   }

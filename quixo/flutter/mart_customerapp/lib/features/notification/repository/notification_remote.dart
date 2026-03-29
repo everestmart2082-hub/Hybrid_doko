@@ -1,5 +1,3 @@
-import 'package:quickmartcustomer/core/constants/api_constants.dart';
-
 import '../../../core/network/dio_client.dart';
 import '../data/notification_model.dart';
 import '../data/notification_query_model.dart';
@@ -11,19 +9,19 @@ class NotificationRemote {
 
   Future<List<NotificationModel>> getNotifications(
       NotificationQueryModel query) async {
-    final response = await dio.post(
-      ApiEndpoints.getNotifications,
-      query.toJson(),
+    final response = await dio.get(
+      '/api/user/notification',
+      query: query.toJson(),
     );
 
-    final data = response.data;
+    final data = response.data ?? response;
 
     if (data["success"] == true) {
       return (data["message"] as List)
-          .map((e) => NotificationModel.fromJson(e))
+          .map((e) => NotificationModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } else {
       throw Exception(data["message"]);
     }
   }
-}
+}

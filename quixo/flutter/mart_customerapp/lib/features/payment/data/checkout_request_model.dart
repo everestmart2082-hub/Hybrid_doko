@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:dio/dio.dart';
 
 class CheckoutRequestModel extends Equatable {
   final String addressId;
@@ -17,6 +18,18 @@ class CheckoutRequestModel extends Equatable {
       "cart_ids": cartIds,
       "payment_method": paymentMethod,
     };
+  }
+
+  FormData toFormData() {
+    var formData = FormData.fromMap({
+      "address id": addressId,
+      "payment method": paymentMethod,
+    });
+    // Add array elements as list
+    for (var i = 0; i < cartIds.length; i++) {
+      formData.fields.add(MapEntry("cart ids[]", cartIds[i]));
+    }
+    return formData;
   }
 
   @override

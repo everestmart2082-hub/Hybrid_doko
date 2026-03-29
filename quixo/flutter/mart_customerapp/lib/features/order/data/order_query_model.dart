@@ -26,6 +26,30 @@ class OrderQueryModel extends Equatable {
     };
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      "page": page,
+      "limit": limit,
+      if (search != null) "search": search,
+      if (status != null) "status": status,
+      if (deliveryCategory != null) "delivery_category": deliveryCategory,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return toJson();
+  }
+
+  Map<String, dynamic> toFormData() {
+    return {
+      "page": page,
+      "limit": limit,
+      if (search != null) "search": search,
+      if (status != null) "status": status,
+      if (deliveryCategory != null) "delivery_category": deliveryCategory,
+    };
+  }
+
   @override
   List<Object?> get props =>
       [page, limit, search, status, deliveryCategory];

@@ -77,15 +77,15 @@ class ProductListItem extends Equatable {
 
   factory ProductListItem.fromMap(Map<String, dynamic> map) {
     return ProductListItem(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      shortDescription: map['shortDescription'] as String,
-      pricePerUnit: (map['pricePerUnit'] as num).toDouble(),
-      productCategory: map['productCategory'] as String,
-      deliveryCategory: map['deliveryCategory'] as String,
-      stock: map['stock'] as int,
-      brandName: map['brandName'] as String,
-      images: List<String>.from(map["images"])
+      id: (map['Product id'] ?? map['id'] ?? '').toString(),
+      name: map['name'] as String? ?? '',
+      shortDescription: map['short description'] as String? ?? '',
+      pricePerUnit: (map['price per unit'] as num?)?.toDouble() ?? 0.0,
+      productCategory: map['product catagory'] as String? ?? '', 
+      deliveryCategory: map['delivary category'] as String? ?? '', 
+      stock: (map['stock'] as num?)?.toInt() ?? 0,
+      brandName: map['brand name'] as String? ?? '',
+      images: List<String>.from(map['photos'] ?? []),
     );
   }
 

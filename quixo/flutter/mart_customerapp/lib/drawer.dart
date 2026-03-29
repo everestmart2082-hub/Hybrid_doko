@@ -60,7 +60,7 @@ Drawer buildAppDrawer(BuildContext context) {
               tile(
                 title: 'Home',
                 icon: Icons.home,
-                route: '/',
+                route: '/mainapp',
               ),
               if(!isLoggedIn)
               tile(
@@ -88,11 +88,11 @@ Drawer buildAppDrawer(BuildContext context) {
                   route: '/orders',
                 ),
                 
-                tile(
-                  title: 'Wishlist',
-                  icon: Icons.bookmark,
-                  route: '/wishlist',
-                ),
+                // tile(
+                //   title: 'Wishlist',
+                //   icon: Icons.bookmark,
+                //   route: '/wishlist',
+                // ),
                 tile(
                   title: 'Addresses',
                   icon: Icons.location_on,

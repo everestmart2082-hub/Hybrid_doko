@@ -25,14 +25,14 @@ class WishlistItemModel extends Equatable {
 
   factory WishlistItemModel.fromJson(Map<String, dynamic> json) {
     return WishlistItemModel(
-      productId: json["product_id"] ?? "",
+      productId: (json["product id"] ?? json["product_id"] ?? "").toString(),
       name: json["name"] ?? "",
       image: json["image"] ?? "",
-      number: json["number"] ?? "",
-      pricePerUnit: (json["priceperunit"] ?? 0).toDouble(),
+      number: (json["number"] ?? "").toString(),
+      pricePerUnit: (json["priceperunit"] as num?)?.toDouble() ?? 0.0,
       unit: json["unit"] ?? "",
-      deliveryCategory: json["delivary_category"] ?? "",
-      productCategory: json["product_category"] ?? "",
+      deliveryCategory: json["delivary category"] ?? json["delivary_category"] ?? "",
+      productCategory: json["product category"] ?? json["product_category"] ?? "",
       brandName: json["brandname"] ?? "",
     );
   }
