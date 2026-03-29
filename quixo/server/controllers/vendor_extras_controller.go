@@ -54,3 +54,28 @@ func VendorChartMonth(c *gin.Context) {
 		},
 	})
 }
+
+// VendorNotification handles /api/vender/notification
+func VendorNotification(c *gin.Context) {
+	vendorID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
+		return
+	}
+
+	coll := utils.GetCollection("notifications")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := coll.Find(ctx, bson.M{"user_id": vendorID})
+	var results []bson.M
+	if err == nil {
+		cursor.All(ctx, &results)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": results,
+	})
+}
+

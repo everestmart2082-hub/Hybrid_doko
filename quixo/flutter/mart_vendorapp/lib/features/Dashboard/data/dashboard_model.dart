@@ -1,18 +1,15 @@
 import 'package:equatable/equatable.dart';
 
 class VendorChartData extends Equatable {
-  final String label; // e.g., date or category
-  final double value; // e.g., sales amount, order count
+  final String label;
+  final double value;
 
-  const VendorChartData({
-    required this.label,
-    required this.value,
-  });
+  const VendorChartData({required this.label, required this.value});
 
   factory VendorChartData.fromMap(Map<String, dynamic> map) {
     return VendorChartData(
-      label: map["label"] ?? "",
-      value: (map["value"] ?? 0).toDouble(),
+      label: map["date"] ?? map["day"] ?? "",
+      value: (map["amount"] ?? map["revenue"] ?? 0).toDouble(),
     );
   }
 
@@ -20,29 +17,46 @@ class VendorChartData extends Equatable {
   List<Object?> get props => [label, value];
 }
 
-class VendorChartResponse {
-  final bool success;
-  final String message;
-  final List<VendorChartData> data;
+class DashboardStatsModel extends Equatable {
+  final int totalOrders;
+  final int preparingOrders;
+  final int preparedOrders;
+  final int deliveredOrders;
+  final int cancelledByUserOrders;
+  final int cancelledByVendorOrders;
+  final int returnedOrders;
 
-  VendorChartResponse({
-    required this.success,
-    required this.message,
-    required this.data,
+  final double totalRevenue;
+  final List<VendorChartData> chart;
+
+  final int totalProducts;
+  final int outOfStockProducts;
+  final int lowStockProducts;
+  final int activeProducts;
+  final int inactiveProducts;
+
+  const DashboardStatsModel({
+    required this.totalOrders,
+    required this.preparingOrders,
+    required this.preparedOrders,
+    required this.deliveredOrders,
+    required this.cancelledByUserOrders,
+    required this.cancelledByVendorOrders,
+    required this.returnedOrders,
+    required this.totalRevenue,
+    required this.chart,
+    required this.totalProducts,
+    required this.outOfStockProducts,
+    required this.lowStockProducts,
+    required this.activeProducts,
+    required this.inactiveProducts,
   });
 
-  factory VendorChartResponse.fromMap(Map<String, dynamic> map) {
-    final List<VendorChartData> chartData = [];
-    if (map["message"] != null && map["message"] is List) {
-      for (var e in map["message"]) {
-        chartData.add(VendorChartData.fromMap(e));
-      }
-    }
-
-    return VendorChartResponse(
-      success: map["success"] ?? false,
-      message: map["message"] is String ? map["message"] : "Chart loaded",
-      data: chartData,
-    );
-  }
+  @override
+  List<Object?> get props => [
+    totalOrders, preparingOrders, preparedOrders, deliveredOrders,
+    cancelledByUserOrders, cancelledByVendorOrders, returnedOrders,
+    totalRevenue, chart,
+    totalProducts, outOfStockProducts, lowStockProducts, activeProducts, inactiveProducts
+  ];
 }

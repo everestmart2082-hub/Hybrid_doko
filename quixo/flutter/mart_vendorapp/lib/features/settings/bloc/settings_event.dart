@@ -5,3 +5,11 @@ class ChangeTheme extends SettingsEvent {
 
   ChangeTheme(this.theme);
 }
+
+class ChangeLanguage extends SettingsEvent {
+  final String language;
+
+  ChangeLanguage(this.language);
+}
+
+class LoadSettings extends SettingsEvent {}

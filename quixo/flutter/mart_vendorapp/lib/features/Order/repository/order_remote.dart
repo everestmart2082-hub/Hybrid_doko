@@ -27,8 +27,12 @@ class OrderRemote {
       },
     );
 
-    final List list = map["message"];
-    return list.map((e) => VendorOrder.fromMap(e)).toList();
+    final List wrapper = map["message"] ?? [];
+    if (wrapper.isNotEmpty && wrapper.length > 1) {
+      final List list = wrapper[1];
+      return list.map((e) => VendorOrder.fromMap(e)).toList();
+    }
+    return [];
   }
 
   Future<void> markOrderPrepared(String orderId) async {
@@ -41,4 +45,4 @@ class OrderRemote {
       throw Exception(map["message"] ?? "Server error");
     }
   }
-}
+}

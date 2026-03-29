@@ -41,12 +41,11 @@ class VenderAuthModel extends Equatable {
     return {
       "name": name,
       "number": number,
-      "pan": pan,
       "storeName": storeName,
-      "address": address,
+      "Address": address,
       "email": email,
-      "businessType": businessType,
-      "description": description,
+      "Business Type": businessType,
+      "Description": description,
       "geolocation": geolocation
     };
   }

@@ -51,3 +51,5 @@ class VenderLoginOtpVerify extends VenderAuthEvent {
 }
 
 class VenderLogout extends VenderAuthEvent {}
+
+class VenderFetchBusinessTypes extends VenderAuthEvent {}

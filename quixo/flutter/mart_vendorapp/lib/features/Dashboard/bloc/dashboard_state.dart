@@ -13,12 +13,12 @@ class DashboardInitial extends DashboardState {}
 class DashboardLoading extends DashboardState {}
 
 class DashboardLoaded extends DashboardState {
-  final List<VendorChartData> chartData;
+  final DashboardStatsModel stats;
 
-  const DashboardLoaded(this.chartData);
+  const DashboardLoaded(this.stats);
 
   @override
-  List<Object?> get props => [chartData];
+  List<Object?> get props => [stats];
 }
 
 class DashboardError extends DashboardState {

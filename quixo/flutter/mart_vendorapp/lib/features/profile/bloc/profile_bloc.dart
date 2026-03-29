@@ -48,7 +48,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       bool success = await remote.updateProfile(event.profile);
 
       if (success) {
-        emit(ProfileUpdated());
+        // OTP has been sent to user's number — trigger OTP dialog in UI
+        emit(ProfileOtpRequired());
       }
 
     } catch (e) {
@@ -72,7 +73,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       );
 
       if (success) {
-        emit(ProfileUpdated());
+        // Successfully updated — show success dialog, disable edit, show green tick
+        emit(const ProfileUpdateSuccess("Profile update request submitted successfully"));
       }
 
     } catch (e) {

@@ -30,3 +30,12 @@ class VenderAuthFailed extends VenderAuthState {
   @override
   List<Object?> get props => [message];
 }
+
+class VenderBusinessTypesLoaded extends VenderAuthState {
+  final List<dynamic> businessTypes;
+
+  const VenderBusinessTypesLoaded({required this.businessTypes});
+
+  @override
+  List<Object?> get props => [businessTypes];
+}

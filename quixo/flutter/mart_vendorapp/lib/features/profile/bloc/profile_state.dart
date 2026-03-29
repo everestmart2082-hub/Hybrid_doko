@@ -12,6 +12,7 @@ class ProfileInitial extends ProfileState {}
 
 class ProfileLoading extends ProfileState {}
 
+/// Profile data has been loaded (display screen)
 class ProfileLoaded extends ProfileState {
 
   final ProfileModel profile;
@@ -22,8 +23,19 @@ class ProfileLoaded extends ProfileState {
   List<Object?> get props => [profile];
 }
 
-class ProfileUpdated extends ProfileState {}
+/// UpdateProfile was called successfully — OTP dialog should now appear
+class ProfileOtpRequired extends ProfileState {}
 
+/// OTP verified successfully — show success dialog then return to dashboard
+class ProfileUpdateSuccess extends ProfileState {
+  final String message;
+  const ProfileUpdateSuccess(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Account was deleted
 class ProfileDeleted extends ProfileState {}
 
 class ProfileFailed extends ProfileState {

@@ -20,6 +20,7 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
     on<VenderRegisterOtpVerify>(_onRegisterOtpVerify);
     on<VenderLogin>(_onLogin);
     on<VenderLoginOtpVerify>(_onLoginOtpVerify);
+    on<VenderFetchBusinessTypes>(_onFetchBusinessTypes);
 
     on<VenderLogout>((event, emit) async {
       await s.clearkey(prefs.token.name);
@@ -131,5 +132,17 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
     }
 
     return const VenderAuthFailed(message: "Something went wrong");
+  }
+
+  FutureOr<void> _onFetchBusinessTypes(
+      VenderFetchBusinessTypes event,
+      Emitter<VenderAuthState> emit) async {
+    emit(VenderAuthLoading());
+    try {
+      final businessTypes = await authRemote.fetchBusinessTypes();
+      emit(VenderBusinessTypesLoaded(businessTypes: businessTypes));
+    } catch (e) {
+      emit(_mapError(e));
+    }
   }
 }

@@ -11,6 +11,27 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// corsMiddleware allows cross-origin requests from any origin.
+// Required for Flutter web running on a different port (e.g. localhost:59502)
+// calling the API on localhost:5000.
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Requested-With")
+		c.Header("Access-Control-Expose-Headers", "Content-Length")
+		c.Header("Access-Control-Allow-Credentials", "false")
+
+		// Handle preflight OPTIONS request immediately
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
+
 func main() {
 	// Load .env file
 	if err := godotenv.Load(".env"); err != nil {
@@ -25,6 +46,17 @@ func main() {
 
 	// Initialize Gin router
 	r := gin.Default()
+
+	// ── CORS ─────────────────────────────────────────────────────────────────
+	// Must be registered BEFORE all routes so preflight OPTIONS requests are
+	// handled correctly and every API response carries the right headers.
+	r.Use(corsMiddleware())
+
+	// Gin only runs middleware for matched routes. Register a wildcard OPTIONS
+	// route so every browser preflight gets a 204 instead of a 404.
+	r.OPTIONS("/*path", func(c *gin.Context) {
+		c.AbortWithStatus(204)
+	})
 
 	// Serve static files from the uploads directory
 	r.Static("/uploads", "./uploads")
@@ -48,7 +80,7 @@ func main() {
 	if port == "" {
 		port = "5000"
 	}
-	
+
 	log.Printf("Server starting on port %s", port)
 	if err := r.Run(":" + port); err != nil {
 		log.Fatal("Failed to start server: ", err)

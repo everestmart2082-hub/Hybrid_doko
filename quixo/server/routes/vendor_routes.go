@@ -32,6 +32,7 @@ func SetupVendorRoutes(r *gin.Engine) {
 			protected.POST("/profile/otp", controllers.VendorProfileUpdateOTP)
 			protected.DELETE("/profile/delete", controllers.VendorProfileDelete)
 			protected.POST("/profile", controllers.VendorProfileGet)
+			protected.POST("/notification", controllers.VendorNotification)
 		}
 	}
 }

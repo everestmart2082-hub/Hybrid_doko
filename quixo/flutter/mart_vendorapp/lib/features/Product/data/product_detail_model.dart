@@ -36,15 +36,15 @@ class ProductDetail {
   factory ProductDetail.fromMap(Map<String, dynamic> map) {
     return ProductDetail(
       id: map["id"].toString(),
-      name: map["Name"] ?? "",
+      name: map["name"] ?? "",
       brand: map["brand"] ?? "",
       description: map["description"] ?? "",
       shortDescription: map["short descriptions"] ?? "",
       price: (map["price per unit"] ?? 0).toDouble(),
       unit: map["unit"] ?? "",
       discount: (map["discount"] ?? 0).toDouble(),
-      productCategory: map["product catagory"] ?? "",
-      deliveryCategory: map["delivary categpory"] ?? "",
+      productCategory: map["product category"] ?? "",
+      deliveryCategory: map["delivary category"] ?? "",
       stock: map["stock"] ?? 0,
       photos: List<String>.from(map["Photos"] ?? []),
       vendorId: map["vender id"] ?? "",

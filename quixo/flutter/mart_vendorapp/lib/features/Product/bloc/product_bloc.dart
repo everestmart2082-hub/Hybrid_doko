@@ -12,10 +12,33 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoading());
 
       try {
-        final products =
-            await repo.getProducts(page: event.page, limit: event.limit);
+        final products = await repo.getProducts(
+          page: event.page,
+          limit: event.limit,
+          minPrice: event.minPrice,
+          maxPrice: event.maxPrice,
+          productCategory: event.productCategory,
+          deliveryCategory: event.deliveryCategory,
+          searchText: event.searchText,
+          brand: event.brand,
+          rating: event.rating,
+          stock: event.stock,
+          sortBy: event.sortBy,
+          vendorId: event.vendorId,
+        );
 
         emit(ProductListLoaded(products));
+      } catch (e) {
+        emit(ProductError(e.toString()));
+      }
+    });
+
+    on<GetProductFilters>((event, emit) async {
+      emit(ProductLoading());
+      try {
+        final categories = await repo.getCategories();
+        final vendors = await repo.getVendors();
+        emit(ProductFiltersLoaded(categories, vendors));
       } catch (e) {
         emit(ProductError(e.toString()));
       }
@@ -37,7 +60,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoading());
 
       try {
-        await repo.addProduct(event.input);
+        await repo.addProduct(event.input, event.files);
 
         emit(ProductSuccess("Product added"));
       } catch (e) {
@@ -49,7 +72,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoading());
 
       try {
-        await repo.editProduct(event.input);
+        await repo.editProduct(event.input, event.files, event.productId);
 
         emit(ProductSuccess("Product updated"));
       } catch (e) {

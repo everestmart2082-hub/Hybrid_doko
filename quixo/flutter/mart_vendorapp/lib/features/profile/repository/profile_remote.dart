@@ -1,4 +1,5 @@
 
+import 'package:dio/dio.dart';
 import 'package:quickmartvender/core/constants/api_constants.dart';
 import 'package:quickmartvender/core/failures/failures.dart';
 import 'package:quickmartvender/core/network/dio_client.dart';
@@ -21,14 +22,14 @@ class ProfileRemote {
 
     checkSuccess(map);
 
-    return ProfileModel.fromMap(map["message"]);
+    return ProfileModel.fromMap(map["message"] ?? map["data"]);
   }
 
   Future<bool> updateProfile(ProfileModel model) async {
 
     Map<String, dynamic> map = await dio.post(
       ApiEndpoints.profileUpdate,
-      model.toJson(),
+      FormData.fromMap(model.toMap()),
     );
 
     return checkSuccess(map);
@@ -38,10 +39,10 @@ class ProfileRemote {
 
     Map<String, dynamic> map = await dio.post(
       ApiEndpoints.profileOtp,
-      {
+      FormData.fromMap({
         "phone": phone,
         "otp": otp,
-      },
+      }),
     );
 
     return checkSuccess(map);
@@ -49,9 +50,10 @@ class ProfileRemote {
 
   Future<bool> deleteProfile(ProfileDeleteModel model) async {
 
+    final encodedReason = Uri.encodeComponent(model.reason ?? "delete");
     Map<String, dynamic> map = await dio.delete(
-      ApiEndpoints.profileDelete,
-      model.toJson(),
+      "${ApiEndpoints.profileDelete}?reason=$encodedReason",
+      {},
     );
 
     return checkSuccess(map);

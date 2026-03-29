@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quickmartvender/drawer.dart';
-
-import '../bloc/settings_bloc.dart';
-import '../bloc/settings_event.dart';
-import '../bloc/settings_state.dart';
-
+import 'package:quickmartvender/features/settings/bloc/settings_bloc.dart';
+import 'package:quickmartvender/features/settings/bloc/settings_event.dart';
+import 'package:quickmartvender/features/settings/bloc/settings_state.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -26,13 +24,11 @@ class _SettingsPageState extends State<SettingsPage> {
       "amber-red",
       "orange-bluegray-dark",
       "teal-blue-dark",
-      "amber-red-dark"
+      "amber-red-dark",
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       drawer: buildAppDrawer(context),
       body: BlocBuilder<SettingsBloc, SettingsState>(
         builder: (context, state) {
@@ -41,10 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
             height: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.white ,
-                  Theme.of(context).primaryColorLight,
-                ],
+                colors: [Colors.white, Theme.of(context).primaryColorLight],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -60,26 +53,36 @@ class _SettingsPageState extends State<SettingsPage> {
                     final selected = await showDialog<String>(
                       context: context,
                       builder: (context) => SimpleDialog(
-                        title: Text('Select Color Theme', style: TextStyle(color: Theme.of(context).primaryColor),),
+                        title: Text(
+                          'Select Color Theme',
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
                         children: themeOptions
                             .map(
                               (t) => SimpleDialogOption(
                                 onPressed: () => Navigator.pop(context, t),
-                                child: Text(t,style: TextStyle(color: Theme.of(context).primaryColor) ),
+                                child: Text(
+                                  t,
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
                               ),
                             )
                             .toList(),
                       ),
                     );
-            
+
                     if (selected != null) {
                       context.read<SettingsBloc>().add(ChangeTheme(selected));
                     }
                   },
                 ),
-            
+
                 const Divider(),
-            
+
                 // App version info
                 const ListTile(
                   leading: Icon(Icons.info_outline),

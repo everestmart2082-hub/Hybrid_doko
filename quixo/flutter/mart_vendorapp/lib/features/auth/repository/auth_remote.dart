@@ -6,6 +6,7 @@ import 'package:quickmartvender/core/network/dio_client.dart';
 import '../data/auth_model.dart';
 import '../data/auth_token_model.dart';
 import '../data/otp_verify_model.dart';
+import '../data/business_type_model.dart';
 
 class VenderAuthRemote {
   final DioClient dio;
@@ -16,7 +17,7 @@ class VenderAuthRemote {
 
     FormData formData = FormData.fromMap({
       ...m.toMap(),
-      "files": files
+      if (files.isNotEmpty) "Pan file": files.first,
     });
 
     Map<String, dynamic> map = await dio.post(
@@ -43,10 +44,15 @@ class VenderAuthRemote {
 
   Future<bool> login(String phone) async {
 
+    print(phone);
+
     Map<String, dynamic> map = await dio.post(
        ApiEndpoints.login,
       {"phone": phone},
     );
+
+    print("fello");
+    print(map);
 
     return checkSuccess(map);
   }
@@ -63,5 +69,16 @@ class VenderAuthRemote {
     return VenderAuthToken.fromMap({
       "token": map["token"]
     });
+  }
+
+  Future<List<BusinessTypeModel>> fetchBusinessTypes() async {
+    Map<String, dynamic> map = await dio.get(ApiEndpoints.businessTypes);
+    
+    if (checkSuccess(map)) {
+      List<dynamic> data = map['data'] ?? [];
+      return data.map((e) => BusinessTypeModel.fromMap(e)).toList();
+    } else {
+      throw const ServerFailure("Failed to fetch business types");
+    }
   }
 }

@@ -1,3 +1,6 @@
+import 'package:dio/dio.dart';
+import '../data/product_input_model.dart';
+
 abstract class ProductEvent {}
 
 class GetProducts extends ProductEvent {
@@ -11,6 +14,8 @@ class GetProducts extends ProductEvent {
   final String brand;
   final int? rating;
   final int? stock;
+  final String sortBy;
+  final String vendorId;
 
   GetProducts({
     this.page = 1,
@@ -23,8 +28,12 @@ class GetProducts extends ProductEvent {
     this.brand = "",
     this.rating,
     this.stock,
+    this.sortBy = "default",
+    this.vendorId = "all",
   });
 }
+
+class GetProductFilters extends ProductEvent {}
 
 class GetProductDetail extends ProductEvent {
   final String id;
@@ -33,15 +42,18 @@ class GetProductDetail extends ProductEvent {
 }
 
 class AddProduct extends ProductEvent {
-  final dynamic input;
+  final ProductInput input;
+  final List<MultipartFile> files;
 
-  AddProduct(this.input);
+  AddProduct(this.input, this.files);
 }
 
 class EditProduct extends ProductEvent {
-  final dynamic input;
+  final ProductInput input;
+  final List<MultipartFile> files;
+  final String productId;
 
-  EditProduct(this.input);
+  EditProduct(this.input, this.files, this.productId);
 }
 
 class DeleteProduct extends ProductEvent {

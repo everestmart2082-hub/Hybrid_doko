@@ -42,11 +42,11 @@ class ProfileModel extends Equatable {
     return ProfileModel(
       name: map["name"] ?? "",
       number: map["number"] ?? "",
-      pan: map["pan"] ?? "",
-      storeName: map["store_name"] ?? "",
+      pan: map["pan number"] ?? "",
+      storeName: map["store name"] ?? "",
       address: map["address"] ?? "",
       email: map["email"] ?? "",
-      businessType: map["business_type"] ?? "",
+      businessType: map["business type"] ?? "",
       description: map["description"] ?? "",
       geolocation: map["geolocation"] ?? "",
     );

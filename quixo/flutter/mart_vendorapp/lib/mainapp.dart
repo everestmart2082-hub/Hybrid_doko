@@ -25,9 +25,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     context.read<VenderAuthBloc>().add(VenderAuthCheck());
-    context.read<DashboardBloc>().add(
-          const LoadVendorChart(page: 1, limit: 10),
-        );
+    context.read<DashboardBloc>().add(LoadDashboardData());
   }
 
   @override
@@ -60,7 +58,7 @@ class _MainAppState extends State<MainApp> {
             }
 
             if (state is DashboardLoaded) {
-              return _buildDashboard(context, state.chartData);
+              return _buildDashboard(context, state.stats);
             }
 
             return const SizedBox();
@@ -72,8 +70,9 @@ class _MainAppState extends State<MainApp> {
 
   Widget _buildDashboard(
     BuildContext context,
-    List<VendorChartData> chartData,
+    DashboardStatsModel stats,
   ) {
+    final chartData = stats.chart;
     final theme = Theme.of(context);
 
     return Container(
@@ -150,36 +149,36 @@ class _MainAppState extends State<MainApp> {
                 crossAxisSpacing: 16,
                 childAspectRatio: 1.3,
               ),
-              children: const [
+              children: [
 
                 DashboardCard(
                   title: "Products",
-                  value: "0",
+                  value: stats.totalProducts.toString(),
                   icon: Icons.inventory,
                 ),
 
                 DashboardCard(
                   title: "Orders",
-                  value: "0",
+                  value: stats.totalOrders.toString(),
                   icon: Icons.shopping_bag,
                 ),
 
                 DashboardCard(
                   title: "Pending Orders",
-                  value: "0",
+                  value: stats.preparingOrders.toString(),
                   icon: Icons.pending_actions,
                 ),
 
                 DashboardCard(
                   title: "Revenue",
-                  value: "Rs 0",
+                  value: "Rs ${stats.totalRevenue}",
                   icon: Icons.attach_money,
                 ),
 
                 DashboardCard(
-                  title: "Complaints",
-                  value: "0",
-                  icon: Icons.report_problem,
+                  title: "Returned",
+                  value: stats.returnedOrders.toString(),
+                  icon: Icons.keyboard_return,
                 ),
               ],
             )
