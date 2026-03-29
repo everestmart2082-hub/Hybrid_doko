@@ -1,6 +1,6 @@
 class AppConstants {
   // App
-  static const String appName = 'QuixoAdmin';
+  static const String appName = 'Quixo Admin';
 
   // API
   static const int connectTimeoutSeconds = 10;

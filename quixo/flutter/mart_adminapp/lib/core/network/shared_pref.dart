@@ -25,5 +25,7 @@ enum prefs {
 
   // for theme
   theme,
-  
-  }
+
+  // for language
+  language,
+}
