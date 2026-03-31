@@ -62,6 +62,7 @@ Drawer buildAppDrawer(BuildContext context) {
             if (isLoggedIn) ...[
               tile(title: 'Orders', icon: Icons.receipt_long, route: '/orders'),
               tile(title: 'Products', icon: Icons.inventory, route: '/products'),
+              tile(title: 'Categories', icon: Icons.category, route: '/categories'),
               tile(title: 'Vendors', icon: Icons.store, route: '/vendors'),
               tile(title: 'Customers', icon: Icons.people, route: '/customers'),
               tile(title: 'Riders', icon: Icons.two_wheeler, route: '/riders'),

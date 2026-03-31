@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quickmartcustomer/core/constants/api_constants.dart';
 import 'package:quickmartcustomer/core/constants/app_constants.dart';
@@ -57,6 +58,7 @@ import 'package:quickmartcustomer/features/product/repository/product_remote.dar
 const String checkNotificationsTask = "checkNotifications";
 
 void callbackDispatcher() {
+  if (kIsWeb) return;
   Workmanager().executeTask((task, inputData) async {
     if (task == checkNotificationsTask) {
       final remote = NotificationRemote(dio: DioClient(baseUrl: ApiEndpoints.baseUrl)); // your repo to fetch notifications
@@ -74,6 +76,7 @@ void callbackDispatcher() {
 
 // Initialize Workmanager in main()
 void initBackgroundTasks() {
+  if (kIsWeb) return;
   Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
   Workmanager().registerPeriodicTask(
     "1",
@@ -85,7 +88,11 @@ void initBackgroundTasks() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  initBackgroundTasks();
+  // Background tasks + local notifications are Android/iOS only.
+  if (!kIsWeb) {
+    initBackgroundTasks();
+    await initNotifications();
+  }
 
   runApp(MyApp());
 }

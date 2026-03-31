@@ -32,6 +32,7 @@ import 'package:mart_adminapp/ui/web/employees/employees_page.dart';
 import 'package:mart_adminapp/ui/web/home/home_page.dart';
 import 'package:mart_adminapp/ui/web/orders/orders_page.dart';
 import 'package:mart_adminapp/ui/web/products/product_details_page.dart';
+import 'package:mart_adminapp/ui/web/products/categories_page.dart';
 import 'package:mart_adminapp/ui/web/products/products_page.dart';
 import 'package:mart_adminapp/ui/web/profile/profile_page.dart';
 import 'package:mart_adminapp/ui/web/riders/riders_page.dart';
@@ -130,6 +131,7 @@ class AdminRoot extends StatelessWidget {
                 '/vendors': (context) => const AdminVendorPage(),
                 '/orders': (context) => const AdminOrdersPage(),
                 '/products': (context) => const AdminProductsPage(),
+                '/categories': (context) => const AdminCategoriesPage(),
                 '/product_details': (context) => const AdminProductDetailsPage(),
                 '/customers': (context) => const AdminCustomersPage(),
                 '/riders': (context) => const AdminRidersPage(),

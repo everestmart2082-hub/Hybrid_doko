@@ -75,3 +75,39 @@ func AdminOrderAll(c *gin.Context) {
 		"message": mapped,
 	})
 }
+
+// AdminGetAllEmployees handles /api/admin/employee/all
+// Returns a slimmed-down list of employees with basic info + violations.
+func AdminGetAllEmployees(c *gin.Context) {
+	coll := utils.GetCollection("employees")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, _ := coll.Find(ctx, bson.M{}, options.Find().SetLimit(200))
+	var results []bson.M
+	cursor.All(ctx, &results)
+
+	var mapped []gin.H
+	for _, v := range results {
+		mapped = append(mapped, gin.H{
+			"id":              v["_id"],
+			"name":            v["name"],
+			"email":           v["email"],
+			"phone":           v["phone"],
+			"position":        v["position"],
+			"salary":          v["salary"],
+			"address":         v["address"],
+			"citizenship_file": v["citizenship_file"],
+			"bank_name":       v["bank_name"],
+			"account_number":  v["account_number"],
+			"pan_file":        v["pan_file"],
+			"suspended":       v["suspended"],
+			"violations":      v["violations"],
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": mapped,
+	})
+}

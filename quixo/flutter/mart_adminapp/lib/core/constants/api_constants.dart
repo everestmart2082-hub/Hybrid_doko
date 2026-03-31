@@ -1,7 +1,7 @@
 class ApiEndpoints {
   // Base
-  static const String baseImageUrl = 'http://10.0.2.2:5000';
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
+  static const String baseImageUrl = "http://localhost:5000";//'http://10.0.2.2:5000';
+  static const String baseUrl = "http://localhost:5000/api";//'http://10.0.2.2:5000/api';
 
   // ========== AUTH ==========
   static const String adminLogin = '/admin/Login/';
@@ -46,6 +46,7 @@ class ApiEndpoints {
   static const String adminEmployeeUpdateOtp = '/admin/employee/update/otp';
   static const String adminEmployeeDelete = '/admin/employee/delete';
   static const String adminEmployeeViolations = '/admin/employee/violations/update';
+  static const String adminEmployeeAll = '/admin/employee/all';
 
   // ========== PRODUCTS ==========
   static const String adminProductAll = '/admin/product/all';

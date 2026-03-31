@@ -42,9 +42,17 @@ class RiderAuthBloc extends Bloc<RiderAuthEvent, RiderAuthState> {
     try {
       final response = await future;
       if (response.success) {
-        s.setKey(prefs.token.name,response.token);
-        emit(RiderAuthSuccess(response.message,
-            token: response.token));
+        // OTP step responses do not contain token.
+        final token = response.token;
+        if (token != null && token.isNotEmpty) {
+          s.setKey(prefs.token.name, token);
+        }
+        emit(
+          RiderAuthSuccess(
+            response.message,
+            token: token,
+          ),
+        );
       } else {
         emit(RiderAuthFailure(response.message));
       }

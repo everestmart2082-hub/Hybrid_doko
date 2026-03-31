@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quickmartrider/core/constants/api_constants.dart';
 import 'package:quickmartrider/core/constants/app_constants.dart';
@@ -32,6 +33,7 @@ import 'mainapp.dart';
 import 'theme.dart';
 
 void callbackDispatcher() {
+  if (kIsWeb) return;
   Workmanager().executeTask((task, inputData) async {
     // Call your notification API here
     // Example: fetch new notifications
@@ -44,15 +46,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   WidgetsFlutterBinding.ensureInitialized();
-  await Workmanager().initialize(
-    callbackDispatcher,
-    isInDebugMode: true,
-  );
-  await Workmanager().registerPeriodicTask(
-    "notificationChecker",
-    "fetchNotifications",
-    frequency: const Duration(minutes: 15), // Check every 15 min
-  );
+  // Workmanager is not supported on web. Guard to prevent runtime crash.
+  if (!kIsWeb) {
+    await Workmanager().initialize(
+      callbackDispatcher,
+      isInDebugMode: true,
+    );
+    await Workmanager().registerPeriodicTask(
+      "notificationChecker",
+      "fetchNotifications",
+      frequency: const Duration(minutes: 15), // Check every 15 min
+    );
+  }
 
 
   runApp(MyApp());

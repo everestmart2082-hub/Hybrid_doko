@@ -50,7 +50,8 @@ class AuthModel extends Equatable {
 
   FormData toFormData() {
     return FormData.fromMap({
-      'phone number': phone,
+      // Backend expects PostForm("phone")
+      'phone': phone,
       'email': email,
       if (name != null) 'name': name,
     });

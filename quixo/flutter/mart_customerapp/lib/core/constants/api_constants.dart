@@ -1,7 +1,15 @@
+import 'package:flutter/foundation.dart';
+
 class ApiEndpoints {
   // Base
-  static const String baseImageUrl = 'http://10.0.2.2:5000';
-  static const String baseUrl = 'http://localhost:5000/api';
+  static String get _host {
+    // Android emulator needs 10.0.2.2, while web should use localhost.
+    if (kIsWeb) return 'http://localhost:5000';
+    return 'http://10.0.2.2:5000';
+  }
+
+  static String get baseImageUrl => _host;
+  static String get baseUrl => '$_host/api';
 
   // ========== AUTH ==========
   static const String userRegister = '/user/registration';

@@ -10,6 +10,17 @@ class AdminEmployeeRemote {
 
   AdminEmployeeRemote({required this.dio});
 
+  // GET /admin/employee/all
+  Future<List<AdminEmployeeModel>> getAllEmployees() async {
+    final Map<String, dynamic> map =
+        await dio.get(ApiEndpoints.adminEmployeeAll);
+    checkSuccess(map);
+    final list = map['message'] as List<dynamic>? ?? [];
+    return list
+        .map((e) => AdminEmployeeModel.fromMap(e as Map<String, dynamic>))
+        .toList();
+  }
+
   // POST /admin/employee/add
   // citizenshipFilePath is the local file path for upload (optional)
   Future<bool> addEmployee(

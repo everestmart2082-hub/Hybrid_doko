@@ -8,11 +8,23 @@ class AdminEmployeeBloc extends Bloc<AdminEmployeeEvent, AdminEmployeeState> {
   final AdminEmployeeRemote remote;
 
   AdminEmployeeBloc(this.remote) : super(AdminEmployeeInitial()) {
+    on<AdminEmployeeLoad>(_onLoad);
     on<AdminEmployeeAdd>(_onAdd);
     on<AdminEmployeeUpdate>(_onUpdate);
     on<AdminEmployeeUpdateOtpVerify>(_onOtpVerify);
     on<AdminEmployeeDelete>(_onDelete);
     on<AdminEmployeeUpdateViolations>(_onViolations);
+  }
+
+  FutureOr<void> _onLoad(
+      AdminEmployeeLoad e, Emitter<AdminEmployeeState> emit) async {
+    emit(AdminEmployeeLoading());
+    try {
+      final list = await remote.getAllEmployees();
+      emit(AdminEmployeeListLoaded(list));
+    } catch (ex) {
+      emit(AdminEmployeeFailed(ex.toString()));
+    }
   }
 
   FutureOr<void> _onAdd(AdminEmployeeAdd e, Emitter<AdminEmployeeState> emit) async {

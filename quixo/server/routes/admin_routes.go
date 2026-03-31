@@ -55,6 +55,7 @@ func SetupAdminRoutes(r *gin.Engine) {
 			protected.POST("/employee/update", controllers.AdminUpdateEmployee)
 			protected.POST("/employee/update/otp", controllers.AdminUpdateEmployeeOTP)
 			protected.DELETE("/employee/delete", controllers.AdminDeleteEmployee)
+			protected.GET("/employee/all", controllers.AdminGetAllEmployees)
 
 			// Notifications
 			protected.POST("/vender/notification", controllers.AdminVendorNotification)

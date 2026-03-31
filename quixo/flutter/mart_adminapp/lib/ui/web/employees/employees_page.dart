@@ -16,11 +16,14 @@ class AdminEmployeesPage extends StatefulWidget {
   State<AdminEmployeesPage> createState() => _AdminEmployeesPageState();
 }
 
-class _AdminEmployeesPageState extends State<AdminEmployeesPage>
-    with SingleTickerProviderStateMixin {
-  final _addFormKey = GlobalKey<FormState>();
-  final _editFormKey = GlobalKey<FormState>();
+class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
+  static const int _perPage = 10;
 
+  int _page = 0;
+  List<AdminEmployeeModel> _employees = const [];
+
+  // Add form
+  final _addFormKey = GlobalKey<FormState>();
   final _addName = TextEditingController();
   final _addPosition = TextEditingController();
   final _addSalary = TextEditingController();
@@ -30,7 +33,10 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage>
   final _addBankName = TextEditingController();
   final _addAccountNumber = TextEditingController();
   final _addPan = TextEditingController();
+  MultipartFile? _addCitizenshipFile;
 
+  // Edit form
+  final _editFormKey = GlobalKey<FormState>();
   final _editName = TextEditingController();
   final _editPosition = TextEditingController();
   final _editSalary = TextEditingController();
@@ -40,8 +46,6 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage>
   final _editBankName = TextEditingController();
   final _editAccountNumber = TextEditingController();
   final _editIfscCode = TextEditingController();
-
-  MultipartFile? _addCitizenshipFile;
   MultipartFile? _editCitizenshipFile;
 
   bool _otpDialogOpen = false;
@@ -49,6 +53,7 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage>
   @override
   void initState() {
     super.initState();
+    context.read<AdminEmployeeBloc>().add(AdminEmployeeLoad());
   }
 
   @override
@@ -88,6 +93,97 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage>
     return MultipartFile.fromBytes(bytes, filename: file.name);
   }
 
+  void _openAddDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Add Employee'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: _addFormKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildField(controller: _addPosition, label: 'position'),
+                  const SizedBox(height: 8),
+                  _buildField(
+                    controller: _addSalary,
+                    label: 'salary',
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _addName, label: 'name'),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _addAddress, label: 'address'),
+                  const SizedBox(height: 8),
+                  _buildField(
+                    controller: _addEmail,
+                    label: 'email',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildField(
+                    controller: _addPhone,
+                    label: 'phone',
+                    keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _addBankName, label: 'bank name'),
+                  const SizedBox(height: 8),
+                  _buildField(
+                      controller: _addAccountNumber, label: 'account number'),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _addPan, label: 'pan (text)'),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('citizenship file'),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _addCitizenshipFile?.filename ??
+                                    'No file selected',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            OutlinedButton(
+                              onPressed: () async {
+                                final f = await _pickCitizenship();
+                                setState(() => _addCitizenshipFile = f);
+                              },
+                              child: const Text('select'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: _submitAdd,
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _submitAdd() {
     if (!(_addFormKey.currentState?.validate() ?? false)) return;
     final salary = double.tryParse(_addSalary.text.trim()) ?? 0;
@@ -105,6 +201,109 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage>
     context.read<AdminEmployeeBloc>().add(
           AdminEmployeeAdd(req: req, citizenshipFile: _addCitizenshipFile),
         );
+    Navigator.of(context).pop();
+  }
+
+  void _openEditDialog(AdminEmployeeModel e) {
+    _editName.text = e.name;
+    _editPosition.text = e.position;
+    _editSalary.text = e.salary.toString();
+    _editAddress.text = e.address;
+    _editEmail.text = e.email;
+    _editPhone.text = e.phone;
+    _editBankName.text = e.bankName;
+    _editAccountNumber.text = e.accountNumber;
+    _editIfscCode.text = '';
+    _editCitizenshipFile = null;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Employee'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: _editFormKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildField(controller: _editPosition, label: 'position'),
+                  const SizedBox(height: 8),
+                  _buildField(
+                    controller: _editSalary,
+                    label: 'salary',
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _editName, label: 'name'),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _editAddress, label: 'address'),
+                  const SizedBox(height: 8),
+                  _buildField(
+                    controller: _editEmail,
+                    label: 'email',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildField(
+                    controller: _editPhone,
+                    label: 'phone',
+                    keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _editBankName, label: 'bank name'),
+                  const SizedBox(height: 8),
+                  _buildField(
+                      controller: _editAccountNumber, label: 'account number'),
+                  const SizedBox(height: 8),
+                  _buildField(controller: _editIfscCode, label: 'ifsc code'),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('citizenship file (optional)'),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _editCitizenshipFile?.filename ??
+                                    'No file selected',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            OutlinedButton(
+                              onPressed: () async {
+                                final f = await _pickCitizenship();
+                                setState(() => _editCitizenshipFile = f);
+                              },
+                              child: const Text('select'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: _submitEdit,
+              child: const Text('Verify OTP'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _submitEdit() {
@@ -124,188 +323,124 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage>
     context.read<AdminEmployeeBloc>().add(
           AdminEmployeeUpdate(req: req, citizenshipFile: _editCitizenshipFile),
         );
+    Navigator.of(context).pop();
+  }
+
+  void _deleteEmployee(AdminEmployeeModel e) {
+    context.read<AdminEmployeeBloc>().add(AdminEmployeeDelete(e.id));
   }
 
   @override
   Widget build(BuildContext context) {
     return WebShell(
       title: 'Employees',
-      child: DefaultTabController(
-        length: 2,
-        child: BlocListener<AdminEmployeeBloc, AdminEmployeeState>(
-          listener: (context, state) async {
-            if (state is AdminEmployeeOtpRequired && !_otpDialogOpen) {
-              _otpDialogOpen = true;
-              final otp = await showOtpDialog(context);
-              if (otp != null && context.mounted) {
-                context.read<AdminEmployeeBloc>().add(
-                      AdminEmployeeUpdateOtpVerify(
-                        phone: state.phone,
-                        otp: otp,
-                      ),
-                    );
-              }
-              _otpDialogOpen = false;
-            } else if (state is AdminEmployeeActionSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            } else if (state is AdminEmployeeFailed) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
+      child: BlocListener<AdminEmployeeBloc, AdminEmployeeState>(
+        listener: (context, state) async {
+          if (state is AdminEmployeeOtpRequired && !_otpDialogOpen) {
+            _otpDialogOpen = true;
+            final otp = await showOtpDialog(context);
+            if (otp != null && context.mounted) {
+              context.read<AdminEmployeeBloc>().add(
+                    AdminEmployeeUpdateOtpVerify(
+                      phone: state.phone,
+                      otp: otp,
+                    ),
+                  );
             }
-          },
-          child: Column(
-            children: [
-              const TabBar(
-                tabs: [
-                  Tab(text: 'Add Employee'),
-                  Tab(text: 'Edit Employee'),
-                ],
+            _otpDialogOpen = false;
+          } else if (state is AdminEmployeeActionSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+            // Refresh list after any action
+            context.read<AdminEmployeeBloc>().add(AdminEmployeeLoad());
+          } else if (state is AdminEmployeeFailed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
               ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 720),
-                        child: Form(
-                          key: _addFormKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Add Employee page',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                              const SizedBox(height: 14),
-                              _buildField(controller: _addPosition, label: 'position'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addSalary, label: 'salary', keyboardType: TextInputType.number),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addName, label: 'name'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addAddress, label: 'address'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addEmail, label: 'email', keyboardType: TextInputType.emailAddress),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addPhone, label: 'phone', keyboardType: TextInputType.phone),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addBankName, label: 'bank name'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addAccountNumber, label: 'account number'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _addPan, label: 'pan (text)'),
-                              const SizedBox(height: 12),
-                              const Text('citizenship file'),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      _addCitizenshipFile?.filename ?? 'No file selected',
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                      final f = await _pickCitizenship();
-                                      setState(() => _addCitizenshipFile = f);
-                                    },
-                                    child: const Text('select file'),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () => _submitAdd(),
-                                  child: const Text('Add Employee'),
-                                ),
-                              ),
-                            ],
-                          ),
+            );
+          } else if (state is AdminEmployeeListLoaded) {
+            setState(() => _employees = state.employees);
+          }
+        },
+        child: Builder(
+          builder: (context) {
+            final totalPages =
+                (_employees.length / _perPage).ceil().clamp(1, 999999);
+            final page = _page.clamp(0, totalPages - 1);
+            final start = page * _perPage;
+            final end = (start + _perPage).clamp(0, _employees.length);
+            final items = _employees.sublist(start, end);
+
+            return Column(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Employees',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
                       ),
-                    ),
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 720),
-                        child: Form(
-                          key: _editFormKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Edit Employee page',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                              const SizedBox(height: 14),
-                              _buildField(controller: _editPosition, label: 'position'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editSalary, label: 'salary', keyboardType: TextInputType.number),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editName, label: 'name'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editAddress, label: 'address'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editEmail, label: 'email', keyboardType: TextInputType.emailAddress),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editPhone, label: 'phone', keyboardType: TextInputType.phone),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editBankName, label: 'bank name'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editAccountNumber, label: 'account number'),
-                              const SizedBox(height: 12),
-                              _buildField(controller: _editIfscCode, label: 'ifsc code'),
-                              const SizedBox(height: 12),
-                              const Text('citizenship file (optional)'),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      _editCitizenshipFile?.filename ?? 'No file selected',
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  OutlinedButton(
-                                    onPressed: () async {
-                                      final f = await _pickCitizenship();
-                                      setState(() => _editCitizenshipFile = f);
-                                    },
-                                    child: const Text('select file'),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () => _submitEdit(),
-                                  child: const Text('Update Employee'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: _openAddDialog,
+                        child: const Text('Add Employee'),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+                const Divider(height: 1),
+                Expanded(
+                  child: _employees.isEmpty
+                      ? const Center(child: Text('No employees found.'))
+                      : ListView.separated(
+                          padding: const EdgeInsets.all(16),
+                          itemBuilder: (context, index) {
+                            final e = items[index];
+                            return _EmployeeCard(
+                              employee: e,
+                              onEdit: () => _openEditDialog(e),
+                              onDelete: () => _deleteEmployee(e),
+                            );
+                          },
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemCount: items.length,
+                        ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      TextButton(
+                        onPressed: page > 0
+                            ? () => setState(() => _page = page - 1)
+                            : null,
+                        child: const Text('Prev'),
+                      ),
+                      const SizedBox(width: 8),
+                      Text('${page + 1} / $totalPages'),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: page < totalPages - 1
+                            ? () => setState(() => _page = page + 1)
+                            : null,
+                        child: const Text('Next'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -328,6 +463,103 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage>
         if (value.isEmpty) return '$label is required';
         return null;
       },
+    );
+  }
+}
+
+class _EmployeeCard extends StatelessWidget {
+  final AdminEmployeeModel employee;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _EmployeeCard({
+    required this.employee,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    employee.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                Text(employee.position),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text('${employee.email} | ${employee.phone}'),
+            const SizedBox(height: 4),
+            Text(employee.address),
+            const SizedBox(height: 4),
+            Text(
+                'Salary: ${employee.salary.toStringAsFixed(2)} | Bank: ${employee.bankName} | Acc: ${employee.accountNumber}'),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 8,
+              children: [
+                Chip(
+                  label: Text(
+                      'suspended: ${employee.suspended ? 'yes' : 'no'}'),
+                ),
+                if (employee.citizenshipFile.isNotEmpty)
+                  const Chip(label: Text('citizenship file')),
+                if (employee.panFile.isNotEmpty)
+                  const Chip(label: Text('pan file')),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (employee.violations.isNotEmpty) ...[
+              const Text(
+                'Violations:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: employee.violations
+                    .map(
+                      (v) => Chip(
+                        label: Text(v.toString()),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: onEdit,
+                  child: const Text('Edit'),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: onDelete,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

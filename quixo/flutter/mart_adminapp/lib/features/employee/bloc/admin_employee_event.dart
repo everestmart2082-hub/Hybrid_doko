@@ -7,6 +7,8 @@ abstract class AdminEmployeeEvent extends Equatable {
   @override List<Object?> get props => [];
 }
 
+class AdminEmployeeLoad extends AdminEmployeeEvent {}
+
 class AdminEmployeeAdd extends AdminEmployeeEvent {
   final AdminEmployeeAddRequest req;
   final MultipartFile? citizenshipFile;
