@@ -5,7 +5,8 @@ class GenerateOtpModel extends Equatable {
 
   const GenerateOtpModel({required this.orderId});
 
-  Map<String, dynamic> toJson() => {"order id": orderId};
+  // Backend uses: c.PostForm("orders id")
+  Map<String, dynamic> toJson() => {"orders id": orderId};
 
   @override
   List<Object?> get props => [orderId];
@@ -17,8 +18,31 @@ class DeliverOrderOtpModel extends Equatable {
 
   const DeliverOrderOtpModel({required this.orderId, required this.otp});
 
-  Map<String, dynamic> toJson() => {"otp": otp};
+  // Backend uses: c.PostForm("orders id") and c.PostForm("otp")
+  Map<String, dynamic> toJson() => {"orders id": orderId, "otp": otp};
 
   @override
   List<Object?> get props => [orderId, otp];
+}
+
+class AcceptOrderModel extends Equatable {
+  final String orderId;
+
+  const AcceptOrderModel({required this.orderId});
+
+  Map<String, dynamic> toJson() => {"orders id": orderId};
+
+  @override
+  List<Object?> get props => [orderId];
+}
+
+class RejectOrderModel extends Equatable {
+  final String orderId;
+
+  const RejectOrderModel({required this.orderId});
+
+  Map<String, dynamic> toJson() => {"orders id": orderId};
+
+  @override
+  List<Object?> get props => [orderId];
 }

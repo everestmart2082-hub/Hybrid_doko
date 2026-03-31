@@ -19,10 +19,13 @@ class OrderRemote {
       query: query.toMap(),
     );
 
-    final data = response.data ?? response; // Depending on dio interceptor config
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
 
     if (data["success"] == true) {
-      return (data["message"] as List)
+      final list = data["message"] as List? ?? const [];
+      return list
           .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } else {
@@ -38,7 +41,10 @@ class OrderRemote {
       formData,
     );
 
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
 
   /// REORDER
@@ -49,16 +55,29 @@ class OrderRemote {
       formData,
     );
 
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
 
   /// RATE RIDER
   Future<SimpleResponseModel> rateRider(RiderRatingRequestModel request) async {
+    // Backend uses `c.PostForm("rider id")` + `c.PostForm("rating")` (strconv.Atoi).
+    final formData = FormData.fromMap({
+      "rider id": request.riderId,
+      "rating": request.rating.toInt().toString(),
+    });
+
     final response = await dio.post(
       '/api/user/rider/rating',
-      request.toJson(), // assuming rating uses standard json based on go server standard elsewhere
+      formData,
     );
 
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+
+    return SimpleResponseModel.fromJson(data);
   }
-}
+}

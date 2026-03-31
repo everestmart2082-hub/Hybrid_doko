@@ -14,7 +14,9 @@ class SettingsState extends Equatable {
   }
 
   factory SettingsState.fromMap(Map<String, dynamic> map) {
-    return SettingsState(theme: map['theme'] ?? false);
+    final raw = map['theme'];
+    final theme = raw is String && raw.isNotEmpty ? raw : 'amber-red';
+    return SettingsState(theme: theme);
   }
 
   @override

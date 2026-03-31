@@ -44,3 +44,12 @@ class OrderRiderRatingRequested extends OrderEvent {
   @override
   List<Object?> get props => [request];
 }
+
+class OrderCancelAllRequested extends OrderEvent {
+  final List<String> orderIds;
+
+  const OrderCancelAllRequested(this.orderIds);
+
+  @override
+  List<Object?> get props => [orderIds];
+}

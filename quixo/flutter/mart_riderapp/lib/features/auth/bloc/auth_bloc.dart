@@ -24,12 +24,15 @@ class RiderAuthBloc extends Bloc<RiderAuthEvent, RiderAuthState> {
 
   FutureOr<void> _onAuthCheck(AuthCheck event, Emitter<RiderAuthState> emit) async{
     emit(RiderAuthLoading());
-    bool b = (await s.getKey(prefs.token.name))!.isNotEmpty;
-    if(!b){
+    final token = await s.getKey(prefs.token.name);
+    final hasToken = token != null && token.isNotEmpty;
+
+    if (!hasToken) {
       emit(RiderAuthFailure("Token not found"));
+      return;
     }
 
-    emit(RiderAuthSuccess(b.toString(),token: s.getKey(prefs.token.name) as String?));
+    emit(RiderAuthSuccess(hasToken.toString(), token: token));
   }
 
   FutureOr<void> _handleAuth(

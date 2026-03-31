@@ -43,3 +43,21 @@ class RiderOrderDelivered extends RiderOrderEvent {
   @override
   List<Object?> get props => [model];
 }
+
+class RiderOrderAcceptRequested extends RiderOrderEvent {
+  final AcceptOrderModel model;
+
+  const RiderOrderAcceptRequested(this.model);
+
+  @override
+  List<Object?> get props => [model];
+}
+
+class RiderOrderRejectRequested extends RiderOrderEvent {
+  final RejectOrderModel model;
+
+  const RiderOrderRejectRequested(this.model);
+
+  @override
+  List<Object?> get props => [model];
+}

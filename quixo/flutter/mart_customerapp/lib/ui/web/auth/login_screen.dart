@@ -21,23 +21,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _submitLogin() {
     if (_formKey.currentState!.validate()) {
-      context.read<AuthBloc>().add(AuthLogin(
-        input: AuthModel(
-          phone: _phoneController.text.trim(),
-          email: '', // Not required for login
+      context.read<AuthBloc>().add(
+        AuthLogin(
+          input: AuthModel(
+            phone: _phoneController.text.trim(),
+            email: '', // Not required for login
+          ),
         ),
-      ));
+      );
     }
   }
 
   void _submitOtp() {
     if (_otpController.text.length == 6) {
-      context.read<AuthBloc>().add(AuthLoginOtpVerify(
-        input: OtpVerifyModel(
-          phone: _phoneController.text.trim(),
-          otp: _otpController.text.trim(),
+      context.read<AuthBloc>().add(
+        AuthLoginOtpVerify(
+          input: OtpVerifyModel(
+            phone: _phoneController.text.trim(),
+            otp: _otpController.text.trim(),
+          ),
         ),
-      ));
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('OTP must be exactly 6 digits')),
@@ -98,9 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(context, '/mainapp');
           } else if (state is AuthFailed) {
             if (Navigator.canPop(context)) Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         child: Center(
@@ -118,13 +122,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Text(
                         "Login",
                         style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold),
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 32),
                       TextFormField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         decoration: const InputDecoration(
                           labelText: "Phone (+977)",
                           border: OutlineInputBorder(),
@@ -144,7 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: BlocBuilder<AuthBloc, AuthState>(
                           builder: (context, state) {
                             return ElevatedButton(
-                              onPressed: (state is AuthLoading) ? null : _submitLogin,
+                              onPressed: (state is AuthLoading)
+                                  ? null
+                                  : _submitLogin,
                               child: (state is AuthLoading)
                                   ? const CircularProgressIndicator()
                                   : const Text("Login Button"),

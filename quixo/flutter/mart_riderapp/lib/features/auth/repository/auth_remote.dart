@@ -2,6 +2,7 @@
 import 'package:quickmartrider/core/constants/api_constants.dart';
 
 import '../../../core/network/dio_client.dart';
+import 'package:dio/dio.dart';
 import '../data/rider_model.dart';
 import '../data/rider_login_model.dart';
 import '../data/rider_otp_model.dart';
@@ -21,7 +22,10 @@ class RiderAuthRemote {
       formData,
     );
 
-    return RiderAuthResponseModel.fromJson(response.data);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return RiderAuthResponseModel.fromJson(data);
   }
 
   /// Registration OTP
@@ -29,29 +33,38 @@ class RiderAuthRemote {
       RiderOtpModel model) async {
     final response = await dio.post(
       ApiEndpoints.registrationOtp,
-      model.toJson(),
+      FormData.fromMap(model.toJson()),
     );
 
-    return RiderAuthResponseModel.fromJson(response.data);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return RiderAuthResponseModel.fromJson(data);
   }
 
   /// Login
   Future<RiderAuthResponseModel> login(RiderLoginModel model) async {
     final response = await dio.post(
       ApiEndpoints.login,
-      model.toJson(),
+      FormData.fromMap(model.toJson()),
     );
 
-    return RiderAuthResponseModel.fromJson(response.data);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return RiderAuthResponseModel.fromJson(data);
   }
 
   /// Login OTP
   Future<RiderAuthResponseModel> verifyLoginOtp(RiderOtpModel model) async {
     final response = await dio.post(
       ApiEndpoints.loginOtp,
-      model.toJson(),
+      FormData.fromMap(model.toJson()),
     );
 
-    return RiderAuthResponseModel.fromJson(response.data);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return RiderAuthResponseModel.fromJson(data);
   }
 }

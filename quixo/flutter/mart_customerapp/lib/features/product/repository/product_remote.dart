@@ -1,10 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:quickmartcustomer/core/constants/api_constants.dart';
 import 'package:quickmartcustomer/core/failures/failures.dart';
 import 'package:quickmartcustomer/core/network/dio_client.dart';
 import 'package:quickmartcustomer/features/product/data/review_model.dart';
 import '../data/product_list_item_model.dart';
 import '../data/product_model.dart';
-import '../../../core/network/dio_client.dart';
 import '../data/rating_request_model.dart';
 import '../data/simple_response_model.dart';
 
@@ -66,21 +66,40 @@ class ProductRemote {
   }
 
   Future<SimpleResponseModel> addReview(ReviewRequestModel review) async {
+    final formData = FormData.fromMap({
+      "product id": review.productId,
+      "message": review.message,
+    });
+
     final response = await dio.post(
       ApiEndpoints.addReview,
-      review.toJson(),
+      formData,
     );
 
-    return SimpleResponseModel.fromJson(response.data);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+
+    return SimpleResponseModel.fromJson(data);
   }
 
   Future<SimpleResponseModel> addRating(RatingRequestModel rating) async {
+    // Backend parses rating using `strconv.Atoi`, so ensure it's an integer string.
+    final formData = FormData.fromMap({
+      "product id": rating.productId,
+      "rating": rating.rating.toInt().toString(),
+    });
+
     final response = await dio.post(
       ApiEndpoints.addRating,
-      rating.toJson(),
+      formData,
     );
 
-    return SimpleResponseModel.fromJson(response.data);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+
+    return SimpleResponseModel.fromJson(data);
   }
 
   void _checkSuccess(Map<String, dynamic> map) {
@@ -88,4 +107,4 @@ class ProductRemote {
       throw UnknownFailure( map['message']?.toString() ?? "Something went wrong");
     }
   }
-}
+}

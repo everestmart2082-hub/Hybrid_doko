@@ -16,6 +16,8 @@ import 'package:quickmartrider/features/notification/ui/notification_page.dart';
 import 'package:quickmartrider/features/order/bloc/order_bloc.dart';
 import 'package:quickmartrider/features/order/repository/order_remote.dart';
 import 'package:quickmartrider/features/order/ui/order_page.dart';
+import 'package:quickmartrider/features/contacts/bloc/contact_bloc.dart';
+import 'package:quickmartrider/features/contacts/repository/contacts_remote.dart';
 import 'package:quickmartrider/features/profile/bloc/profile_bloc.dart';
 import 'package:quickmartrider/features/profile/repository/rider_profile_remote.dart';
 import 'package:quickmartrider/features/profile/ui/profile_page.dart';
@@ -93,6 +95,7 @@ class MyApp extends StatelessWidget {
       providers: [
         /// AUTH
         RepositoryProvider(create: (context)=>RiderAuthRemote(dio: dioClient)),
+        RepositoryProvider(create: (context)=>RiderContactsRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>RiderNotificationRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>RiderDashboardRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>RiderOrderRemote(dio: dioClient)),
@@ -104,6 +107,7 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(create: (context)=> SettingsBloc()),
           BlocProvider(create: (context)=> RiderAuthBloc(context.read<RiderAuthRemote>())),
+          BlocProvider(create: (context)=> RiderContactsBloc(context.read<RiderContactsRemote>())),
           BlocProvider(create: (context)=> RiderNotificationBloc(context.read<RiderNotificationRemote>())),
           BlocProvider(create: (context)=> RiderDashboardBloc(context.read<RiderDashboardRemote>())),
           BlocProvider(create: (context)=> RiderOrderBloc(context.read<RiderOrderRemote>())),

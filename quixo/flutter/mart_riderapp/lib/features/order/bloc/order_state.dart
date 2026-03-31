@@ -34,6 +34,22 @@ class RiderOrderDeliveredSuccess extends RiderOrderState {
   List<Object?> get props => [message];
 }
 
+class RiderOrderActionSuccess extends RiderOrderState {
+  final String message;
+  const RiderOrderActionSuccess(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class RiderOrderActionFailure extends RiderOrderState {
+  final String message;
+  const RiderOrderActionFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class RiderOrderFailure extends RiderOrderState {
   final String message;
   const RiderOrderFailure(this.message);

@@ -10,20 +10,26 @@ class WishlistRemote {
   WishlistRemote({required this.dio});
 
   /// GET WISHLIST ITEMS
+  ///
+  /// Backend route: `POST /api/user/wishlist/get`
   Future<List<WishlistItemModel>> getWishlist(WishlistQueryModel query) async {
-    final response = await dio.get(
+    final response = await dio.post(
       '/api/user/wishlist/get',
-      query: query.toJson(),
+      FormData.fromMap(query.toJson()),
     );
 
-    final data = response.data ?? response;
-    if (data["success"] == true) {
-      return (data["message"] as List)
-          .map((e) => WishlistItemModel.fromJson(e as Map<String, dynamic>))
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+
+    if (data['success'] == true) {
+      final list = data['message'] as List? ?? const [];
+      return list
+          .map((e) => WishlistItemModel.fromJson((e as Map).cast<String, dynamic>()))
           .toList();
-    } else {
-      throw Exception(data["message"]);
     }
+
+    throw Exception(data['message'] ?? 'Failed to fetch wishlist');
   }
 
   /// ADD ITEM
@@ -33,7 +39,10 @@ class WishlistRemote {
       '/api/user/wishlist/add',
       formData,
     );
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
 
   /// REMOVE ITEM
@@ -43,6 +52,9 @@ class WishlistRemote {
       '/api/user/wishlist/remove',
       formData,
     );
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
-}
+}

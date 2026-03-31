@@ -14,6 +14,8 @@ import 'package:quickmartcustomer/ui/web/auth/login_screen.dart';
 import 'package:quickmartcustomer/ui/web/auth/register_screen.dart';
 import 'package:quickmartcustomer/features/cart/bloc/cart_bloc.dart';
 import 'package:quickmartcustomer/features/cart/repository/cart_remote.dart';
+import 'package:quickmartcustomer/features/contacts/bloc/contact_bloc.dart';
+import 'package:quickmartcustomer/features/contacts/repository/contact_remote.dart';
 import 'package:quickmartcustomer/features/cart/ui/cart_page.dart';
 import 'package:quickmartcustomer/features/notification/bloc/notification_bloc.dart';
 import 'package:quickmartcustomer/features/notification/data/notification_query_model.dart';
@@ -25,8 +27,10 @@ import 'package:quickmartcustomer/features/order/ui/order_page.dart';
 import 'package:quickmartcustomer/features/payment/bloc/payment_bloc.dart';
 import 'package:quickmartcustomer/features/payment/repository/payment_remote.dart';
 import 'package:quickmartcustomer/features/payment/ui/checkout_page.dart';
-import 'package:quickmartcustomer/features/payment/ui/payment_page.dart';
 import 'package:quickmartcustomer/features/product/ui/product_list_page.dart';
+import 'package:quickmartcustomer/features/product/ui/product_detail_page.dart';
+import 'package:quickmartcustomer/features/wishlist/ui/wishlist_page.dart';
+import 'package:quickmartcustomer/features/product/data/product_list_item_model.dart';
 import 'package:quickmartcustomer/features/productGuest/bloc/product_bloc.dart';
 import 'package:quickmartcustomer/features/productGuest/repository/product_remote.dart';
 import 'package:quickmartcustomer/features/productGuest/ui/product_list_page.dart';
@@ -46,6 +50,9 @@ import 'core/network/dio_client.dart';
 
 import 'mainapp.dart';
 import 'theme.dart';
+
+import 'package:quickmartcustomer/features/product/bloc/product_bloc.dart';
+import 'package:quickmartcustomer/features/product/repository/product_remote.dart';
 
 const String checkNotificationsTask = "checkNotifications";
 
@@ -125,6 +132,8 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context)=>AddressRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>OrderRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>CartRemote(dio: dioClient)),
+        RepositoryProvider(create: (context)=>ContactRemote(dio: dioClient)),
+        RepositoryProvider(create: (context)=>ProductRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>PaymentRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>ProductGuestRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>WishlistRemote(dio: dioClient)),
@@ -139,6 +148,8 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (context)=>AddressBloc(context.read<AddressRemote>())),
           BlocProvider(create: (context)=>OrderBloc(context.read<OrderRemote>())),
           BlocProvider(create: (context)=>CartBloc(context.read<CartRemote>())),
+          BlocProvider(create: (context)=>ProductBloc(context.read<ProductRemote>())),
+          BlocProvider(create: (context)=>ContactBloc(context.read<ContactRemote>())),
           BlocProvider(create: (context)=>PaymentBloc(context.read<PaymentRemote>())),
           BlocProvider(create: (context)=>ProductGuestBloc(context.read<ProductGuestRemote>())),
           BlocProvider(create: (context)=>WishlistBloc(context.read<WishlistRemote>())),
@@ -167,6 +178,19 @@ class MyApp extends StatelessWidget {
                 '/payment': (context) => const CheckoutPage(),
                 '/addresses': (context) => const AddressPage(),
                 '/notifications': (context) => const NotificationPage()
+                ,
+                '/wishlist': (context) => const WishlistPage(),
+                '/product-detail': (context) {
+                  final args = ModalRoute.of(context)?.settings.arguments;
+                  if (args is String) {
+                    return ProductDetailPage(productId: args);
+                  }
+                  // Support navigation from ProductListPage/MainApp which passes a ProductListItem.
+                  if (args is ProductListItem) {
+                    return ProductDetailPage(productId: args.id);
+                  }
+                  return const ProductDetailPage(productId: '');
+                },
               },
             );
           }

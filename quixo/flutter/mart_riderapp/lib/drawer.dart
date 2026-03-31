@@ -39,8 +39,7 @@ Drawer buildAppDrawer(BuildContext context) {
       child: 
       BlocBuilder<RiderAuthBloc, RiderAuthState>(
         builder: (context, state) {
-          // #usethis for testing login
-          final isLoggedIn = state is RiderAuthSuccess ? state.message == true.toString() : false;
+          final isLoggedIn = state is RiderAuthSuccess && (state.token?.isNotEmpty ?? false);
 
           return Column(
             children: [
@@ -62,7 +61,7 @@ Drawer buildAppDrawer(BuildContext context) {
               tile(
                 title: 'Home',
                 icon: Icons.home,
-                route: '/',
+                route: '/mainapp',
               ),
               
 
@@ -76,7 +75,7 @@ Drawer buildAppDrawer(BuildContext context) {
                 tile(
                   title: 'Orders',
                   icon: Icons.receipt_long,
-                  route: '/orders',
+                  route: '/order',
                 ),
               ],
 
@@ -118,7 +117,7 @@ Drawer buildAppDrawer(BuildContext context) {
                     label: const Text('Logout'),
                     onPressed: () {
                       context.read<RiderAuthBloc>().add(RiderAuthLogout());
-                      Navigator.pushReplacementNamed(context, '/');
+                      Navigator.pushReplacementNamed(context, '/login');
                     },
                   ),
                   onTap: () {

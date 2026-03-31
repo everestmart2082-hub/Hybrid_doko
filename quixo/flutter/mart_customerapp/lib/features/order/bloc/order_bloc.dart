@@ -11,6 +11,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   OrderBloc(this.orderRemote) : super(OrderInitial()) {
     on<OrderFetchRequested>(_onFetch);
     on<OrderCancelRequested>(_onCancel);
+    on<OrderCancelAllRequested>(_onCancelAll);
     on<OrderReorderRequested>(_onReorder);
     on<OrderRiderRatingRequested>(_onRiderRating);
   }
@@ -38,6 +39,39 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
       emit(OrderActionSuccess(response.message));
 
+      add(OrderFetchRequested(const OrderQueryModel()));
+    } catch (e) {
+      emit(OrderFailed(e.toString()));
+    }
+  }
+
+  FutureOr<void> _onCancelAll(
+    OrderCancelAllRequested event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(OrderLoading());
+    try {
+      int cancelledCount = 0;
+      int skippedCount = 0;
+      String lastSkipMessage = '';
+
+      for (final orderId in event.orderIds) {
+        final response = await orderRemote.cancelOrder(orderId);
+        if (response.success) {
+          cancelledCount++;
+        } else {
+          skippedCount++;
+          lastSkipMessage = response.message;
+        }
+      }
+
+      final message = skippedCount == 0
+          ? 'All orders cancelled successfully'
+          : 'Cancelled $cancelledCount orders, skipped $skippedCount ($lastSkipMessage)';
+
+      emit(OrderActionSuccess(message));
+
+      // Refresh orders after cancel-all attempt.
       add(OrderFetchRequested(const OrderQueryModel()));
     } catch (e) {
       emit(OrderFailed(e.toString()));

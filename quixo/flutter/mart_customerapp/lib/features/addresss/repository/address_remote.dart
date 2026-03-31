@@ -15,22 +15,25 @@ class AddressRemote {
     required int page,
     required int limit,
   }) async {
-    final response = await dio.get(
+    final response = await dio.post(
       '/api/user/address/all',
-      query: {
+      FormData.fromMap({
         "page": page,
         "limit": limit,
-      },
+      }),
     );
 
-    final data = response.data ?? response;
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
 
     if (data["success"] == true) {
-      return (data["message"] as List)
-          .map((e) => AddressModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+      return (data["message"] as List?)
+              ?.map((e) => AddressModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [];
     } else {
-      throw Exception(data["message"]);
+      throw Exception(data["message"] ?? 'Failed to fetch addresses');
     }
   }
 
@@ -41,7 +44,10 @@ class AddressRemote {
       address.toFormData(),
     );
 
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
 
   // UPDATE
@@ -51,7 +57,10 @@ class AddressRemote {
       address.toFormData(),
     );
 
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
 
   // DELETE
@@ -62,6 +71,9 @@ class AddressRemote {
       formData,
     );
 
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
-}
+}

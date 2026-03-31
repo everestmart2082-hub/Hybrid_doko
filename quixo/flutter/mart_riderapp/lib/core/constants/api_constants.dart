@@ -16,14 +16,19 @@ class ApiEndpoints {
   static const String Notification = '/rider/notification';
 
   //========Orders=====
-  static const String orderAll = '/user/order/all';
+  static const String orderAll = '/rider/order/all';
   static const String generateOtp = '/rider/generate_otp';
-  static const String orderDelivered = '/user/order/delievered/';
+  static const String orderDelivered = '/rider/order/delivered';
+  static const String orderAccept = '/rider/order/accept';
+  static const String orderReject = '/rider/order/reject';
 
   //======Profile===========
   static const String getProfile = '/rider/profile/get';
   static const String profileUpdate = '/rider/profile/update';
   static const String deleteProfile = '/rider/profile/delete';
   static const String updateProfileOtp = '/rider/profile/otp';
+
+  //======Messaging===========
+  static const String riderMessage = '/rider/message';
 
 }

@@ -146,7 +146,7 @@ class _ProductListPageState extends State<ProductListPage> {
         value: o,
         groupValue: _selectedCategory ?? 'all',
         onChanged: (val) {
-          setState(() => _selectedCategory = val as String?);
+          setState(() => _selectedCategory = val);
         },
         dense: true,
       )).toList(),

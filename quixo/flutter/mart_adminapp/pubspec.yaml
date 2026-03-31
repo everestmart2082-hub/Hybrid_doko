@@ -9,6 +9,7 @@ environment:
 dependencies:
   dio: ^5.9.2
   equatable: ^2.0.8
+  file_picker: ^10.3.10
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1

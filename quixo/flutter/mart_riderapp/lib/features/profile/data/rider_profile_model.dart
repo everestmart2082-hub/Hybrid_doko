@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:equatable/equatable.dart';
 
 class RiderProfileModel extends Equatable {
@@ -6,22 +5,26 @@ class RiderProfileModel extends Equatable {
   final String number;
   final String? email;
   final String? defaultAddress;
-  final File? blueBook;
+  final String? blueBookUrl;
   final String? bikeDetail;
-  final File? insurancePaper;
-  final File? panCard;
-  final File? citizenship;
+  final String? insurancePaperUrl;
+  final String? panCardUrl;
+  final String? citizenshipUrl;
+  final bool verified;
+  final bool updationRequested;
 
   const RiderProfileModel({
     required this.name,
     required this.number,
     this.email,
     this.defaultAddress,
-    this.blueBook,
+    this.blueBookUrl,
     this.bikeDetail,
-    this.insurancePaper,
-    this.panCard,
-    this.citizenship,
+    this.insurancePaperUrl,
+    this.panCardUrl,
+    this.citizenshipUrl,
+    this.verified = false,
+    this.updationRequested = false,
   });
 
   @override
@@ -30,10 +33,12 @@ class RiderProfileModel extends Equatable {
         number,
         email,
         defaultAddress,
-        blueBook,
+        blueBookUrl,
         bikeDetail,
-        insurancePaper,
-        panCard,
-        citizenship,
+        insurancePaperUrl,
+        panCardUrl,
+        citizenshipUrl,
+        verified,
+        updationRequested,
       ];
 }

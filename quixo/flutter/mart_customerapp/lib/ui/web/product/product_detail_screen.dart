@@ -5,7 +5,6 @@ import 'package:quickmartcustomer/features/cart/bloc/cart_bloc.dart';
 import 'package:quickmartcustomer/features/cart/bloc/cart_event.dart';
 import 'package:quickmartcustomer/features/cart/data/cart_model.dart';
 import 'package:quickmartcustomer/features/product/data/product_list_item_model.dart';
-import 'package:quickmartcustomer/features/product/data/product_model.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final ProductListItem productItem;

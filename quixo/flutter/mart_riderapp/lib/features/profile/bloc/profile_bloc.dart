@@ -27,6 +27,12 @@ class RiderProfileBloc extends Bloc<RiderProfileEvent, RiderProfileState> {
           email: res.email,
           defaultAddress: res.defaultAddress,
           bikeDetail: res.bikeDetail,
+          verified: res.verified ?? false,
+          updationRequested: res.updationRequested ?? false,
+          blueBookUrl: res.blueBookUrl,
+          insurancePaperUrl: res.insurancePaperUrl,
+          panCardUrl: res.panCardUrl,
+          citizenshipUrl: res.citizenshipUrl,
         )));
       } else {
         emit(RiderProfileFailure(res.message));
