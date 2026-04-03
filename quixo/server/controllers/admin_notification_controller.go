@@ -49,10 +49,14 @@ func AdminRiderNotification(c *gin.Context) { handleNotification(c, "rider id", 
 func handleViolationUpdate(c *gin.Context, collName, idField string) {
 	idStr := c.PostForm(idField)
 	
-	// Form arrays typically bind as slice
 	violations := c.PostFormArray("violations[]")
 	if len(violations) == 0 {
-		violations = append(violations, c.PostForm("violations"))
+		val := c.PostForm("violations")
+		if val != "" {
+			violations = append(violations, val)
+		} else {
+			violations = []string{}
+		}
 	}
 	id, _ := primitive.ObjectIDFromHex(idStr)
 

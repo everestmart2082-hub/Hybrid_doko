@@ -185,9 +185,12 @@ func GetAllCategories(c *gin.Context) {
 	for i, cat := range results {
 		name, _ := cat["name"].(string)
 		mapped = append(mapped, gin.H{
-			"id":   i + 1,
-			"name": name,
-			"_id":  cat["_id"], // Behind the scenes true ID mapped
+			"id":              i + 1,
+			"name":            name,
+			"_id":             cat["_id"], // Behind the scenes true ID mapped
+			"delivery_type":   cat["delivery_type"],
+			"required_fields": cat["required_fields"],
+			"other_fields":    cat["other_fields"],
 		})
 	}
 

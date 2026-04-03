@@ -25,7 +25,7 @@ class AdminRiderRemote {
   Future<bool> approveRider(String riderId, bool approved) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminRiderApprove,
-      {'rider id': riderId, 'approved': approved.toString()},
+      FormData.fromMap({'rider id': riderId, 'approved': approved.toString()}),
     );
     return checkSuccess(map);
   }
@@ -34,7 +34,7 @@ class AdminRiderRemote {
   Future<bool> suspendRider(String riderId, bool suspended) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminRiderSuspension,
-      {'rider id': riderId, 'suspended': suspended.toString()},
+      FormData.fromMap({'rider id': riderId, 'suspended': suspended.toString()}),
     );
     return checkSuccess(map);
   }
@@ -43,7 +43,7 @@ class AdminRiderRemote {
   Future<bool> blacklistRider(String riderId, bool blacklisted) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminRiderBlacklist,
-      {'rider id': riderId, 'blacklisted': blacklisted.toString()},
+      FormData.fromMap({'rider id': riderId, 'blacklisted': blacklisted.toString()}),
     );
     return checkSuccess(map);
   }
@@ -52,7 +52,7 @@ class AdminRiderRemote {
   Future<bool> sendNotification(String riderId, String message) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminRiderNotification,
-      {'rider id': riderId, 'message': message},
+      FormData.fromMap({'rider id': riderId, 'message': message}),
     );
     return checkSuccess(map);
   }
@@ -61,7 +61,8 @@ class AdminRiderRemote {
   Future<bool> updateViolations(String riderId, List<String> violations) async {
     final formData = FormData.fromMap({
       'rider id': riderId,
-      'violations[]': violations,
+      if (violations.isNotEmpty) 'violations[]': violations,
+      if (violations.isEmpty) 'violations': '',
     });
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminRiderViolations,

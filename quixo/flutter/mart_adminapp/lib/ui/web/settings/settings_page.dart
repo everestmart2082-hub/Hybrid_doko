@@ -26,6 +26,7 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
     final selected = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
+        backgroundColor: Theme.of(context).primaryColorLight,
         title: const Text('Theme'),
         children: themeOptions
             .map(
@@ -33,9 +34,7 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
                 onPressed: () => Navigator.pop(context, t),
                 child: Text(
                   t,
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  style: TextStyle(color: Theme.of(context).primaryColorDark),
                 ),
               ),
             )
@@ -52,12 +51,16 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
     final selected = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
+        backgroundColor: Theme.of(context).primaryColorLight,
         title: const Text('Language'),
         children: languages
             .map(
               (l) => SimpleDialogOption(
                 onPressed: () => Navigator.pop(context, l),
-                child: Text(l),
+                child: Text(
+                  l,
+                  style: TextStyle(color: Theme.of(context).primaryColorDark),
+                ),
               ),
             )
             .toList(),
@@ -78,36 +81,74 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
             padding: const EdgeInsets.all(16),
             children: [
               ListTile(
-                title: const Text('Theme'),
-                subtitle: Text(state.theme),
-                trailing: const Icon(Icons.chevron_right),
+                title: Text(
+                  'Theme',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  state.theme,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).textTheme.headlineLarge?.color,
+                ),
                 onTap: () => _pickTheme(context, state),
               ),
               const Divider(),
               ListTile(
-                title: const Text('Language'),
-                subtitle: Text(state.language),
-                trailing: const Icon(Icons.chevron_right),
+                title: Text(
+                  'Language',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  state.language,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).textTheme.headlineLarge?.color,
+                ),
                 onTap: () => _pickLanguage(context, state),
               ),
               const Divider(),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'About',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const ListTile(
-                title: Text('version'),
-                subtitle: Text('0.1.0'),
+              ListTile(
+                title: Text(
+                  'version',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  '0.1.0',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ),
-              const ListTile(
-                title: Text('developer'),
-                subtitle: Text('Quixo team'),
+              ListTile(
+                title: Text(
+                  'developer',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  'Quixo team',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ),
-              const ListTile(
-                title: Text('license'),
-                subtitle: Text('MIT'),
+              ListTile(
+                title: Text(
+                  'license',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  'MIT',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ),
             ],
           );
@@ -116,4 +157,3 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
     );
   }
 }
-

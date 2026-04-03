@@ -21,8 +21,10 @@ class WebShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
-        title: Text(title),
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(title, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
         actions: actions,
       ),

@@ -25,7 +25,7 @@ class AdminVendorRemote {
   Future<bool> approveVendor(String venderId, bool approved) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminVendorApprove,
-      {'vender id': venderId, 'approved': approved.toString()},
+      FormData.fromMap({'vender id': venderId, 'approved': approved.toString()}),
     );
     return checkSuccess(map);
   }
@@ -34,7 +34,7 @@ class AdminVendorRemote {
   Future<bool> suspendVendor(String venderId, bool suspended) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminVendorSuspension,
-      {'vender id': venderId, 'suspended': suspended.toString()},
+      FormData.fromMap({'vender id': venderId, 'suspended': suspended.toString()}),
     );
     return checkSuccess(map);
   }
@@ -43,7 +43,7 @@ class AdminVendorRemote {
   Future<bool> blacklistVendor(String venderId, bool blacklisted) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminVendorBlacklist,
-      {'vender id': venderId, 'blacklisted': blacklisted.toString()},
+      FormData.fromMap({'vender id': venderId, 'blacklisted': blacklisted.toString()}),
     );
     return checkSuccess(map);
   }
@@ -53,7 +53,7 @@ class AdminVendorRemote {
       AdminNotificationRequest req) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminVendorNotification,
-      {'vender id': req.targetId, 'message': req.message},
+      FormData.fromMap({'vender id': req.targetId, 'message': req.message}),
     );
     return checkSuccess(map);
   }
@@ -62,8 +62,8 @@ class AdminVendorRemote {
   Future<bool> updateViolations(AdminViolationsRequest req) async {
     final formData = FormData.fromMap({
       'vender id': req.targetId,
-      // FormData sends repeated keys for array: violations[]=... violations[]=...
-      'violations[]': req.violations,
+      if (req.violations.isNotEmpty) 'violations[]': req.violations,
+      if (req.violations.isEmpty) 'violations': '',
     });
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminVendorViolations,

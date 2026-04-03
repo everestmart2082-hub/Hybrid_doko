@@ -77,7 +77,8 @@ class AdminEmployeeRemote {
       String employeeId, List<String> violations) async {
     final formData = FormData.fromMap({
       'employee id': employeeId,
-      'violations[]': violations,
+      if (violations.isNotEmpty) 'violations[]': violations,
+      if (violations.isEmpty) 'violations': '',
     });
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminEmployeeViolations,

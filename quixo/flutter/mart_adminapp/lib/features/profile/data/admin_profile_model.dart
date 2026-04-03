@@ -30,25 +30,23 @@ class AdminProfile extends Equatable {
 class AdminProfileUpdateRequest extends Equatable {
   final String name;
   final String number;
-  final String description;
-  final String address;
+  final String email;
 
   const AdminProfileUpdateRequest({
     required this.name,
     required this.number,
-    required this.description,
-    required this.address,
+    required this.email
+
   });
 
   Map<String, dynamic> toMap() => {
         'name': name,
         'number': number,
-        'description': description,
-        'address': address,
+        'email': email,
       };
 
   @override
-  List<Object?> get props => [name, number, description, address];
+  List<Object?> get props => [name, number, email];
 }
 
 // ─── Delete Request ─────────────────────────────────────────────────────────

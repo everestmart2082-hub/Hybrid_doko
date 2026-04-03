@@ -122,8 +122,10 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                     SizedBox(
                       width: 320,
                       child: TextField(
+                        style: Theme.of(context).textTheme.bodyLarge,
                         controller: _search,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
+                          labelStyle: Theme.of(context).textTheme.bodyLarge,
                           labelText: 'Search',
                           border: OutlineInputBorder(),
                         ),
@@ -132,6 +134,9 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                     ),
                     const SizedBox(width: 16),
                     DropdownButton<String>(
+                      
+                      dropdownColor: Theme.of(context).primaryColorLight,
+                      iconEnabledColor: Theme.of(context).primaryColorDark,
                       value: _category,
                       onChanged: (v) {
                         setState(() {
@@ -140,15 +145,18 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                         });
                       },
                       items: [
-                        const DropdownMenuItem(value: 'all', child: Text('All categories')),
+                        DropdownMenuItem(value: 'all', child: Text('All categories', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),)),
                         ..._categories.map((c) => DropdownMenuItem(
                               value: c.name,
-                              child: Text(c.name),
+                              child: Text(c.name,style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),),
                             )),
                       ],
                     ),
                     const SizedBox(width: 16),
                     DropdownButton<String>(
+                      
+                      dropdownColor: Theme.of(context).primaryColorLight,
+                      iconEnabledColor: Theme.of(context).primaryColorDark,
                       value: _sort,
                       onChanged: (v) => setState(() => _sort = v ?? 'default'),
                       items: const [
@@ -266,9 +274,9 @@ class _ProductCard extends StatelessWidget {
                     ),
               ),
               const SizedBox(height: 6),
-              Text('${product.pricePerUnit} ${product.deliveryCategory.isEmpty ? '' : ''} per unit'),
+              Text('${product.pricePerUnit} ${product.deliveryCategory.isEmpty ? '' : ''} per unit', style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 4),
-              Text('brand: ${product.brandName}'),
+              Text('brand: ${product.brandName}', style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -364,7 +372,7 @@ class _Pagination extends StatelessWidget {
         children: [
           TextButton(onPressed: onPrev, child: const Text('Prev')),
           const SizedBox(width: 10),
-          Text('${page + 1} / $totalPages'),
+          Text('${page + 1} / $totalPages', style: Theme.of(context).textTheme.bodyMedium),
           const Spacer(),
           TextButton(onPressed: onNext, child: const Text('Next')),
         ],

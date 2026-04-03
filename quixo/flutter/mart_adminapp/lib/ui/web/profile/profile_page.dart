@@ -18,8 +18,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
   final _editKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _numberCtrl = TextEditingController();
-  final _descriptionCtrl = TextEditingController();
-  final _addressCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -31,16 +30,14 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
   void dispose() {
     _nameCtrl.dispose();
     _numberCtrl.dispose();
-    _descriptionCtrl.dispose();
-    _addressCtrl.dispose();
+    _emailCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _showEditDialog(AdminProfile profile) async {
     _nameCtrl.text = profile.name;
     _numberCtrl.text = profile.number;
-    _descriptionCtrl.text = '';
-    _addressCtrl.text = '';
+    _emailCtrl.text = profile.email;
 
     await showDialog<void>(
       context: context,
@@ -56,6 +53,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 child: Column(
                   children: [
                     TextFormField(
+                      style: const TextStyle(color:Colors.black),
                       controller: _nameCtrl,
                       decoration: const InputDecoration(
                         labelText: 'name',
@@ -69,6 +67,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      style: const TextStyle(color:Colors.black),
                       controller: _numberCtrl,
                       decoration: const InputDecoration(
                         labelText: 'number',
@@ -83,18 +82,10 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
-                      controller: _descriptionCtrl,
+                      style: const TextStyle(color:Colors.black),
+                      controller: _emailCtrl,
                       decoration: const InputDecoration(
-                        labelText: 'description',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _addressCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'address',
+                        labelText: 'email',
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 2,
@@ -115,8 +106,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 final req = AdminProfileUpdateRequest(
                   name: _nameCtrl.text.trim(),
                   number: _numberCtrl.text.trim(),
-                  description: _descriptionCtrl.text.trim(),
-                  address: _addressCtrl.text.trim(),
+                  email: _emailCtrl.text.trim()
                 );
                 context
                     .read<AdminProfileBloc>()
@@ -168,6 +158,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 child: ListView(
                   children: [
                     Card(
+                      color: Theme.of(context).primaryColorLight,
                       elevation: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
@@ -179,9 +170,9 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             const SizedBox(height: 6),
-                            Text('number: ${p.number}'),
+                            Text('number: ${p.number}', style: Theme.of(context).textTheme.bodyMedium),
                             const SizedBox(height: 6),
-                            Text('email: ${p.email}'),
+                            Text('email: ${p.email}', style: Theme.of(context).textTheme.bodyMedium),
                           ],
                         ),
                       ),

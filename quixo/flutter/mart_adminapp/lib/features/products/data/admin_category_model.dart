@@ -7,21 +7,30 @@ class CategoryListItem extends Equatable {
   final int id;
   final String name;
   final String objectId; // the MongoDB _id
+  final String deliveryType;
+  final String requiredFields;
+  final String otherFields;
 
   const CategoryListItem({
     required this.id,
     required this.name,
     required this.objectId,
+    this.deliveryType = '',
+    this.requiredFields = '',
+    this.otherFields = '',
   });
 
   factory CategoryListItem.fromMap(Map<String, dynamic> map) => CategoryListItem(
         id: (map['id'] as num?)?.toInt() ?? 0,
         name: map['name'] as String? ?? '',
         objectId: map['_id']?.toString() ?? '',
+        deliveryType: map['delivery_type']?.toString() ?? '',
+        requiredFields: map['required_fields']?.toString() ?? '',
+        otherFields: map['other_fields']?.toString() ?? '',
       );
 
   @override
-  List<Object?> get props => [id, name, objectId];
+  List<Object?> get props => [id, name, objectId, deliveryType, requiredFields, otherFields];
 }
 
 // ─── Category Add/Edit Request ───────────────────────────────────────────────

@@ -9,8 +9,9 @@ Future<String?> showOtpDialog(BuildContext context) {
     barrierDismissible: false,
     builder: (ctx) {
       return AlertDialog(
-        title: const Text('Enter OTP'),
+        title: const Text('Enter OTP', style: const TextStyle(color: Colors.black),),
         content: TextField(
+           style: const TextStyle(color: Colors.black),
           controller: controller,
           keyboardType: TextInputType.number,
           maxLength: 6,

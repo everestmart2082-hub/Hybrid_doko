@@ -111,11 +111,12 @@ class _CustomerCardState extends State<_CustomerCard> {
     final verified = u.status == true;
 
     return Card(
+      color: Theme.of(context).primaryColorLight,
       margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ExpansionTile(
-        title: Text(u.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('ID: ${u.userId}'),
+        title: Text(u.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        subtitle: Text('ID: ${u.userId}', style: Theme.of(context).textTheme.bodySmall),
         trailing: verified
             ? const Icon(Icons.verified, color: Colors.green, size: 18)
             : const Icon(Icons.pending, color: Colors.orange, size: 18),
@@ -138,7 +139,7 @@ class _CustomerCardState extends State<_CustomerCard> {
                 ...violations.map(
                   (viol) => ListTile(
                     dense: true,
-                    title: Text(viol),
+                    title: Text(viol, style: Theme.of(context).textTheme.bodyMedium),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, size: 18),
                       onPressed: () {
@@ -158,10 +159,12 @@ class _CustomerCardState extends State<_CustomerCard> {
                   children: [
                     Expanded(
                       child: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium,
                         controller: _violationCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
+                          hintStyle: Theme.of(context).textTheme.bodyMedium,
                           hintText: 'Add violation',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -185,10 +188,12 @@ class _CustomerCardState extends State<_CustomerCard> {
                 ),
                 const SizedBox(height: 12),
                 TextField(
+                  style: Theme.of(context).textTheme.bodyMedium,
                   controller: _msgCtrl,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    labelStyle: Theme.of(context).textTheme.bodyMedium,
                     labelText: 'Send notification message',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -295,7 +300,7 @@ class _Pagination extends StatelessWidget {
         children: [
           TextButton(onPressed: onPrev, child: const Text('Prev')),
           const SizedBox(width: 10),
-          Text('${page + 1} / $totalPages'),
+          Text('${page + 1} / $totalPages', style: Theme.of(context).textTheme.bodyMedium),
           const Spacer(),
           TextButton(onPressed: onNext, child: const Text('Next')),
         ],

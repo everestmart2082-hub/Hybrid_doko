@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:mart_adminapp/core/constants/api_constants.dart';
 import 'package:mart_adminapp/core/failures/failures.dart';
 import 'package:mart_adminapp/core/network/dio_client.dart';
@@ -24,7 +25,7 @@ class AdminCategoryRemote {
   // Server reads: c.PostForm("name"), "quick/normal", "required", "others"
   Future<bool> addCategory(AdminCategoryRequest req) async {
     final Map<String, dynamic> map =
-        await dio.post(ApiEndpoints.adminCategoryAdd, req.toMap());
+        await dio.post(ApiEndpoints.adminCategoryAdd, FormData.fromMap(req.toMap()));
     return checkSuccess(map);
   }
 
@@ -36,7 +37,7 @@ class AdminCategoryRemote {
       ...req.toMap(),
     };
     final Map<String, dynamic> map =
-        await dio.post(ApiEndpoints.adminCategoryEdit, body);
+        await dio.post(ApiEndpoints.adminCategoryEdit, FormData.fromMap(body));
     return checkSuccess(map);
   }
 
@@ -45,7 +46,7 @@ class AdminCategoryRemote {
   Future<bool> hideCategory(String categoryId, bool hidden) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminCategoryHide,
-      {'category id': categoryId, 'hidden': hidden.toString()},
+      FormData.fromMap({'category id': categoryId, 'hidden': hidden.toString()}),
     );
     return checkSuccess(map);
   }

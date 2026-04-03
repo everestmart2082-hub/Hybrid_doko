@@ -86,6 +86,7 @@ class _AdminContactsPageState extends State<AdminContactsPage> {
                         ),
                         const SizedBox(height: 18),
                         TextFormField(
+                          style: const TextStyle(color: Colors.black),
                           controller: _name,
                           decoration: const InputDecoration(
                             labelText: 'Name',
@@ -96,6 +97,7 @@ class _AdminContactsPageState extends State<AdminContactsPage> {
                         ),
                         const SizedBox(height: 14),
                         TextFormField(
+                          style: const TextStyle(color: Colors.black),
                           controller: _email,
                           decoration: const InputDecoration(
                             labelText: 'Email',
@@ -115,6 +117,7 @@ class _AdminContactsPageState extends State<AdminContactsPage> {
                         ),
                         const SizedBox(height: 14),
                         TextFormField(
+                          style: const TextStyle(color: Colors.black),
                           controller: _message,
                           decoration: const InputDecoration(
                             labelText: 'Message',

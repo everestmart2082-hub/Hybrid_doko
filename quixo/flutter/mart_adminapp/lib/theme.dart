@@ -40,10 +40,10 @@ ThemeData themeDataFromColors(ThemeColors colors) {
     textTheme: TextTheme(
       bodyLarge: TextStyle(color: colors.primaryText),
       bodyMedium: TextStyle(color: colors.primaryText),
-      bodySmall: TextStyle(color: colors.secondaryText),
+      bodySmall: TextStyle(color: colors.primaryText),
       titleLarge: TextStyle(color: colors.primaryText),
       titleMedium: TextStyle(color: colors.primaryText),
-      titleSmall: TextStyle(color: colors.secondaryText),
+      titleSmall: TextStyle(color: colors.primaryText),
       headlineLarge: TextStyle(color: colors.primaryText),
       headlineMedium: TextStyle(color: colors.primaryText),
       headlineSmall: TextStyle(color: colors.primaryText),

@@ -111,11 +111,12 @@ class _RiderCardState extends State<_RiderCard> {
     final violations = _violations;
 
     return Card(
+      color: Theme.of(context).primaryColorLight,
       margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ExpansionTile(
-        title: Text(r.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('ID: ${r.riderId}'),
+        title: Text(r.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        subtitle: Text('ID: ${r.riderId}', style: Theme.of(context).textTheme.bodySmall),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -144,9 +145,9 @@ class _RiderCardState extends State<_RiderCard> {
                 ...violations.map(
                   (viol) => ListTile(
                     dense: true,
-                    title: Text(viol),
+                    title: Text(viol, style: Theme.of(context).textTheme.bodyMedium),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete, size: 18),
+                      icon: Icon(Icons.delete, size: 18, color: Theme.of(context).primaryColorDark,),
                       onPressed: () {
                         final newList = List<String>.from(violations)
                           ..remove(viol);
@@ -164,10 +165,12 @@ class _RiderCardState extends State<_RiderCard> {
                   children: [
                     Expanded(
                       child: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium,
                         controller: _violationCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
+                          hintStyle: Theme.of(context).textTheme.bodyMedium,
                           hintText: 'Add violation',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                         onSubmitted: (_) {
                           final txt = _violationCtrl.text.trim();
@@ -203,10 +206,12 @@ class _RiderCardState extends State<_RiderCard> {
                 ),
                 const SizedBox(height: 12),
                 TextField(
+                  style: Theme.of(context).textTheme.bodyMedium,
                   controller: _msgCtrl,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    labelStyle: Theme.of(context).textTheme.bodyMedium,
                     labelText: 'Send notification message',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -313,7 +318,7 @@ class _Pagination extends StatelessWidget {
         children: [
           TextButton(onPressed: onPrev, child: const Text('Prev')),
           const SizedBox(width: 10),
-          Text('${page + 1} / $totalPages'),
+          Text('${page + 1} / $totalPages', style: Theme.of(context).textTheme.bodyMedium),
           const Spacer(),
           TextButton(onPressed: onNext, child: const Text('Next')),
         ],

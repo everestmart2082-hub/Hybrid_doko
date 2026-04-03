@@ -51,8 +51,7 @@ func AdminProfileUpdate(c *gin.Context) {
 
 	name := c.PostForm("name")
 	number := c.PostForm("number")
-	description := c.PostForm("description")
-	address := c.PostForm("address")
+	email := c.PostForm("email")
 
 	coll := utils.GetCollection("admins")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -64,8 +63,7 @@ func AdminProfileUpdate(c *gin.Context) {
 		"updates_proposed": bson.M{
 			"name":        name,
 			"number":      number,
-			"description": description,
-			"address":     address,
+			"email": email,
 		},
 		"otp": otp,
 	}
@@ -93,14 +91,33 @@ func AdminProfileOTP(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var admin models.Admin
-	err := coll.FindOne(ctx, bson.M{"_id": adminID, "otp": otp}).Decode(&admin)
+	var adminDoc bson.M
+	err := coll.FindOne(ctx, bson.M{"_id": adminID, "otp": otp}).Decode(&adminDoc)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"success": false, "message": "otp verification failure"})
 		return
 	}
 
-	_, err = coll.UpdateOne(ctx, bson.M{"_id": adminID}, bson.M{"$unset": bson.M{"otp": "", "updation_requested": ""}})
+	proposed, ok := adminDoc["updates_proposed"].(bson.M)
+	var updateQuery bson.M
+	if !ok {
+		updateQuery = bson.M{"$unset": bson.M{"otp": "", "updation_requested": "", "updates_proposed": ""}}
+	} else {
+		updateQuery = bson.M{
+			"$set": bson.M{
+				"name":  proposed["name"],
+				"phone": proposed["number"],
+				"email": proposed["email"],
+			},
+			"$unset": bson.M{
+				"otp":                "",
+				"updation_requested": "",
+				"updates_proposed":   "",
+			},
+		}
+	}
+
+	_, err = coll.UpdateOne(ctx, bson.M{"_id": adminID}, updateQuery)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return

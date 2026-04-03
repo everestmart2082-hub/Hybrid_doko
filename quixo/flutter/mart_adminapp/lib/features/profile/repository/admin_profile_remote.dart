@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:mart_adminapp/core/constants/api_constants.dart';
 import 'package:mart_adminapp/core/failures/failures.dart';
 import 'package:mart_adminapp/core/network/dio_client.dart';
@@ -22,14 +23,14 @@ class AdminProfileRemote {
   // POST /admin/profile/update — stores proposed update + generates OTP
   Future<bool> updateProfile(AdminProfileUpdateRequest req) async {
     final Map<String, dynamic> map =
-        await dio.post(ApiEndpoints.adminProfileUpdate, req.toMap());
+        await dio.post(ApiEndpoints.adminProfileUpdate, FormData.fromMap(req.toMap()));
     return checkSuccess(map);
   }
 
   // POST /admin/profile/otp — verifies OTP to commit profile update
   Future<bool> verifyUpdateOtp(String otp) async {
     final Map<String, dynamic> map =
-        await dio.post(ApiEndpoints.adminProfileOtp, {'otp': otp});
+        await dio.post(ApiEndpoints.adminProfileOtp, FormData.fromMap({'otp': otp}));
     return checkSuccess(map);
   }
 
@@ -37,7 +38,7 @@ class AdminProfileRemote {
   Future<bool> verifyAddOtp(String phone, String otp) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminProfileAddOtp,
-      {'phone': phone, 'otp': otp},
+      FormData.fromMap({'phone': phone, 'otp': otp}),
     );
     return checkSuccess(map);
   }
@@ -45,7 +46,7 @@ class AdminProfileRemote {
   // DELETE /admin/profile/delete — delete or suspend own account
   Future<bool> deleteProfile(AdminProfileDeleteRequest req) async {
     final Map<String, dynamic> map =
-        await dio.delete(ApiEndpoints.adminProfileDelete, req.toMap());
+        await dio.delete(ApiEndpoints.adminProfileDelete, FormData.fromMap(req.toMap()));
     return checkSuccess(map);
   }
 }

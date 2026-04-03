@@ -82,6 +82,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                           ),
                           const SizedBox(height: 32),
                           TextFormField(
+                            style: TextStyle(color: Colors.black),
                             controller: _phone,
                             keyboardType: TextInputType.phone,
                             decoration: const InputDecoration(

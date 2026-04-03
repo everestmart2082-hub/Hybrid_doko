@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:mart_adminapp/core/constants/api_constants.dart';
 import 'package:mart_adminapp/core/failures/failures.dart';
 import 'package:mart_adminapp/core/network/dio_client.dart';
@@ -11,8 +12,9 @@ class AdminProductRemote {
 
   // GET /admin/product/all — returns list wrapped in "message"
   Future<List<AdminProductListItem>> getAllProducts() async {
-    final Map<String, dynamic> map =
-        await dio.get(ApiEndpoints.adminProductAll);
+    final Map<String, dynamic> map = await dio.get(
+      ApiEndpoints.adminProductAll,
+    );
     checkSuccess(map);
     final list = map['message'] as List<dynamic>? ?? [];
     return list
@@ -37,7 +39,10 @@ class AdminProductRemote {
   Future<bool> approveProduct(String productId, bool approved) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminProductApprove,
-      {'product id': productId, 'approved': approved.toString()},
+      FormData.fromMap({
+        'product id': productId,
+        'approved': approved.toString(),
+      }),
     );
     return checkSuccess(map);
   }
@@ -47,7 +52,7 @@ class AdminProductRemote {
   Future<bool> hideProduct(String productId, bool hide) async {
     final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminProductHide,
-      {'product id': productId, 'hide': hide.toString()},
+      FormData.fromMap({'product id': productId, 'hide': hide.toString()}),
     );
     return checkSuccess(map);
   }

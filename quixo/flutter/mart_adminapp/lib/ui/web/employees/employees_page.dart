@@ -98,6 +98,7 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).primaryColorLight,
           title: const Text('Add Employee'),
           content: SingleChildScrollView(
             child: Form(
@@ -220,6 +221,7 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).primaryColorLight,
           title: const Text('Edit Employee'),
           content: SingleChildScrollView(
             child: Form(
@@ -381,12 +383,9 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     children: [
-                      const Text(
+                      Text(
                         'Employees',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
                       ElevatedButton(
@@ -424,16 +423,16 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
                         onPressed: page > 0
                             ? () => setState(() => _page = page - 1)
                             : null,
-                        child: const Text('Prev'),
+                        child: Text('Prev', style: Theme.of(context).textTheme.bodyMedium,),
                       ),
                       const SizedBox(width: 8),
-                      Text('${page + 1} / $totalPages'),
+                      Text('${page + 1} / $totalPages', style: Theme.of(context).textTheme.bodyMedium),
                       const Spacer(),
                       TextButton(
                         onPressed: page < totalPages - 1
                             ? () => setState(() => _page = page + 1)
                             : null,
-                        child: const Text('Next'),
+                        child: Text('Next', style: Theme.of(context).textTheme.bodyMedium,),
                       ),
                     ],
                   ),
@@ -452,10 +451,12 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
     TextInputType keyboardType = TextInputType.text,
   }) {
     return TextFormField(
+      style: Theme.of(context).textTheme.bodyMedium,
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: Theme.of(context).textTheme.bodyMedium,
         border: const OutlineInputBorder(),
       ),
       validator: (v) {
@@ -481,6 +482,7 @@ class _EmployeeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Theme.of(context).primaryColorLight,
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -497,16 +499,16 @@ class _EmployeeCard extends StatelessWidget {
                         ),
                   ),
                 ),
-                Text(employee.position),
+                Text(employee.position, style: Theme.of(context).textTheme.bodyLarge),
               ],
             ),
             const SizedBox(height: 4),
-            Text('${employee.email} | ${employee.phone}'),
+            Text('${employee.email} | ${employee.phone}', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 4),
-            Text(employee.address),
+            Text(employee.address, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 4),
             Text(
-                'Salary: ${employee.salary.toStringAsFixed(2)} | Bank: ${employee.bankName} | Acc: ${employee.accountNumber}'),
+                'Salary: ${employee.salary.toStringAsFixed(2)} | Bank: ${employee.bankName} | Acc: ${employee.accountNumber}', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 4),
             Wrap(
               spacing: 8,

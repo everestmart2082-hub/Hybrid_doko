@@ -103,16 +103,21 @@ class _AdminOrdersPageState extends State<AdminOrdersPage>
                     SizedBox(
                       width: 360,
                       child: TextField(
+                        style: Theme.of(context).textTheme.bodyLarge,
                         controller: _searchCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Search',
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).primaryColorLight)),
+                          labelStyle: Theme.of(context).textTheme.bodyMedium
+                          
                         ),
                         onChanged: (_) => setState(() => _page = 0),
                       ),
                     ),
                     const SizedBox(width: 16),
                     DropdownButton<String>(
+                      dropdownColor: Theme.of(context).primaryColorLight,
+                      iconEnabledColor: Theme.of(context).primaryColorDark,
                       value: _deliveryCategory,
                       onChanged: (v) {
                         setState(() {
@@ -130,9 +135,10 @@ class _AdminOrdersPageState extends State<AdminOrdersPage>
                 ),
               ),
               TabBar(
+                indicatorColor: Theme.of(context).primaryColor,
                 controller: _tabController,
                 isScrollable: true,
-                tabs: _tabs.map((t) => Tab(text: t.label)).toList(),
+                tabs: _tabs.map((t) => Tab(child: Text(t.label,style: Theme.of(context).textTheme.bodyLarge,),)).toList(),
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -195,8 +201,8 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w600)),
-          Flexible(child: Text(value)),
+          Text('$label: ', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Flexible(child: Text(value, style: Theme.of(context).textTheme.bodyMedium)),
         ],
       ),
     );
@@ -222,11 +228,11 @@ class _Pagination extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Row(
         children: [
-          TextButton(onPressed: onPrev, child: const Text('Prev')),
+          TextButton(onPressed: onPrev, child: Text('Prev', style: Theme.of(context).textTheme.bodyMedium,)),
           const SizedBox(width: 10),
-          Text('${page + 1} / $totalPages'),
+          Text('${page + 1} / $totalPages', style: Theme.of(context).textTheme.bodyMedium),
           const Spacer(),
-          TextButton(onPressed: onNext, child: const Text('Next')),
+          TextButton(onPressed: onNext, child: Text('Next', style: Theme.of(context).textTheme.bodyMedium,)),
         ],
       ),
     );

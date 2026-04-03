@@ -91,10 +91,10 @@ class _StatsGrid extends StatelessWidget {
                       style: Theme.of(context)
                           .textTheme
                           .headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold)),
+                          ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
                   const SizedBox(height: 4),
                   Text(s.label,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).primaryColor),
                       overflow: TextOverflow.ellipsis),
                 ],
               ),

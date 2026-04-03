@@ -100,16 +100,17 @@ class _VendorCardState extends State<_VendorCard> {
   Widget build(BuildContext context) {
     final v = widget.vendor;
     return Card(
+      color: Theme.of(context).primaryColorLight,
       margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ExpansionTile(
-        title: Text(v.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('ID: ${v.venderId}'),
+        title: Text(v.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        subtitle: Text('ID: ${v.venderId}', style: Theme.of(context).textTheme.bodySmall),
         trailing: Row(mainAxisSize: MainAxisSize.min, children: [
           if (v.status == true) const Icon(Icons.verified, color: Colors.green, size: 18),
           if (v.status != true) const Icon(Icons.pending, color: Colors.orange, size: 18),
           const SizedBox(width: 8),
-          const Icon(Icons.expand_more),
+          Icon(Icons.expand_more, color: Theme.of(context).textTheme.bodyLarge?.color,),
         ]),
         onExpansionChanged: (v) => setState(() => _expanded = v),
         children: [
@@ -127,9 +128,9 @@ class _VendorCardState extends State<_VendorCard> {
                         .titleSmall
                         ?.copyWith(fontWeight: FontWeight.bold)),
                 ...v.violations.map((viol) =>
-                    ListTile(dense: true, title: Text(viol.toString()),
+                    ListTile(dense: true, title: Text(viol.toString(), style: Theme.of(context).textTheme.bodyMedium),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete, size: 18),
+                        icon: Icon(Icons.delete, size: 18, color: Theme.of(context).primaryColorDark,),
                         onPressed: () {
                           final newList = List<String>.from(
                               v.violations.map((e) => e.toString()))
@@ -144,11 +145,14 @@ class _VendorCardState extends State<_VendorCard> {
                 Row(children: [
                   Expanded(
                     child: TextField(
+                      style: Theme.of(context).textTheme.bodyMedium,
                       controller: _violationCtrl,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                           hintText: 'Add violation',
                           isDense: true,
-                          border: OutlineInputBorder()),
+                          border: OutlineInputBorder(),
+                          hintStyle: Theme.of(context).textTheme.bodyMedium
+                          ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -172,7 +176,8 @@ class _VendorCardState extends State<_VendorCard> {
                 const SizedBox(height: 10),
                 TextField(
                   controller: _msgCtrl,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                      labelStyle: Theme.of(context).textTheme.bodyMedium,
                       labelText: 'Send notification message',
                       border: OutlineInputBorder()),
                 ),
@@ -180,10 +185,10 @@ class _VendorCardState extends State<_VendorCard> {
                 Wrap(spacing: 8, runSpacing: 8, children: [
                   ElevatedButton.icon(
                     icon: const Icon(Icons.check),
-                    label: const Text('Approve'),
+                    label: Text(v.status == true ? 'Unapprove' : 'Approve'),
                     onPressed: () => context.read<AdminVendorBloc>().add(
                         AdminVendorApprove(
-                            venderId: v.venderId, approved: true)),
+                            venderId: v.venderId, approved: v.status == true ? false : true)),
                   ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.pause),
@@ -195,6 +200,13 @@ class _VendorCardState extends State<_VendorCard> {
                             venderId: v.venderId, suspended: true)),
                   ),
                   ElevatedButton.icon(
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Unsuspend'),
+                    onPressed: () => context.read<AdminVendorBloc>().add(
+                        AdminVendorSuspend(
+                            venderId: v.venderId, suspended: false)),
+                  ),
+                  ElevatedButton.icon(
                     icon: const Icon(Icons.block),
                     label: const Text('Blacklist'),
                     style: ElevatedButton.styleFrom(
@@ -202,6 +214,13 @@ class _VendorCardState extends State<_VendorCard> {
                     onPressed: () => context.read<AdminVendorBloc>().add(
                         AdminVendorBlacklist(
                             venderId: v.venderId, blacklisted: true)),
+                  ),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.verified),
+                    label: const Text('Unblacklist'),
+                    onPressed: () => context.read<AdminVendorBloc>().add(
+                        AdminVendorBlacklist(
+                            venderId: v.venderId, blacklisted: false)),
                   ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.notifications),
@@ -235,8 +254,8 @@ class _InfoRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(children: [
           Text('$label: ',
-              style: const TextStyle(fontWeight: FontWeight.w600)),
-          Text(value),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text(value, style: Theme.of(context).textTheme.bodyMedium),
         ]),
       );
 }
@@ -267,7 +286,7 @@ class _Pagination extends StatelessWidget {
                 onPressed: () => onPage(i),
                 child: Text(
                   '${i + 1}',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: i == current
                           ? FontWeight.bold
                           : FontWeight.normal),
