@@ -40,8 +40,11 @@ class _ContactUsPageState extends State<ContactUsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
-        title: const Text('Contact Us'),
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text('Contact Us', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        elevation: 1,
       ),
       body: BlocListener<RiderContactsBloc, RiderContactState>(
         listener: (context, state) {
@@ -71,6 +74,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
               constraints: const BoxConstraints(maxWidth: 520),
               child: Card(
                 elevation: 2,
+                color: Theme.of(context).primaryColorLight,
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Form(

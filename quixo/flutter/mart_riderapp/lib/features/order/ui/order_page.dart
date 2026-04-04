@@ -5,6 +5,7 @@ import 'package:quickmartrider/features/order/bloc/order_event.dart';
 import 'package:quickmartrider/features/order/bloc/order_state.dart';
 import 'package:quickmartrider/features/order/data/order_model.dart';
 import 'package:quickmartrider/features/order/data/otp_model.dart';
+import 'package:quickmartrider/ui/web_shell.dart';
 
 class RiderOrdersTabsPage extends StatefulWidget {
   const RiderOrdersTabsPage({super.key});
@@ -184,16 +185,15 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Orders'),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: _tabs.map((t) => Tab(text: t.label)).toList(),
-        ),
+    return WebShell(
+      title: 'Orders',
+      bottom: TabBar(
+        indicatorColor: Theme.of(context).primaryColor,
+        controller: _tabController,
+        isScrollable: true,
+        tabs: _tabs.map((t) => Tab(child: Text(t.label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight),),)).toList(),
       ),
-      body: BlocListener<RiderOrderBloc, RiderOrderState>(
+      child: BlocListener<RiderOrderBloc, RiderOrderState>(
         listener: (context, state) async {
           if (state is RiderOrderActionSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -206,14 +206,12 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
             );
           }
           if (state is RiderOrderActionFailure) {
-            final msg = state.message;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(msg), backgroundColor: Colors.red),
+              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           } else if (state is RiderOrderFailure) {
-            final msg = state.message;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(msg), backgroundColor: Colors.red),
+              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           }
 
@@ -240,7 +238,7 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
                   if (state is RiderOrderLoaded) {
                     final orders = state.orders;
                     if (orders.isEmpty) {
-                      return const Center(child: Text('No orders found.'));
+                      return Center(child: Text('No orders found.', style: Theme.of(context).textTheme.bodyMedium));
                     }
 
                     return ListView.builder(
@@ -317,7 +315,7 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
                     return Center(
                       child: Text(
                         state.message,
-                        style: const TextStyle(color: Colors.red),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     );
                   }
@@ -338,29 +336,11 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Row(
         children: [
-          Text('Prev'),
-          const SizedBox(width: 8),
-          IconButton(
-            onPressed: _page <= 1
-                ? null
-                : () {
-                    setState(() => _page -= 1);
-                    _fetchForActiveTab();
-                  },
-            icon: const Icon(Icons.chevron_left),
-          ),
-          const SizedBox(width: 8),
-          Text('$_page'),
-          const SizedBox(width: 8),
-          IconButton(
-            onPressed: () {
-              setState(() => _page += 1);
-              _fetchForActiveTab();
-            },
-            icon: const Icon(Icons.chevron_right),
-          ),
+          TextButton(onPressed: _page <= 1 ? null : () { setState(() => _page -= 1); _fetchForActiveTab(); }, child: Text('Prev', style: Theme.of(context).textTheme.bodyMedium,)),
+          const SizedBox(width: 10),
+          Text('$_page', style: Theme.of(context).textTheme.bodyMedium),
           const Spacer(),
-          const Text('Next'),
+          TextButton(onPressed: () { setState(() => _page += 1); _fetchForActiveTab(); }, child: Text('Next', style: Theme.of(context).textTheme.bodyMedium,)),
         ],
       ),
     );
@@ -410,4 +390,3 @@ class _OrderTab {
     required this.status,
   });
 }
-

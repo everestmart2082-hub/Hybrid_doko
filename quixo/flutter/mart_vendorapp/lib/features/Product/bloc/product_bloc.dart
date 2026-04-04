@@ -25,6 +25,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           stock: event.stock,
           sortBy: event.sortBy,
           vendorId: event.vendorId,
+          stockFilter: event.stockFilter,
         );
 
         emit(ProductListLoaded(products));
@@ -37,8 +38,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoading());
       try {
         final categories = await repo.getCategories();
-        final vendors = await repo.getVendors();
-        emit(ProductFiltersLoaded(categories, vendors));
+        emit(ProductFiltersLoaded(categories));
       } catch (e) {
         emit(ProductError(e.toString()));
       }

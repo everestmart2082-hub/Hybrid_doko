@@ -73,6 +73,11 @@ Drawer buildAppDrawer(BuildContext context) {
           
               tile(title: 'Settings', icon: Icons.settings, route: '/settings'),
               if (isLoggedIn)
+                tile(
+                    title: 'Constants',
+                    icon: Icons.tune,
+                    route: '/constants'),
+              if (isLoggedIn)
               tile(
                   title: 'Contact Us',
                   icon: Icons.support_agent,

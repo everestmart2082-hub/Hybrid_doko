@@ -35,7 +35,12 @@ class _ProductGuestListPageState extends State<ProductGuestListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Products')),
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text('Products', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        elevation: 1,
+      ),
       drawer: null,
       body: Padding(
         padding: const EdgeInsets.all(16),

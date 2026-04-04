@@ -71,6 +71,7 @@ class SettingsPage extends StatelessWidget {
                   _SectionHeader('About'),
                   const SizedBox(height: 10),
                   Card(
+                    color: Theme.of(context).primaryColorLight,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     child: Column(
                       children: [

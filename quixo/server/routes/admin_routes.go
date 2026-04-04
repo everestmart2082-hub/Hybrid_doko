@@ -75,6 +75,7 @@ func SetupAdminRoutes(r *gin.Engine) {
 			protected.POST("/profile/add/otp", controllers.AdminProfileAddOTP)
 			protected.DELETE("/profile/delete", controllers.AdminProfileDelete)
 			protected.POST("/changeConstants", controllers.AdminChangeConstants)
+			protected.POST("/constants/all", controllers.AdminGetAllConstants)
 			protected.POST("/order/all", controllers.AdminOrderAll)
 		}
 	}

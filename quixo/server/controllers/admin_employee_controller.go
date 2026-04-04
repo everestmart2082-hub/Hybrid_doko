@@ -73,6 +73,7 @@ func AdminUpdateEmployee(c *gin.Context) {
 	bankName := c.PostForm("bank name")
 	accountNumber := c.PostForm("account number")
 	ifscCode := c.PostForm("ifsc code")
+	pan := c.PostForm("pan")
 	// The employee update spec doesn't require an employee ID field! 
 	// This usually means phone/email acts as identity, we'll use phone.
 
@@ -86,19 +87,22 @@ func AdminUpdateEmployee(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	salary, _ := strconv.ParseFloat(salaryStr, 64)
+
 	update := bson.M{
 		"name":            name,
 		"position":        position,
-		"salary":          salaryStr,
+		"salary":          salary,
 		"address":         address,
 		"email":           email,
 		"bank name":       bankName,     // Note dynamic field alignment for DB 
-		"account number":  accountNumber,
+		"account_number":  accountNumber,
 		"ifsc":            ifscCode,
+		"pan_file":        pan,
 	}
 
 	if citizenshipPath != "" {
-		update["citizenship"] = citizenshipPath
+		update["citizenship_file"] = citizenshipPath
 	}
 
 	_, err := coll.UpdateOne(ctx, bson.M{"phone": phone}, bson.M{"$set": update})

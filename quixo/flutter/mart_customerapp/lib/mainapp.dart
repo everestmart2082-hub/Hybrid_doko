@@ -12,6 +12,7 @@ import 'package:quickmartcustomer/features/product/bloc/product_state.dart';
 import 'package:quickmartcustomer/features/product/data/product_list_item_model.dart';
 
 import 'drawer.dart';
+import 'ui/web_shell.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -30,10 +31,9 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppConstants.appName), elevation: 0),
-      drawer: buildAppDrawer(context),
-      body: Container(
+    return WebShell(
+      title: AppConstants.appName,
+      child: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(

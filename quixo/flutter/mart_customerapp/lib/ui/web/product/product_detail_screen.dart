@@ -31,7 +31,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final p = widget.productItem;
 
     return Scaffold(
-      appBar: AppBar(title: Text(p.name)),
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(p.name, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        elevation: 1,
+      ),
       drawer: buildAppDrawer(context),
       body: SingleChildScrollView(
         child: Column(

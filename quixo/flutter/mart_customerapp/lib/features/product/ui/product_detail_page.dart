@@ -67,8 +67,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
-        title: const Text('Product Details'),
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text('Product Details', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        elevation: 1,
       ),
       body: BlocListener<WishlistBloc, WishlistState>(
         listener: (context, state) {

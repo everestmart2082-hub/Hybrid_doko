@@ -50,14 +50,9 @@ class AdminVendorBloc extends Bloc<AdminVendorEvent, AdminVendorState> {
       _withReload(() => remote.blacklistVendor(e.venderId, e.blacklisted), emit,
           success: 'Vendor blacklist updated.');
 
-  FutureOr<void> _onNotify(AdminVendorNotify e, Emitter<AdminVendorState> emit) async {
-    try {
-      await remote.sendNotification(e.req);
-      emit(const AdminVendorActionSuccess('Notification sent.'));
-    } catch (ex) {
-      emit(AdminVendorFailed(ex.toString()));
-    }
-  }
+  FutureOr<void> _onNotify(AdminVendorNotify e, Emitter<AdminVendorState> emit) =>
+      _withReload(() => remote.sendNotification(e.req), emit,
+          success: 'Notification sent.');
 
   FutureOr<void> _onViolations(
       AdminVendorUpdateViolations e, Emitter<AdminVendorState> emit) =>

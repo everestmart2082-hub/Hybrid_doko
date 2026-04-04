@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartvender/core/constants/api_constants.dart';
 import 'package:quickmartvender/features/Product/bloc/product_bloc.dart';
 import 'package:quickmartvender/features/Product/bloc/product_event.dart';
 import 'package:quickmartvender/features/Product/bloc/product_state.dart';
 import 'package:quickmartvender/features/Product/data/product_model.dart';
 import '../web_shell.dart';
+
+String _categoryIdHex(Map<String, dynamic> c) {
+  final v = c['_id'];
+  if (v is String) return v;
+  if (v is Map && v[r'$oid'] is String) return v[r'$oid'] as String;
+  return '';
+}
+
+String? _absolutePhotoUrl(String path) {
+  final t = path.trim();
+  if (t.isEmpty) return null;
+  if (t.startsWith('http://') || t.startsWith('https://')) return t;
+  final p = t.startsWith('/') ? t : '/$t';
+  return '${ApiEndpoints.baseUrl}$p';
+}
 
 class ProductListPage extends StatefulWidget {
   const ProductListPage({super.key});
@@ -17,6 +33,8 @@ class _ProductListPageState extends State<ProductListPage> {
   final _search = TextEditingController();
   String _sortBy = 'default';
   String _selectedCategory = '';
+  String _brandQuery = '';
+  String _stockFilter = '';
   List<Map<String, dynamic>> _categories = [];
   double? _minPrice, _maxPrice;
   int _page = 1;
@@ -44,6 +62,8 @@ class _ProductListPageState extends State<ProductListPage> {
       productCategory: _selectedCategory,
       minPrice: _minPrice,
       maxPrice: _maxPrice,
+      brand: _brandQuery,
+      stockFilter: _stockFilter,
     ));
   }
 
@@ -87,7 +107,16 @@ class _ProductListPageState extends State<ProductListPage> {
                   selectedCategory: _selectedCategory,
                   onSortChanged: (v) { setState(() => _sortBy = v ?? 'default'); _load(); },
                   onCategoryChanged: (v) { setState(() => _selectedCategory = v ?? ''); _load(); },
-                  onPriceChanged: (min, max) { setState(() { _minPrice = min; _maxPrice = max; }); _load(); },
+                  onApply: (min, max, brand, stock) {
+                    setState(() {
+                      _minPrice = min;
+                      _maxPrice = max;
+                      _brandQuery = brand;
+                      _stockFilter = stock;
+                      _page = 1;
+                    });
+                    _load();
+                  },
                 ),
               ),
             // ── Main Content ────────────────────────
@@ -199,7 +228,7 @@ class _FilterPanel extends StatefulWidget {
   final String selectedCategory;
   final void Function(String?) onSortChanged;
   final void Function(String?) onCategoryChanged;
-  final void Function(double?, double?) onPriceChanged;
+  final void Function(double?, double?, String brand, String stockStatus) onApply;
 
   const _FilterPanel({
     required this.sortOptions,
@@ -208,7 +237,7 @@ class _FilterPanel extends StatefulWidget {
     required this.selectedCategory,
     required this.onSortChanged,
     required this.onCategoryChanged,
-    required this.onPriceChanged,
+    required this.onApply,
   });
 
   @override
@@ -218,11 +247,14 @@ class _FilterPanel extends StatefulWidget {
 class _FilterPanelState extends State<_FilterPanel> {
   final _minCtrl = TextEditingController();
   final _maxCtrl = TextEditingController();
+  final _brandCtrl = TextEditingController();
+  String _stockMode = '';
 
   @override
   void dispose() {
     _minCtrl.dispose();
     _maxCtrl.dispose();
+    _brandCtrl.dispose();
     super.dispose();
   }
 
@@ -232,6 +264,7 @@ class _FilterPanelState extends State<_FilterPanel> {
       margin: const EdgeInsets.only(top: 16, left: 16, bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
+        color: Theme.of(context).primaryColorLight,
         border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(10),
       ),
@@ -243,6 +276,8 @@ class _FilterPanelState extends State<_FilterPanel> {
             const Divider(),
             const Text('Sort By', style: TextStyle(fontWeight: FontWeight.w600)),
             DropdownButton<String>(
+              dropdownColor: Theme.of(context).primaryColorLight,
+              iconEnabledColor: Theme.of(context).primaryColorDark,
               isExpanded: true,
               value: widget.sortBy,
               items: widget.sortOptions
@@ -253,17 +288,49 @@ class _FilterPanelState extends State<_FilterPanel> {
             const SizedBox(height: 12),
             const Text('Category', style: TextStyle(fontWeight: FontWeight.w600)),
             DropdownButton<String>(
+              dropdownColor: Theme.of(context).primaryColorLight,
+              iconEnabledColor: Theme.of(context).primaryColorDark,
               isExpanded: true,
               value: widget.selectedCategory.isEmpty ? null : widget.selectedCategory,
               hint: const Text('All'),
               items: [
                 const DropdownMenuItem(value: '', child: Text('All')),
                 ...widget.categories.map((c) {
+                  final id = _categoryIdHex(c);
                   final name = c['name']?.toString() ?? '';
-                  return DropdownMenuItem(value: name, child: Text(name, style: const TextStyle(fontSize: 12)));
-                }),
+                  if (id.isEmpty) return null;
+                  return DropdownMenuItem(
+                    value: id,
+                    child: Text(name, style: const TextStyle(fontSize: 12)),
+                  );
+                }).whereType<DropdownMenuItem<String>>(),
               ],
               onChanged: widget.onCategoryChanged,
+            ),
+            const SizedBox(height: 12),
+            const Text('Brand', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _brandCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Contains',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text('Stock', style: TextStyle(fontWeight: FontWeight.w600)),
+            DropdownButton<String>(
+              dropdownColor: Theme.of(context).primaryColorLight,
+              iconEnabledColor: Theme.of(context).primaryColorDark,
+              isExpanded: true,
+              value: _stockMode,
+              items: const [
+                DropdownMenuItem(value: '', child: Text('Any')),
+                DropdownMenuItem(value: 'in_stock', child: Text('In stock')),
+                DropdownMenuItem(value: 'out_of_stock', child: Text('Out of stock')),
+              ],
+              onChanged: (v) => setState(() => _stockMode = v ?? ''),
             ),
             const SizedBox(height: 12),
             const Text('Price Range', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -284,12 +351,14 @@ class _FilterPanelState extends State<_FilterPanel> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  widget.onPriceChanged(
+                  widget.onApply(
                     double.tryParse(_minCtrl.text),
                     double.tryParse(_maxCtrl.text),
+                    _brandCtrl.text.trim(),
+                    _stockMode,
                   );
                 },
-                child: const Text('Apply'),
+                child: const Text('Apply filters'),
               ),
             ),
           ],
@@ -313,6 +382,7 @@ class _ProductCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         elevation: 3,
+        color: theme.primaryColorLight,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,10 +390,30 @@ class _ProductCard extends StatelessWidget {
             // Image placeholder
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Container(
+              child: SizedBox(
                 height: 130,
-                color: theme.primaryColorLight,
-                child: Center(child: Icon(Icons.image, size: 48, color: theme.primaryColor)),
+                width: double.infinity,
+                child: () {
+                  final url = product.photos.isEmpty
+                      ? null
+                      : _absolutePhotoUrl(product.photos.first);
+                  if (url == null || url.isEmpty) {
+                    return ColoredBox(
+                      color: theme.primaryColorLight,
+                      child: Center(
+                        child: Icon(Icons.image, size: 48, color: theme.primaryColor),
+                      ),
+                    );
+                  }
+                  return Image.network(
+                    url,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => ColoredBox(
+                      color: theme.primaryColorLight,
+                      child: Icon(Icons.broken_image, color: theme.primaryColor),
+                    ),
+                  );
+                }(),
               ),
             ),
             Padding(

@@ -162,7 +162,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text('Profile', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        elevation: 1,
+      ),
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) async {
           if (state is ProfileSuccess) {
@@ -202,21 +207,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 6),
-                                Text(p.name),
+                                Text(p.name, style: Theme.of(context).textTheme.bodyMedium),
                                 const SizedBox(height: 16),
                                 const Text(
                                   'Email:',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 6),
-                                Text(p.email),
+                                Text(p.email, style: Theme.of(context).textTheme.bodyMedium),
                                 const SizedBox(height: 16),
                                 const Text(
                                   'Phone:',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 6),
-                                Text(p.phone),
+                                Text(p.phone, style: Theme.of(context).textTheme.bodyMedium),
                                 const SizedBox(height: 16),
                                 const Text(
                                   'Default Address',
@@ -225,7 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(height: 6),
                                 Text(p.defaultAddress.isEmpty
                                     ? 'Not set'
-                                    : p.defaultAddress),
+                                    : p.defaultAddress, style: Theme.of(context).textTheme.bodyMedium),
                                 const SizedBox(height: 16),
                                 Align(
                                   alignment: Alignment.centerLeft,

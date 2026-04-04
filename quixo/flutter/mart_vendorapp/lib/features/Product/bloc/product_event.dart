@@ -16,6 +16,8 @@ class GetProducts extends ProductEvent {
   final int? stock;
   final String sortBy;
   final String vendorId;
+  /// Server: `in_stock` | `out_of_stock` | empty
+  final String stockFilter;
 
   GetProducts({
     this.page = 1,
@@ -30,6 +32,7 @@ class GetProducts extends ProductEvent {
     this.stock,
     this.sortBy = "default",
     this.vendorId = "all",
+    this.stockFilter = "",
   });
 }
 

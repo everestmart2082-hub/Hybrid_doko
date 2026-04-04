@@ -11,6 +11,21 @@ class VenderAuthInitial extends VenderAuthState {}
 
 class VenderAuthLoading extends VenderAuthState {}
 
+/// Shown after login/register API asks for OTP. [session] increments each time so Bloc does not drop
+/// the state when it matches a previous [VenderAuthenticated(authenticated: false)] (Equatable).
+class VenderAuthOtpStep extends VenderAuthState {
+  final bool forRegistration;
+  final int session;
+
+  const VenderAuthOtpStep({
+    required this.forRegistration,
+    required this.session,
+  });
+
+  @override
+  List<Object?> get props => [forRegistration, session];
+}
+
 class VenderAuthenticated extends VenderAuthState {
   final bool authenticated;
 

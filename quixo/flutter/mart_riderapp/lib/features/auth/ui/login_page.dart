@@ -81,6 +81,7 @@ class _RiderLoginPageState extends State<RiderLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       body: BlocListener<RiderAuthBloc, RiderAuthState>(
         listener: (context, state) async {
           if (state is RiderAuthFailure) {
@@ -121,6 +122,7 @@ class _RiderLoginPageState extends State<RiderLoginPage> {
               constraints: const BoxConstraints(maxWidth: 560),
               child: Card(
                 elevation: 4,
+                color: Theme.of(context).primaryColorLight,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Padding(
                   padding: const EdgeInsets.all(32),

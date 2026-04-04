@@ -4,6 +4,7 @@ import 'package:quickmartrider/features/notification/bloc/notification_bloc.dart
 import 'package:quickmartrider/features/notification/bloc/notification_event.dart';
 import 'package:quickmartrider/features/notification/bloc/notification_state.dart';
 import 'package:quickmartrider/features/notification/data/notification_model.dart';
+import 'package:quickmartrider/ui/web_shell.dart';
 
 class RiderNotificationPage extends StatefulWidget {
   const RiderNotificationPage({super.key});
@@ -32,11 +33,9 @@ class _RiderNotificationPageState extends State<RiderNotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
-      ),
-      body: Column(
+    return WebShell(
+      title: 'Notifications',
+      child: Column(
         children: [
           Expanded(
             child: BlocBuilder<RiderNotificationBloc, RiderNotificationState>(
@@ -49,7 +48,7 @@ class _RiderNotificationPageState extends State<RiderNotificationPage> {
                 if (state is RiderNotificationLoaded) {
                   final notifications = state.notifications;
                   if (notifications.isEmpty) {
-                    return const Center(child: Text('No notifications.'));
+                    return Center(child: Text('No notifications.', style: Theme.of(context).textTheme.bodyMedium));
                   }
 
                   return ListView.separated(
@@ -68,7 +67,7 @@ class _RiderNotificationPageState extends State<RiderNotificationPage> {
                   return Center(
                     child: Text(
                       state.message,
-                      style: const TextStyle(color: Colors.red),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   );
                 }
@@ -88,29 +87,25 @@ class _RiderNotificationPageState extends State<RiderNotificationPage> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Row(
         children: [
-          Text('Prev'),
-          const SizedBox(width: 8),
-          IconButton(
+          TextButton(
             onPressed: _page <= 1
                 ? null
                 : () {
                     setState(() => _page -= 1);
                     _fetch();
                   },
-            icon: const Icon(Icons.chevron_left),
+            child: Text('Prev', style: Theme.of(context).textTheme.bodyMedium),
           ),
           const SizedBox(width: 8),
-          Text('$_page'),
-          const SizedBox(width: 8),
-          IconButton(
+          Text('$_page', style: Theme.of(context).textTheme.bodyMedium),
+          const Spacer(),
+          TextButton(
             onPressed: () {
               setState(() => _page += 1);
               _fetch();
             },
-            icon: const Icon(Icons.chevron_right),
+            child: Text('Next', style: Theme.of(context).textTheme.bodyMedium),
           ),
-          const Spacer(),
-          const Text('Next'),
         ],
       ),
     );
@@ -127,6 +122,7 @@ class _NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Theme.of(context).primaryColorLight,
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -150,4 +146,3 @@ class _NotificationCard extends StatelessWidget {
     );
   }
 }
-

@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"quixo-server/models"
@@ -17,11 +19,12 @@ import (
 // VendorLogin handles /api/vender/login/
 func VendorLogin(c *gin.Context) {
 	type LoginRequest struct {
-		Phone string `json:"phone" binding:"required"`
+		Phone string `json:"phone" form:"phone" binding:"required"`
 	}
 
 	var req LoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	// Flutter app sends multipart FormData; JSON clients are also supported.
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "server error"})
 		return
 	}
@@ -30,10 +33,16 @@ func VendorLogin(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var vendor models.Vendor
-	err := collection.FindOne(ctx, bson.M{"number": req.Phone}).Decode(&vendor)
+	// Only decode fields we need — avoids 500s when optional nested BSON (e.g. violations) does not match models.Vendor.
+	type vendorLoginDoc struct {
+		ID        primitive.ObjectID `bson:"_id"`
+		Verified  bool               `bson:"verified"`
+		Suspended bool               `bson:"suspended"`
+	}
+	var doc vendorLoginDoc
+	err := collection.FindOne(ctx, bson.M{"number": req.Phone}).Decode(&doc)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "server error"})
 			return
 		}
@@ -41,13 +50,13 @@ func VendorLogin(c *gin.Context) {
 		return
 	}
 
-	if !vendor.Verified || vendor.Suspended {
+	if !doc.Verified || doc.Suspended {
 		c.JSON(http.StatusForbidden, gin.H{"success": false, "message": "account not verified or suspended"})
 		return
 	}
 
 	otp, _ := GenerateOTP()
-	_, err = collection.UpdateOne(ctx, bson.M{"_id": vendor.ID}, bson.M{"$set": bson.M{"otp": otp}})
+	_, err = collection.UpdateOne(ctx, bson.M{"_id": doc.ID}, bson.M{"$set": bson.M{"otp": otp}})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
@@ -59,35 +68,53 @@ func VendorLogin(c *gin.Context) {
 // VendorOTPLogin handles /api/vender/login/otp
 func VendorOTPLogin(c *gin.Context) {
 	type OTPLoginRequest struct {
-		Phone string `json:"phone" binding:"required"`
-		OTP   string `json:"otp" binding:"required"`
+		Phone string `json:"phone" form:"phone" binding:"required"`
+		OTP   string `json:"otp" form:"otp" binding:"required"`
 	}
 
 	var req OTPLoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "server error"})
 		return
 	}
+	req.Phone = strings.TrimSpace(req.Phone)
+	req.OTP = strings.TrimSpace(req.OTP)
 
 	collection := utils.GetCollection("vendors")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var vendor models.Vendor
-	err := collection.FindOne(ctx, bson.M{"number": req.Phone, "otp": req.OTP}).Decode(&vendor)
+	// Match by phone then compare OTP with TrimSpace so we accept correct zero-padded OTPs and
+	// legacy values that were padded with spaces (old fmt "%06s" bug).
+	type vendorOtpDoc struct {
+		ID        primitive.ObjectID `bson:"_id"`
+		OTP       string             `bson:"otp"`
+		Verified  bool               `bson:"verified"`
+		Suspended bool               `bson:"suspended"`
+	}
+	var doc vendorOtpDoc
+	err := collection.FindOne(ctx, bson.M{"number": req.Phone}).Decode(&doc)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusOK, gin.H{"success": false, "message": "otp verification failure"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
+		return
+	}
+	if strings.TrimSpace(doc.OTP) != req.OTP {
 		c.JSON(http.StatusOK, gin.H{"success": false, "message": "otp verification failure"})
 		return
 	}
 
-	if !vendor.Verified || vendor.Suspended {
+	if !doc.Verified || doc.Suspended {
 		c.JSON(http.StatusForbidden, gin.H{"success": false, "message": "account not verified or suspended"})
 		return
 	}
 
-	collection.UpdateOne(ctx, bson.M{"_id": vendor.ID}, bson.M{"$unset": bson.M{"otp": ""}})
+	collection.UpdateOne(ctx, bson.M{"_id": doc.ID}, bson.M{"$unset": bson.M{"otp": ""}})
 
-	token, err := GenerateJWT(vendor.ID, "vendor")
+	token, err := GenerateJWT(doc.ID, "vendor")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
@@ -97,7 +124,7 @@ func VendorOTPLogin(c *gin.Context) {
 		"success": true,
 		"message": "success",
 		"token":   token,
-		"id":      vendor.ID.Hex(),
+		"id":      doc.ID.Hex(),
 	})
 }
 
@@ -162,30 +189,44 @@ func VendorRegistration(c *gin.Context) {
 // VendorRegistrationOTP handles /api/vender/registration/otp
 func VendorRegistrationOTP(c *gin.Context) {
 	type OTPRegRequest struct {
-		Phone string `json:"phone" binding:"required"`
-		OTP   string `json:"otp" binding:"required"`
+		Phone string `json:"phone" form:"phone" binding:"required"`
+		OTP   string `json:"otp" form:"otp" binding:"required"`
 	}
 
 	var req OTPRegRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "server error"})
 		return
 	}
+	req.Phone = strings.TrimSpace(req.Phone)
+	req.OTP = strings.TrimSpace(req.OTP)
 
 	collection := utils.GetCollection("vendors")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var vendor models.Vendor
-	err := collection.FindOne(ctx, bson.M{"number": req.Phone, "otp": req.OTP}).Decode(&vendor)
+	type regOtpDoc struct {
+		ID  primitive.ObjectID `bson:"_id"`
+		OTP string             `bson:"otp"`
+	}
+	var regDoc regOtpDoc
+	err := collection.FindOne(ctx, bson.M{"number": req.Phone}).Decode(&regDoc)
 	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			c.JSON(http.StatusOK, gin.H{"success": false, "message": "otp verification failure"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
+		return
+	}
+	if strings.TrimSpace(regDoc.OTP) != req.OTP {
 		c.JSON(http.StatusOK, gin.H{"success": false, "message": "otp verification failure"})
 		return
 	}
 
-	collection.UpdateOne(ctx, bson.M{"_id": vendor.ID}, bson.M{"$unset": bson.M{"otp": ""}})
+	collection.UpdateOne(ctx, bson.M{"_id": regDoc.ID}, bson.M{"$unset": bson.M{"otp": ""}})
 
-	token, err := GenerateJWT(vendor.ID, "vendor")
+	token, err := GenerateJWT(regDoc.ID, "vendor")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
@@ -195,6 +236,6 @@ func VendorRegistrationOTP(c *gin.Context) {
 		"success": true,
 		"message": "application submitted",
 		"token":   token,
-		"id":      vendor.ID.Hex(),
+		"id":      regDoc.ID.Hex(),
 	})
 }

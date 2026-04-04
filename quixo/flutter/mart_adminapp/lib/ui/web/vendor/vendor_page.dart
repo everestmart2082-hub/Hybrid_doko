@@ -1,3 +1,4 @@
+import 'package:mart_adminapp/core/constants/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mart_adminapp/features/vendor/bloc/admin_vendor_bloc.dart';
@@ -97,51 +98,78 @@ class _VendorCardState extends State<_VendorCard> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {                  
     final v = widget.vendor;
-    return Card(
-      color: Theme.of(context).primaryColorLight,
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ExpansionTile(
-        title: Text(v.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        subtitle: Text('ID: ${v.venderId}', style: Theme.of(context).textTheme.bodySmall),
-        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (v.status == true) const Icon(Icons.verified, color: Colors.green, size: 18),
-          if (v.status != true) const Icon(Icons.pending, color: Colors.orange, size: 18),
-          const SizedBox(width: 8),
-          Icon(Icons.expand_more, color: Theme.of(context).textTheme.bodyLarge?.color,),
-        ]),
-        onExpansionChanged: (v) => setState(() => _expanded = v),
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _InfoRow('Verified', v.status?.toString() ?? 'null'),
-                _InfoRow('Update Request', v.updateRequest?.toString() ?? 'null'),
-                const SizedBox(height: 10),
-                Text('Violations',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall
-                        ?.copyWith(fontWeight: FontWeight.bold)),
-                ...v.violations.map((viol) =>
-                    ListTile(dense: true, title: Text(viol.toString(), style: Theme.of(context).textTheme.bodyMedium),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete, size: 18, color: Theme.of(context).primaryColorDark,),
-                        onPressed: () {
-                          final newList = List<String>.from(
-                              v.violations.map((e) => e.toString()))
-                            ..remove(viol.toString());
-                          context.read<AdminVendorBloc>().add(
-                              AdminVendorUpdateViolations(
-                                  AdminViolationsRequest(
-                                      targetId: v.venderId,
-                                      violations: newList)));
-                        },
-                      ))),
+                    return Card(
+                      color: Theme.of(context).primaryColorLight,
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      child: ExpansionTile(
+                        title: Text('${v.name} (${v.storeName.isEmpty ? "No Store" : v.storeName})', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        subtitle: Text('ID: ${v.venderId} | Ph: ${v.number} | Rev: Rs. ${v.revenue}', style: Theme.of(context).textTheme.bodySmall),
+                        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                          if (v.status == true) const Icon(Icons.verified, color: Colors.green, size: 18),
+                          if (v.status != true) const Icon(Icons.pending, color: Colors.orange, size: 18),
+                          const SizedBox(width: 8),
+                          Icon(Icons.expand_more, color: Theme.of(context).textTheme.bodyLarge?.color,),
+                        ]),
+                        onExpansionChanged: (v) => setState(() => _expanded = v),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _InfoRow('Email', v.email),
+                                _InfoRow('Address', v.address),
+                                _InfoRow('Business', v.businessType),
+                                _InfoRow('Verified', v.status?.toString() ?? 'null'),
+                                _InfoRow('Suspended', v.suspended.toString()),
+                                _InfoRow('Update Request', v.updateRequest?.toString() ?? 'null'),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Text('Description: ${v.description}', style: Theme.of(context).textTheme.bodyMedium),
+                                ),
+                                if (v.panFile.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('PAN File:', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 4),
+                                        ClipRRect(
+                                          child: Image.network(
+                                            '${ApiEndpoints.baseImageUrl}${v.panFile.startsWith('/') ? '' : '/'}${v.panFile}',
+                                            height: 100,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                Chip(label: Text('PAN: ${v.panFile}')),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                const SizedBox(height: 10),
+                                Text('Violations',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.bold)),
+                                ...v.violations.map((viol) =>
+                                    ListTile(dense: true, title: Text(viol.toString(), style: Theme.of(context).textTheme.bodyMedium),
+                                      trailing: IconButton(
+                                        icon: Icon(Icons.delete, size: 18, color: Theme.of(context).primaryColorDark,),
+                                        onPressed: () {
+                                          final newList = List<String>.from(
+                                              v.violations.map((e) => e.toString()))
+                                            ..remove(viol.toString());
+                                          context.read<AdminVendorBloc>().add(
+                                              AdminVendorUpdateViolations(
+                                                  AdminViolationsRequest(
+                                                      targetId: v.venderId,
+                                                      violations: newList)));
+                                        },
+                                      ))),
                 Row(children: [
                   Expanded(
                     child: TextField(

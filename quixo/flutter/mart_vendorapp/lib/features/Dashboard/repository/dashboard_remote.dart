@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:quickmartvender/core/constants/api_constants.dart';
+import 'package:quickmartvender/core/network/shared_pref.dart';
 import '../../../core/network/dio_client.dart';
 import '../data/dashboard_model.dart';
 import '../../Product/data/product_model.dart';
@@ -11,10 +13,10 @@ class DashboardRemote {
 
   Future<DashboardStatsModel> getDashboardStats() async {
     // Fetch Chart Data
-    final chartMap = await dio.post(ApiEndpoints.chartMonth, {
+    final chartMap = await dio.post(ApiEndpoints.chartMonth, FormData.fromMap({
       "page": 1,
       "limit": 10,
-    });
+    }));
     
     List<VendorChartData> chartData = [];
     double totalRevenue = 0;
@@ -28,17 +30,25 @@ class DashboardRemote {
     }
 
     // Fetch Orders Data
-    final orderMap = await dio.post(ApiEndpoints.order, {"page": 1, "limit": 1000});
+    final orderMap = await dio.post(ApiEndpoints.order, FormData.fromMap({"page": 1, "limit": 1000}));
     List<VendorOrder> orders = [];
     if (orderMap["message"] != null && orderMap["message"] is List && orderMap["message"].length > 1) {
       orders = (orderMap["message"][1] as List).map((e) => VendorOrder.fromMap(e)).toList();
     }
     
-    // Fetch Products Data
-    final productMap = await dio.get(ApiEndpoints.products, query: {"page": 1, "limit": 1000});
+    // Fetch Products Data (scoped to logged-in vendor when id is stored)
+    final store = SharedPreferencesProvider();
+    final vid = await store.getKey(prefs.vendorId.name);
+    final productQuery = <String, dynamic>{"page": 1, "limit": 1000};
+    if (vid != null && vid.isNotEmpty) {
+      productQuery["vender id"] = vid;
+    }
+    final productMap = await dio.get(ApiEndpoints.products, query: productQuery);
     List<Product> products = [];
     if (productMap["message"] != null && productMap["message"] is List) {
-      products = (productMap["message"] as List).map((e) => Product.fromMap(e)).toList();
+      products = (productMap["message"] as List)
+          .map((e) => Product.fromMap(Map<String, dynamic>.from(e as Map)))
+          .toList();
     }
 
     // Compute Product Stats

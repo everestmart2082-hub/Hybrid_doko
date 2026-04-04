@@ -44,7 +44,7 @@ class DioClient implements ApiClient {
 
       return response.data;
     } on DioException catch (e) {
-      throw ApiException.from(e);
+      throw ApiException.from(e).failure;
     } catch (e) {
       rethrow;
     }
@@ -61,7 +61,7 @@ class DioClient implements ApiClient {
     } 
     on DioException catch (e) {
       debugPrint(e.message);
-      throw ApiException.from(e);
+      throw ApiException.from(e).failure;
     } 
     catch (e) {
       // throw NetworkException.noInternet();
@@ -83,7 +83,7 @@ class DioClient implements ApiClient {
     } 
     on DioException catch (e) {
       debugPrint(e.message);
-      throw ApiException.from(e);
+      throw ApiException.from(e).failure;
     } 
     catch (e) {
       // throw NetworkException.noInternet();
@@ -101,7 +101,7 @@ class DioClient implements ApiClient {
           },));
       return response.data;
     } on DioException catch (e) {
-      throw ApiException.from(e);
+      throw ApiException.from(e).failure;
     } catch (_) {
       throw NetworkException.noInternet();
     }
@@ -116,7 +116,7 @@ class DioClient implements ApiClient {
           },));
       return response.data;
     } on DioException catch (e) {
-      throw ApiException.from(e);
+      throw ApiException.from(e).failure;
     } catch (_) {
       throw NetworkException.noInternet();
     }

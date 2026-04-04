@@ -39,7 +39,7 @@ class AdminEmployeeModel extends Equatable {
         id: map['_id']?.toString() ?? map['id']?.toString() ?? '',
         name: map['name'] as String? ?? '',
         position: map['position'] as String? ?? '',
-        salary: (map['salary'] as num?)?.toDouble() ?? 0.0,
+        salary: num.tryParse(map['salary']?.toString() ?? '')?.toDouble() ?? 0.0,
         address: map['address'] as String? ?? '',
         email: map['email'] as String? ?? '',
         phone: map['phone'] as String? ?? '',
@@ -118,6 +118,7 @@ class AdminEmployeeUpdateRequest extends Equatable {
   final String bankName;
   final String accountNumber;
   final String ifscCode;
+  final String pan;
 
   const AdminEmployeeUpdateRequest({
     required this.name,
@@ -129,6 +130,7 @@ class AdminEmployeeUpdateRequest extends Equatable {
     required this.bankName,
     required this.accountNumber,
     required this.ifscCode,
+    required this.pan,
   });
 
   Map<String, dynamic> toMap() => {
@@ -141,11 +143,12 @@ class AdminEmployeeUpdateRequest extends Equatable {
         'bank name': bankName,
         'account number': accountNumber,
         'ifsc code': ifscCode,        // exact server field name (with space)
+        'pan': pan,
       };
 
   @override
   List<Object?> get props => [
         name, position, salary, address, email, phone, bankName,
-        accountNumber, ifscCode,
+        accountNumber, ifscCode, pan,
       ];
 }

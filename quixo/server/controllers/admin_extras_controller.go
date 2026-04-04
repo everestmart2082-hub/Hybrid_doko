@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"quixo-server/models"
 	"quixo-server/utils"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,7 @@ import (
 )
 
 // AdminChangeConstants handles /api/admin/changeConstants
- func AdminChangeConstants(c *gin.Context) {
+func AdminChangeConstants(c *gin.Context) {
 	name := c.PostForm("name")
 	typesList := c.PostFormArray("type list []")
 	if len(typesList) == 0 {
@@ -45,6 +46,25 @@ import (
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "success"})
+}
+
+// AdminGetAllConstants handles /api/admin/constants/all — list all constant documents (e.g. Business type).
+func AdminGetAllConstants(c *gin.Context) {
+	coll := utils.GetCollection("constants")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cursor, err := coll.Find(ctx, bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "failure"})
+		return
+	}
+	defer cursor.Close(ctx)
+	var list []models.Constant
+	if err := cursor.All(ctx, &list); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "failure"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": list})
 }
 
 // AdminOrderAll handles /api/admin/order/all
@@ -90,19 +110,19 @@ func AdminGetAllEmployees(c *gin.Context) {
 	var mapped []gin.H
 	for _, v := range results {
 		mapped = append(mapped, gin.H{
-			"id":              v["_id"],
-			"name":            v["name"],
-			"email":           v["email"],
-			"phone":           v["phone"],
-			"position":        v["position"],
-			"salary":          v["salary"],
-			"address":         v["address"],
+			"id":               v["_id"],
+			"name":             v["name"],
+			"email":            v["email"],
+			"phone":            v["phone"],
+			"position":         v["position"],
+			"salary":           v["salary"],
+			"address":          v["address"],
 			"citizenship_file": v["citizenship_file"],
-			"bank_name":       v["bank_name"],
-			"account_number":  v["account_number"],
-			"pan_file":        v["pan_file"],
-			"suspended":       v["suspended"],
-			"violations":      v["violations"],
+			"bank_name":        v["bank name"],
+			"account_number":   v["account_number"],
+			"pan_file":         v["pan_file"],
+			"suspended":        v["suspended"],
+			"violations":       v["violations"],
 		})
 	}
 

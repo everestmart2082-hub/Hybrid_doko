@@ -49,14 +49,9 @@ class AdminRiderBloc extends Bloc<AdminRiderEvent, AdminRiderState> {
       _withReload(() => remote.blacklistRider(e.riderId, e.blacklisted), emit,
           success: 'Rider blacklist updated.');
 
-  FutureOr<void> _onNotify(AdminRiderNotify e, Emitter<AdminRiderState> emit) async {
-    try {
-      await remote.sendNotification(e.riderId, e.message);
-      emit(const AdminRiderActionSuccess('Notification sent.'));
-    } catch (ex) {
-      emit(AdminRiderFailed(ex.toString()));
-    }
-  }
+  FutureOr<void> _onNotify(AdminRiderNotify e, Emitter<AdminRiderState> emit) =>
+      _withReload(() => remote.sendNotification(e.riderId, e.message), emit,
+          success: 'Notification sent.');
 
   FutureOr<void> _onViolations(
       AdminRiderUpdateViolations e, Emitter<AdminRiderState> emit) =>

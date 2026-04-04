@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -170,19 +171,14 @@ func RiderNotification(c *gin.Context) {
 func RiderSendMessage(c *gin.Context) {
 	riderID, _ := c.Get("userID")
 	messageText := c.PostForm("message")
+	name := c.PostForm("name")
+	email := c.PostForm("email")
 
-	coll := utils.GetCollection("riders")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	msg := models.Message{
-		Type:        "to_admin",
-		Date:        time.Now().String(),
-		Description: messageText,
-	}
-
-	_, err := coll.UpdateOne(ctx, bson.M{"_id": riderID}, bson.M{"$push": bson.M{"messages": msg}})
-	if err != nil {
+	footer := fmt.Sprintf("Rider ID: %v", riderID)
+	if err := pushContactToAllAdmins(ctx, "rider", name, email, messageText, footer); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
 		return
 	}

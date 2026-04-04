@@ -24,4 +24,16 @@ class AdminSettingsRemote {
         await dio.post(ApiEndpoints.adminChangeConstants, formData);
     return checkSuccess(map);
   }
+
+  Future<List<AdminConstantModel>> fetchAllConstants() async {
+    final Map<String, dynamic> map =
+        await dio.post(ApiEndpoints.adminConstantsAll, {});
+    checkSuccess(map);
+    final raw = map['message'];
+    if (raw is! List) return [];
+    return raw
+        .map((e) => AdminConstantModel.fromMap(
+            Map<String, dynamic>.from(e as Map)))
+        .toList();
+  }
 }

@@ -22,6 +22,8 @@ class ApiEndpoints {
   // ========== NOTIFICATION ==========
   static const String notification = "/api/vender/notification";
 
+  static const String contactAdmin = "/api/vender/contact/admin";
+
   // ========= PRODUCTS ==========
   static const String products = "/api/product/all";
   static const String productById = "/api/product/id";

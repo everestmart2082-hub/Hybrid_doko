@@ -15,8 +15,8 @@ class VenderOtpVerifyModel extends Equatable {
 
   Map<String, dynamic> toMap() {
     return {
-      "otp": otp,
-      "phone": phone,
+      "otp": otp.trim(),
+      "phone": phone.trim(),
     };
   }
 

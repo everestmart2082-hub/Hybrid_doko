@@ -26,8 +26,8 @@ func GenerateOTP() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// Pad with leading zeroes to ensure 6 digits
-	return fmt.Sprintf("%06s", n.String()), nil
+	// Pad with leading zeroes to ensure 6 digits (%06s would pad with spaces for strings)
+	return fmt.Sprintf("%06d", n.Int64()), nil
 }
 
 // GenerateJWT creates a JWT token including the user ID and role
@@ -71,6 +71,31 @@ func VerifyToken(tokenString string) (jwt.MapClaims, error) {
 	}
 
 	return claims, nil
+}
+
+// TryVendorHexIDFromBearer returns the vendor's Mongo hex id from a valid Bearer JWT (role=vendor), or ("", false).
+func TryVendorHexIDFromBearer(c *gin.Context) (string, bool) {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return "", false
+	}
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return "", false
+	}
+	claims, err := VerifyToken(parts[1])
+	if err != nil {
+		return "", false
+	}
+	role, _ := claims["role"].(string)
+	if role != "vendor" {
+		return "", false
+	}
+	id, _ := claims["id"].(string)
+	if id == "" {
+		return "", false
+	}
+	return id, true
 }
 
 // AuthMiddleware generates a Gin middleware that ensures the request contains a valid JWT for the specified roles.

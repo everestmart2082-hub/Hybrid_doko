@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mart_adminapp/core/constants/api_constants.dart';
 import 'package:mart_adminapp/features/employee/bloc/admin_employee_bloc.dart';
 import 'package:mart_adminapp/features/employee/bloc/admin_employee_event.dart';
 import 'package:mart_adminapp/features/employee/bloc/admin_employee_state.dart';
@@ -46,6 +47,7 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
   final _editBankName = TextEditingController();
   final _editAccountNumber = TextEditingController();
   final _editIfscCode = TextEditingController();
+  final _editPan = TextEditingController();
   MultipartFile? _editCitizenshipFile;
 
   bool _otpDialogOpen = false;
@@ -77,6 +79,7 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
     _editBankName.dispose();
     _editAccountNumber.dispose();
     _editIfscCode.dispose();
+    _editPan.dispose();
     super.dispose();
   }
 
@@ -214,7 +217,8 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
     _editPhone.text = e.phone;
     _editBankName.text = e.bankName;
     _editAccountNumber.text = e.accountNumber;
-    _editIfscCode.text = '';
+    _editIfscCode.text = ''; // Note: mapping from model doesn't supply ifsc, keeping reset logic
+    _editPan.text = e.panFile;
     _editCitizenshipFile = null;
 
     showDialog(
@@ -260,6 +264,8 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
                   const SizedBox(height: 8),
                   _buildField(controller: _editIfscCode, label: 'ifsc code'),
                   const SizedBox(height: 8),
+                  _buildField(controller: _editPan, label: 'pan (text)'),
+                  const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Column(
@@ -267,12 +273,22 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
                       children: [
                         const Text('citizenship file (optional)'),
                         const SizedBox(height: 4),
+                        if (e.citizenshipFile.isNotEmpty && _editCitizenshipFile == null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Image.network(
+                              '${ApiEndpoints.baseImageUrl}${e.citizenshipFile.startsWith('/') ? '' : '/'}${e.citizenshipFile}',
+                              height: 60,
+                              errorBuilder: (_, __, ___) =>
+                                  const Text(''),
+                            ),
+                          ),
                         Row(
                           children: [
                             Expanded(
                               child: Text(
                                 _editCitizenshipFile?.filename ??
-                                    'No file selected',
+                                    (e.citizenshipFile.isNotEmpty ? 'Currently: ${e.citizenshipFile.split('/').last}' : 'No file selected'),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -321,6 +337,7 @@ class _AdminEmployeesPageState extends State<AdminEmployeesPage> {
       bankName: _editBankName.text.trim(),
       accountNumber: _editAccountNumber.text.trim(),
       ifscCode: _editIfscCode.text.trim(),
+      pan: _editPan.text.trim(),
     );
     context.read<AdminEmployeeBloc>().add(
           AdminEmployeeUpdate(req: req, citizenshipFile: _editCitizenshipFile),
@@ -517,12 +534,20 @@ class _EmployeeCard extends StatelessWidget {
                   label: Text(
                       'suspended: ${employee.suspended ? 'yes' : 'no'}'),
                 ),
-                if (employee.citizenshipFile.isNotEmpty)
-                  const Chip(label: Text('citizenship file')),
                 if (employee.panFile.isNotEmpty)
-                  const Chip(label: Text('pan file')),
+                  Chip(label: Text('pan: ${employee.panFile}')),
               ],
             ),
+            if (employee.citizenshipFile.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Image.network(
+                  '${ApiEndpoints.baseImageUrl}${employee.citizenshipFile.startsWith('/') ? '' : '/'}${employee.citizenshipFile}',
+                  height: 60,
+                  errorBuilder: (_, __, ___) =>
+                      const Chip(label: Text('citizenship file (err)')),
+                ),
+              ),
             const SizedBox(height: 8),
             if (employee.violations.isNotEmpty) ...[
               const Text(

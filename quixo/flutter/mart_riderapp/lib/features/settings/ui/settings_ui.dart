@@ -13,111 +13,153 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  static const themeOptions = [
-    "orange-bluegray",
-    "teal-blue",
-    "amber-red",
-    "orange-bluegray-dark",
-    "teal-blue-dark",
-    "amber-red-dark",
+  static const List<String> themeOptions = [
+    'amberDark',
+    'amberLight',
+    'orangeDark',
+    'orangeLight',
+    'tealDark',
+    'tealLight',
   ];
 
-  Future<void> _pickThemeAndDispatch(SettingsState state) async {
+  Future<void> _pickTheme(BuildContext context, SettingsState state) async {
     final selected = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: Text(
-          'Select Color Theme',
-          style: TextStyle(color: Theme.of(context).primaryColor),
-        ),
+        backgroundColor: Theme.of(context).primaryColorLight,
+        title: const Text('Theme'),
         children: themeOptions
             .map(
               (t) => SimpleDialogOption(
                 onPressed: () => Navigator.pop(context, t),
                 child: Text(
                   t,
-                  style: TextStyle(color: Theme.of(context).primaryColor),
+                  style: TextStyle(color: Theme.of(context).primaryColorDark),
                 ),
               ),
             )
             .toList(),
       ),
     );
-
     if (selected != null && selected.isNotEmpty) {
       context.read<SettingsBloc>().add(ChangeTheme(selected));
+    }
+  }
+
+  Future<void> _pickLanguage(BuildContext context, SettingsState state) async {
+    const languages = ['English', 'Nepali'];
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        backgroundColor: Theme.of(context).primaryColorLight,
+        title: const Text('Language'),
+        children: languages
+            .map(
+              (l) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, l),
+                child: Text(
+                  l,
+                  style: TextStyle(color: Theme.of(context).primaryColorDark),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+    if (selected != null && selected.isNotEmpty) {
+      context.read<SettingsBloc>().add(ChangeLanguage(selected));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
-        title: const Text('Settings'),
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text('Settings', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        elevation: 1,
       ),
       drawer: buildAppDrawer(context),
       body: BlocBuilder<SettingsBloc, SettingsState>(
         builder: (context, state) {
-          return Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white,
-                  Theme.of(context).primaryColorLight,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              ListTile(
+                title: Text(
+                  'Theme',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  state.theme,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).textTheme.headlineLarge?.color,
+                ),
+                onTap: () => _pickTheme(context, state),
               ),
-            ),
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                ListTile(
-                  title: const Text('Theme'),
-                  subtitle: Text(state.theme),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _pickThemeAndDispatch(state),
-                ),
-                const Divider(),
-                const SizedBox(height: 8),
-                const Text(
+              const Divider(),
+              ListTile(
+                title: Text(
                   'Language',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 8),
-                const ListTile(
-                  title: Text('English'),
+                subtitle: Text(
+                  state.language,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const ListTile(
-                  title: Text('Nepali'),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).textTheme.headlineLarge?.color,
                 ),
-                const Divider(),
-                const SizedBox(height: 8),
-                const Text(
-                  'About',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                onTap: () => _pickLanguage(context, state),
+              ),
+              const Divider(),
+              const SizedBox(height: 8),
+              Text(
+                'About',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              ListTile(
+                title: Text(
+                  'version',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 8),
-                const ListTile(
-                  title: Text('version'),
-                  subtitle: Text('0.1.0'),
+                subtitle: Text(
+                  '0.1.0',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const ListTile(
-                  title: Text('developer'),
-                  subtitle: Text('Quixo team'),
+              ),
+              ListTile(
+                title: Text(
+                  'developer',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const ListTile(
-                  title: Text('license'),
-                  subtitle: Text('MIT'),
+                subtitle: Text(
+                  'Quixo team',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-              ],
-            ),
+              ),
+              ListTile(
+                title: Text(
+                  'license',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(
+                  'MIT',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ],
           );
         },
       ),
     );
   }
 }
-

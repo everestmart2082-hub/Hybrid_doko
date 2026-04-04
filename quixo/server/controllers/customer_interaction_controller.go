@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -124,24 +125,18 @@ func CustomerSendMessage(c *gin.Context) {
 	}
 
 	messageText := c.PostForm("message")
+	name := c.PostForm("name")
+	email := c.PostForm("email")
 
-	coll := utils.GetCollection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	msg := models.Message{
-		Type:        "to_admin",
-		Date:        time.Now().String(),
-		Description: messageText,
-	}
-
-	_, err := coll.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$push": bson.M{"messages": msg}})
-	if err != nil {
+	footer := fmt.Sprintf("User ID: %v", userID)
+	if err := pushContactToAllAdmins(ctx, "customer", name, email, messageText, footer); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
 		return
 	}
 
-	// Native Spec format
 	c.JSON(http.StatusOK, gin.H{"status": true, "message": "message sent successfully"})
 }
 

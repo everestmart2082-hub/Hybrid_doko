@@ -104,6 +104,7 @@ class _VenderRegisterPageState extends State<VenderRegisterPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       body: BlocListener<VenderAuthBloc, VenderAuthState>(
         listener: (context, state) {
           if (state is VenderBusinessTypesLoaded) {
@@ -112,7 +113,7 @@ class _VenderRegisterPageState extends State<VenderRegisterPage> {
               _loadingBizTypes = false;
             });
           }
-          if (state is VenderAuthenticated && !state.authenticated && !_awaitingOtp) {
+          if (state is VenderAuthOtpStep && state.forRegistration && !_awaitingOtp) {
             _awaitingOtp = true;
             _showOtpAndVerify().then((_) => _awaitingOtp = false);
           }

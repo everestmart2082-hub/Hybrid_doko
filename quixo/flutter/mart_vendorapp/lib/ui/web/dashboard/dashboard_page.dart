@@ -71,6 +71,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 flex: 1,
                 child: Card(
                   elevation: 2,
+                  color: Theme.of(context).primaryColorLight,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -101,6 +102,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 flex: 2,
                 child: Card(
                   elevation: 2,
+                  color: Theme.of(context).primaryColorLight,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -157,6 +159,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildStatCard(_StatCard c) {
     return Card(
       elevation: 2,
+      color: Theme.of(context).primaryColorLight,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),

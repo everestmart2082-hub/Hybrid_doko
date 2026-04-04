@@ -9,6 +9,13 @@ import 'package:quickmartvender/features/Product/data/product_detail_model.dart'
 import 'package:quickmartvender/features/Product/data/product_input_model.dart';
 import '../web_shell.dart';
 
+String _categoryIdHex(Map<String, dynamic> c) {
+  final v = c['_id'];
+  if (v is String) return v;
+  if (v is Map && v[r'$oid'] is String) return v[r'$oid'] as String;
+  return '';
+}
+
 class ProductFormPage extends StatefulWidget {
   /// If [existing] is provided, the form is in edit mode.
   final ProductDetail? existing;
@@ -88,7 +95,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
   Future<List<MultipartFile>> _buildMultiparts() async {
     final result = <MultipartFile>[];
     for (final f in _photos) {
-      result.add(await MultipartFile.fromFile(f.path, filename: f.name));
+      final bytes = await f.readAsBytes();
+      result.add(
+        MultipartFile.fromBytes(bytes, filename: f.name),
+      );
     }
     return result;
   }
@@ -232,6 +242,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   // Unit dropdown
                   const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
+                    dropdownColor: Theme.of(context).primaryColorLight,
+                    iconEnabledColor: Theme.of(context).primaryColorDark,
                     value: _units.contains(_unit) ? _unit : _units.first,
                     decoration: const InputDecoration(
                       labelText: 'Unit',
@@ -253,9 +265,10 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   if (_categories.isNotEmpty) ...[
                     const SizedBox(height: 14),
                     DropdownButtonFormField<String>(
-                      value:
-                          _category.isNotEmpty &&
-                              _categories.any((c) => c['name'] == _category)
+                      dropdownColor: Theme.of(context).primaryColorLight,
+                      iconEnabledColor: Theme.of(context).primaryColorDark,
+                      value: _category.isNotEmpty &&
+                              _categories.any((c) => _categoryIdHex(c) == _category)
                           ? _category
                           : null,
                       hint: const Text('Select Category'),
@@ -264,12 +277,15 @@ class _ProductFormPageState extends State<ProductFormPage> {
                         border: OutlineInputBorder(),
                       ),
                       items: _categories
-                          .map(
-                            (c) => DropdownMenuItem(
-                              value: c['name']?.toString() ?? '',
+                          .map((c) {
+                            final id = _categoryIdHex(c);
+                            if (id.isEmpty) return null;
+                            return DropdownMenuItem(
+                              value: id,
                               child: Text(c['name']?.toString() ?? ''),
-                            ),
-                          )
+                            );
+                          })
+                          .whereType<DropdownMenuItem<String>>()
                           .toList(),
                       onChanged: (v) => setState(() => _category = v ?? ''),
                     ),

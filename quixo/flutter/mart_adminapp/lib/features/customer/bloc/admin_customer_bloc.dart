@@ -49,14 +49,9 @@ class AdminCustomerBloc extends Bloc<AdminCustomerEvent, AdminCustomerState> {
       _withReload(() => remote.blacklistUser(e.userId, e.blacklisted), emit,
           success: 'User blacklist updated.');
 
-  FutureOr<void> _onNotify(AdminCustomerNotify e, Emitter<AdminCustomerState> emit) async {
-    try {
-      await remote.sendNotification(e.userId, e.message);
-      emit(const AdminCustomerActionSuccess('Notification sent.'));
-    } catch (ex) {
-      emit(AdminCustomerFailed(ex.toString()));
-    }
-  }
+  FutureOr<void> _onNotify(AdminCustomerNotify e, Emitter<AdminCustomerState> emit) =>
+      _withReload(() => remote.sendNotification(e.userId, e.message), emit,
+          success: 'Notification sent.');
 
   FutureOr<void> _onViolations(
       AdminCustomerUpdateViolations e, Emitter<AdminCustomerState> emit) =>

@@ -21,9 +21,8 @@ class ProductDetailLoaded extends ProductState {
 
 class ProductFiltersLoaded extends ProductState {
   final List<Map<String, dynamic>> categories;
-  final List<Map<String, dynamic>> vendors;
 
-  ProductFiltersLoaded(this.categories, this.vendors);
+  ProductFiltersLoaded(this.categories);
 }
 
 class ProductSuccess extends ProductState {

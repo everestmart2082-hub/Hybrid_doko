@@ -22,6 +22,7 @@ import 'package:quickmartvender/features/profile/repository/profile_remote.dart'
 import 'package:quickmartvender/features/settings/bloc/settings_bloc.dart';
 import 'package:quickmartvender/features/settings/bloc/settings_state.dart';
 import 'package:quickmartvender/features/contacts/bloc/contact_bloc.dart';
+import 'package:quickmartvender/features/contacts/repository/contact_remote.dart';
 
 // Web UI pages
 import 'package:quickmartvender/ui/web/auth/login_page.dart';
@@ -49,28 +50,22 @@ class MyApp extends StatelessWidget {
 
   final SharedPreferencesProvider s = SharedPreferencesProvider();
 
-  ThemeData _getThemeData(String themeString) {
-    switch (themeString) {
-      case 'orange-bluegray':
-      case 'orangeLight':
-        return themeDataFromColors(orangeBlueGrayTheme);
-      case 'teal-blue':
-      case 'tealLight':
-        return themeDataFromColors(tealBlueTheme);
-      case 'amber-red':
+  ThemeData _themeFor(String theme) {
+    switch (theme) {
       case 'amberLight':
         return themeDataFromColors(amberRedTheme);
-      case 'orange-bluegray-dark':
-      case 'orangeDark':
-        return themeDataFromColors(orangeBlueGrayDarkTheme);
-      case 'teal-blue-dark':
-      case 'tealDark':
-        return themeDataFromColors(tealBlueDarkTheme);
-      case 'amber-red-dark':
       case 'amberDark':
         return themeDataFromColors(amberRedDarkTheme);
+      case 'orangeLight':
+        return themeDataFromColors(orangeBlueGrayTheme);
+      case 'orangeDark':
+        return themeDataFromColors(orangeBlueGrayDarkTheme);
+      case 'tealLight':
+        return themeDataFromColors(tealBlueTheme);
+      case 'tealDark':
+        return themeDataFromColors(tealBlueDarkTheme);
       default:
-        return themeDataFromColors(amberRedTheme);
+        return themeDataFromColors(amberRedDarkTheme);
     }
   }
 
@@ -86,6 +81,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (_) => ProductRemote(dio: dioClient)),
         RepositoryProvider(create: (_) => OrderRemote(dio: dioClient)),
         RepositoryProvider(create: (_) => DashboardRemote(dio: dioClient)),
+        RepositoryProvider(create: (_) => ContactRemote(dio: dioClient)),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -96,14 +92,15 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (ctx) => ProductBloc(ctx.read<ProductRemote>())),
           BlocProvider(create: (ctx) => OrderBloc(ctx.read<OrderRemote>())),
           BlocProvider(create: (ctx) => DashboardBloc(ctx.read<DashboardRemote>())),
-          BlocProvider(create: (_) => ContactBloc()),
+          BlocProvider(
+              create: (ctx) => ContactBloc(ctx.read<ContactRemote>())),
         ],
         child: BlocBuilder<SettingsBloc, SettingsState>(
           builder: (context, state) {
             return MaterialApp(
               title: AppConstants.appName,
               debugShowCheckedModeBanner: false,
-              theme: _getThemeData(state.theme),
+              theme: _themeFor(state.theme),
               // Default home = Dashboard (if logged in); Login otherwise.
               // Auth guard is handled per-page by checking VenderAuthBloc.
               initialRoute: '/mainapp',

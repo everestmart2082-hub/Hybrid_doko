@@ -65,4 +65,5 @@ class ApiEndpoints {
 
   // ========== SETTINGS / CONSTANTS ==========
   static const String adminChangeConstants = '/admin/changeConstants';
+  static const String adminConstantsAll = '/admin/constants/all';
 }

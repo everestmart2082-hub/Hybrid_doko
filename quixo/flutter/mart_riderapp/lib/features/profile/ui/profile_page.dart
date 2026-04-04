@@ -5,6 +5,7 @@ import 'package:quickmartrider/features/profile/bloc/profile_event.dart';
 import 'package:quickmartrider/features/profile/bloc/profile_state.dart';
 import 'package:quickmartrider/features/profile/data/rider_profile_model.dart';
 import 'package:quickmartrider/features/profile/data/rider_profile_update_model.dart';
+import 'package:quickmartrider/ui/web_shell.dart';
 
 class RiderProfilePage extends StatefulWidget {
   const RiderProfilePage({super.key});
@@ -180,11 +181,9 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: BlocListener<RiderProfileBloc, RiderProfileState>(
+    return WebShell(
+      title: 'Profile',
+      child: BlocListener<RiderProfileBloc, RiderProfileState>(
         listener: (context, state) async {
           if (state is RiderProfileFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -232,6 +231,7 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Card(
+                        color: Theme.of(context).primaryColorLight,
                         elevation: 2,
                         child: Padding(
                           padding: const EdgeInsets.all(20),
@@ -245,36 +245,40 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
                                     ),
                               ),
                               const SizedBox(height: 10),
-                              Text('number: ${profile.number}'),
+                              Text('number: ${profile.number}', style: Theme.of(context).textTheme.bodyMedium),
                               const SizedBox(height: 6),
-                              Text('email: ${profile.email ?? ''}'),
+                              Text('email: ${profile.email ?? ''}', style: Theme.of(context).textTheme.bodyMedium),
                               const SizedBox(height: 6),
                               Text(
                                 'Address: ${profile.defaultAddress ?? ''}',
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               const SizedBox(height: 6),
-                              Text('bikeDetail: ${profile.bikeDetail ?? ''}'),
+                              Text('bikeDetail: ${profile.bikeDetail ?? ''}', style: Theme.of(context).textTheme.bodyMedium),
                               const SizedBox(height: 14),
                               const Divider(),
                               const SizedBox(height: 10),
-                              Text('verified: ${profile.verified}'),
+                              Text('verified: ${profile.verified}', style: Theme.of(context).textTheme.bodyMedium),
                               const SizedBox(height: 6),
-                              Text('updation requested: ${profile.updationRequested}'),
+                              Text('updation requested: ${profile.updationRequested}', style: Theme.of(context).textTheme.bodyMedium),
                               const SizedBox(height: 14),
                               const Divider(),
                               const SizedBox(height: 10),
-                              Text('Rc Book file: ${profile.blueBookUrl ?? ''}'),
+                              Text('Rc Book file: ${profile.blueBookUrl ?? ''}', style: Theme.of(context).textTheme.bodySmall),
                               const SizedBox(height: 6),
                               Text(
                                 'Citizenship file: ${profile.citizenshipUrl ?? ''}',
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 'pan card file: ${profile.panCardUrl ?? ''}',
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 'bike insurance paper file: ${profile.insurancePaperUrl ?? ''}',
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],
                           ),
@@ -301,7 +305,7 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
               return Center(
                 child: Text(
                   state.message,
-                  style: const TextStyle(color: Colors.red),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               );
             }
@@ -313,4 +317,3 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
     );
   }
 }
-

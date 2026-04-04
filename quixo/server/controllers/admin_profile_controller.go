@@ -34,9 +34,10 @@ func AdminProfileGet(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": gin.H{
-			"name":    admin.Name,
-			"number":  admin.Phone,
-			"email":   admin.Email,
+			"name":     admin.Name,
+			"number":   admin.Phone,
+			"email":    admin.Email,
+			"messages": admin.Messages,
 		},
 	})
 }

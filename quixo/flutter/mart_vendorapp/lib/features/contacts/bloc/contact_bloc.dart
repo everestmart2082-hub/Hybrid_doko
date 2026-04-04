@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartvender/features/contacts/repository/contact_remote.dart';
 import 'contact_event.dart';
 import 'contact_state.dart';
 
-/// A simple local-only BLoC for the Contact Us form.
-/// The Contacts page (from contacts.txt) takes Name, Email, and Message.
-/// Since there is no backend endpoint for this, we simulate sending and
-/// emit success/failure immediately. When a real API is available, inject
-/// a repository here and call it.
 class ContactBloc extends Bloc<ContactEvent, ContactState> {
-  ContactBloc() : super(ContactInitial()) {
+  final ContactRemote _remote;
+
+  ContactBloc(this._remote) : super(ContactInitial()) {
     on<SendContactMessage>(_onSendContactMessage);
   }
 
@@ -18,7 +16,6 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
     emit(ContactLoading());
 
     try {
-      // Basic validation
       if (event.name.trim().isEmpty ||
           event.email.trim().isEmpty ||
           event.message.trim().isEmpty) {
@@ -32,10 +29,14 @@ class ContactBloc extends Bloc<ContactEvent, ContactState> {
         return;
       }
 
-      // TODO: call a real API endpoint when one is available
-      // e.g. await dio.post("/api/contact", {...})
+      await _remote.sendToAdmin(
+        name: event.name.trim(),
+        email: event.email.trim(),
+        message: event.message.trim(),
+      );
 
-      emit(const ContactSuccess("Your message has been sent. We will get back to you soon."));
+      emit(const ContactSuccess(
+          "Your message has been sent. We will get back to you soon."));
     } catch (e) {
       emit(ContactError(e.toString()));
     }

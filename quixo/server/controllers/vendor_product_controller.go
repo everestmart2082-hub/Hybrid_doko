@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -13,6 +14,32 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+func bsonSliceToStrings(v interface{}) []string {
+	if v == nil {
+		return nil
+	}
+	switch x := v.(type) {
+	case primitive.A:
+		out := make([]string, 0, len(x))
+		for _, e := range x {
+			if s, ok := e.(string); ok {
+				out = append(out, s)
+			}
+		}
+		return out
+	case []string:
+		return x
+	case []interface{}:
+		out := make([]string, 0, len(x))
+		for _, e := range x {
+			out = append(out, fmt.Sprint(e))
+		}
+		return out
+	default:
+		return nil
+	}
+}
 
 // VendorProductAdd handles /api/vender/product/add
 func VendorProductAdd(c *gin.Context) {
@@ -122,6 +149,20 @@ func VendorProductEdit(c *gin.Context) {
 		}
 	}
 
+	coll := utils.GetCollection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	filter := bson.M{"_id": productID, "vendor_id": vendorID}
+	var existing bson.M
+	if err := coll.FindOne(ctx, filter).Decode(&existing); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "product not found"})
+		return
+	}
+	if len(photoPaths) == 0 {
+		photoPaths = bsonSliceToStrings(existing["photos"])
+	}
+
 	updateProposed := models.ProductUpdateProposed{
 		Name:              name,
 		Brand:             brand,
@@ -136,11 +177,6 @@ func VendorProductEdit(c *gin.Context) {
 		VendorID:          vendorID.(primitive.ObjectID),
 	}
 
-	coll := utils.GetCollection("products")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	filter := bson.M{"_id": productID, "vendor_id": vendorID}
 	update := bson.M{"$set": bson.M{
 		"submitted_for_update": true,
 		"updates_proposed":     updateProposed,

@@ -103,26 +103,22 @@ class MyApp extends StatelessWidget {
 
   final SharedPreferencesProvider s = SharedPreferencesProvider();
 
-  var themeString = "amber-red";      
-
-  ThemeData themeData = themeDataFromColors(orangeBlueGrayTheme);
-
-  ThemeData _getThemeData(String themeString) {
-    switch (themeString) {
-      case 'orange-bluegray':
-        return themeDataFromColors(orangeBlueGrayTheme);
-      case 'teal-blue':
-        return themeDataFromColors(tealBlueTheme);
-      case 'amber-red':
+  ThemeData _themeFor(String theme) {
+    switch (theme) {
+      case 'amberLight':
         return themeDataFromColors(amberRedTheme);
-      case 'orange-bluegray-dark':
-        return themeDataFromColors(orangeBlueGrayDarkTheme);
-      case 'teal-blue-dark':
-        return themeDataFromColors(tealBlueDarkTheme);
-      case 'amber-red-dark':
+      case 'amberDark':
         return themeDataFromColors(amberRedDarkTheme);
+      case 'orangeLight':
+        return themeDataFromColors(orangeBlueGrayTheme);
+      case 'orangeDark':
+        return themeDataFromColors(orangeBlueGrayDarkTheme);
+      case 'tealLight':
+        return themeDataFromColors(tealBlueTheme);
+      case 'tealDark':
+        return themeDataFromColors(tealBlueDarkTheme);
       default:
-        return themeDataFromColors(amberRedTheme);
+        return themeDataFromColors(amberRedDarkTheme);
     }
   }
 
@@ -165,11 +161,10 @@ class MyApp extends StatelessWidget {
         ],
         child: BlocBuilder<SettingsBloc,SettingsState>(
           builder: (context, state) {
-            themeData = _getThemeData(state.theme);
             return MaterialApp(
               title: AppConstants.appName,
               debugShowCheckedModeBanner: false,
-              theme: themeData,
+              theme: _themeFor(state.theme),
               initialRoute: '/mainapp',
               routes: {
                 '/mainapp': (context) => const MainApp(),

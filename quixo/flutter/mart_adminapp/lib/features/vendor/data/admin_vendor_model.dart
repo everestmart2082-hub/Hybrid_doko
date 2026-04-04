@@ -6,6 +6,15 @@ import 'package:equatable/equatable.dart';
 class AdminVendorItem extends Equatable {
   final String venderId;
   final String name;
+  final String number;
+  final String email;
+  final String panFile;
+  final String storeName;
+  final String address;
+  final String businessType;
+  final String description;
+  final double revenue;
+  final bool suspended;
   final List<dynamic> violations;
   final bool? status;       // maps "verified"
   final bool? updateRequest; // maps "updateRequest"
@@ -13,6 +22,15 @@ class AdminVendorItem extends Equatable {
   const AdminVendorItem({
     required this.venderId,
     required this.name,
+    required this.number,
+    required this.email,
+    required this.panFile,
+    required this.storeName,
+    required this.address,
+    required this.businessType,
+    required this.description,
+    required this.revenue,
+    required this.suspended,
     required this.violations,
     this.status,
     this.updateRequest,
@@ -21,13 +39,25 @@ class AdminVendorItem extends Equatable {
   factory AdminVendorItem.fromMap(Map<String, dynamic> map) => AdminVendorItem(
         venderId: map['vender id']?.toString() ?? '',
         name: map['name'] as String? ?? '',
+        number: map['number'] as String? ?? '',
+        email: map['email'] as String? ?? '',
+        panFile: map['pan_file'] as String? ?? '',
+        storeName: map['store_name'] as String? ?? '',
+        address: map['address'] as String? ?? '',
+        businessType: map['business_type'] as String? ?? '',
+        description: map['description'] as String? ?? '',
+        revenue: num.tryParse(map['revenue']?.toString() ?? '')?.toDouble() ?? 0.0,
+        suspended: map['suspended'] as bool? ?? false,
         violations: (map['violations'] as List<dynamic>?) ?? [],
         status: map['status'] as bool?,
         updateRequest: map['updateRequest'] as bool?,
       );
 
   @override
-  List<Object?> get props => [venderId, name, violations, status, updateRequest];
+  List<Object?> get props => [
+    venderId, name, number, email, panFile, storeName, address,
+    businessType, description, revenue, suspended, violations, status, updateRequest
+  ];
 }
 
 // ─── Approve / Suspend / Blacklist Request ──────────────────────────────────

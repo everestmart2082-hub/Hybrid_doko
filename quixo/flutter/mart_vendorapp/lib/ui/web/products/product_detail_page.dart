@@ -70,6 +70,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 // Main image
                 Card(
                   elevation: 2,
+                  color: Theme.of(context).primaryColorLight,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Container(
                     height: 260,

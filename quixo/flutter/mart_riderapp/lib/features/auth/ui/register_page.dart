@@ -153,6 +153,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
     const bikeTypes = ['bike', 'scooter', 'cycle'];
 
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       body: BlocListener<RiderAuthBloc, RiderAuthState>(
         listener: (context, state) async {
           if (state is RiderAuthFailure) {
@@ -191,6 +192,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
               constraints: const BoxConstraints(maxWidth: 760),
               child: Card(
                 elevation: 4,
+                color: Theme.of(context).primaryColorLight,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Padding(
                   padding: const EdgeInsets.all(32),
@@ -359,6 +361,8 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
                         const SizedBox(height: 14),
 
                         DropdownButtonFormField<String>(
+                          dropdownColor: Theme.of(context).primaryColorLight,
+                          iconEnabledColor: Theme.of(context).primaryColorDark,
                           value: _bikeType,
                           decoration: const InputDecoration(
                             labelText: 'type',

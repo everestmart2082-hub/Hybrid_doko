@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:quickmartvender/core/constants/api_constants.dart';
+import 'package:quickmartvender/core/network/shared_pref.dart';
 
 import '../../../core/network/dio_client.dart';
 import '../data/product_model.dart';
@@ -24,7 +25,13 @@ class ProductRemote {
     int? stock,
     String sortBy = "default",
     String vendorId = "all",
+    String stockFilter = "",
   }) async {
+    final store = SharedPreferencesProvider();
+    final storedVid = await store.getKey(prefs.vendorId.name);
+    final effectiveVendorId =
+        vendorId != "all" ? vendorId : (storedVid ?? "");
+
     final res = await dio.get(
       ApiEndpoints.products,
       query: {
@@ -39,26 +46,22 @@ class ProductRemote {
         if (rating != null) "rating": rating,
         if (stock != null) "stock": stock,
         if (sortBy != "default") "sort by": sortBy,
-        if (vendorId != "all") "vendor id": vendorId,
+        if (effectiveVendorId.isNotEmpty) "vender id": effectiveVendorId,
+        if (stockFilter.isNotEmpty) "stock_status": stockFilter,
       },
     );
 
     final List data = res["message"] ?? [];
-    return data.map((e) => Product.fromMap(e)).toList();
+    return data.map((e) => Product.fromMap(Map<String, dynamic>.from(e as Map))).toList();
   }
 
   Future<List<Map<String, dynamic>>> getCategories() async {
     final res = await dio.get("/api/category/all");
-    if (res["message"] is List) {
-      return List<Map<String, dynamic>>.from(res["message"]);
-    }
-    return [];
-  }
-
-  Future<List<Map<String, dynamic>>> getVendors() async {
-    final res = await dio.get("/api/vender/all");
-    if (res["message"] is List) {
-      return List<Map<String, dynamic>>.from(res["message"]);
+    final raw = res["data"] ?? res["message"];
+    if (raw is List) {
+      return raw
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
     }
     return [];
   }
@@ -69,7 +72,11 @@ class ProductRemote {
       query: {"product id": id},
     );
 
-    return ProductDetail.fromMap(res["message"]);
+    final msg = res["message"];
+    if (msg is! Map) {
+      throw StateError('Invalid product response');
+    }
+    return ProductDetail.fromMap(Map<String, dynamic>.from(msg));
   }
 
   Future<void> addProduct(ProductInput input, List<MultipartFile> files) async {

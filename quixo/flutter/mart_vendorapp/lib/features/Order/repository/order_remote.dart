@@ -1,4 +1,4 @@
-
+import 'package:dio/dio.dart';
 import 'package:quickmartvender/core/constants/api_constants.dart';
 import 'package:quickmartvender/core/network/dio_client.dart';
 
@@ -18,13 +18,13 @@ class OrderRemote {
   }) async {
     final map = await dio.post(
       ApiEndpoints.order,
-      {
+      FormData.fromMap({
         "page": page,
         "limit": limit,
         "search text": searchText,
         "status": status,
         "delivary category": deliveryCategory,
-      },
+      }),
     );
 
     final List wrapper = map["message"] ?? [];
@@ -38,7 +38,7 @@ class OrderRemote {
   Future<void> markOrderPrepared(String orderId) async {
     final map = await dio.post(
       ApiEndpoints.orderPrepared,
-      {"order id": orderId},
+      FormData.fromMap({"order id": orderId}),
     );
 
     if (!(map["success"] ?? false)) {

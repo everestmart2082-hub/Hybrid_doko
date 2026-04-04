@@ -20,4 +20,13 @@ class SharedPreferencesProvider {
   }
 }
 
-enum prefs {token,theme,}
+enum prefs {
+  // api token
+  token,
+
+  // for theme
+  theme,
+
+  // for language
+  language,
+}

@@ -1,3 +1,13 @@
+String _mongoFieldToHexString(dynamic v) {
+  if (v == null) return '';
+  if (v is String) return v;
+  if (v is Map) {
+    final oid = v[r'$oid'];
+    if (oid is String) return oid;
+  }
+  return v.toString();
+}
+
 class ProductDetail {
   final String id;
   final String name;
@@ -34,21 +44,30 @@ class ProductDetail {
   });
 
   factory ProductDetail.fromMap(Map<String, dynamic> map) {
+    final ph = map["photos"] ?? map["Photos"];
+    List<String> photos = [];
+    if (ph is List) {
+      photos = ph.map((e) => e.toString()).toList();
+    }
     return ProductDetail(
-      id: map["id"].toString(),
-      name: map["name"] ?? "",
-      brand: map["brand"] ?? "",
-      description: map["description"] ?? "",
-      shortDescription: map["short descriptions"] ?? "",
+      id: _mongoFieldToHexString(map["id"]),
+      name: map["Name"]?.toString() ?? map["name"]?.toString() ?? "",
+      brand: map["brand"]?.toString() ?? "",
+      description: map["description"]?.toString() ?? "",
+      shortDescription: map["short description"]?.toString() ??
+          map["short descriptions"]?.toString() ??
+          "",
       price: (map["price per unit"] ?? 0).toDouble(),
-      unit: map["unit"] ?? "",
+      unit: map["unit"]?.toString() ?? "",
       discount: (map["discount"] ?? 0).toDouble(),
-      productCategory: map["product category"] ?? "",
-      deliveryCategory: map["delivary category"] ?? "",
-      stock: map["stock"] ?? 0,
-      photos: List<String>.from(map["Photos"] ?? []),
-      vendorId: map["vender id"] ?? "",
-      vendorName: map["vender name"] ?? "",
+      productCategory: _mongoFieldToHexString(
+        map["product catagory"] ?? map["product category"],
+      ),
+      deliveryCategory: map["delivary category"]?.toString() ?? "",
+      stock: map["stock"] is int ? map["stock"] as int : int.tryParse('${map["stock"] ?? 0}') ?? 0,
+      photos: photos,
+      vendorId: map["vender id"]?.toString() ?? "",
+      vendorName: map["vender name"]?.toString() ?? "",
       rating: (map["rating"] ?? 0).toDouble(),
     );
   }

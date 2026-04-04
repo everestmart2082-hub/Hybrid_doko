@@ -65,6 +65,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
               constraints: const BoxConstraints(maxWidth: 480),
               child: Card(
                 elevation: 4,
+                color: Theme.of(context).primaryColorLight,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Padding(
                   padding: const EdgeInsets.all(32),

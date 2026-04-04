@@ -1,5 +1,12 @@
 import 'package:equatable/equatable.dart';
 
+String _idString(dynamic v) {
+  if (v == null) return '';
+  if (v is String) return v;
+  if (v is Map && v[r'$oid'] is String) return v[r'$oid'] as String;
+  return v.toString();
+}
+
 // ─── Constant Model ──────────────────────────────────────────────────────────
 // Mirrors server models.Constant
 
@@ -16,7 +23,7 @@ class AdminConstantModel extends Equatable {
 
   factory AdminConstantModel.fromMap(Map<String, dynamic> map) =>
       AdminConstantModel(
-        id: map['_id']?.toString() ?? map['id']?.toString() ?? '',
+        id: _idString(map['_id'] ?? map['id']),
         name: map['name'] as String? ?? '',
         typesList: (map['types_list'] as List<dynamic>?)
                 ?.map((e) => e.toString())

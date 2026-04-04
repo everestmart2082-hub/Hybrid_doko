@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quickmartrider/core/constants/app_constants.dart';
-import 'package:quickmartrider/drawer.dart';
 import 'package:quickmartrider/features/auth/bloc/auth_bloc.dart';
 import 'package:quickmartrider/features/auth/bloc/auth_event.dart';
 import 'package:quickmartrider/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:quickmartrider/features/dashboard/bloc/dashboard_event.dart';
 import 'package:quickmartrider/features/dashboard/bloc/dashboard_state.dart';
 import 'package:quickmartrider/features/dashboard/data/dashboard_model.dart';
+import 'package:quickmartrider/ui/web_shell.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -26,45 +26,29 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppConstants.appName), elevation: 0),
-      drawer: buildAppDrawer(context),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.white ,
-              Theme.of(context).primaryColorLight,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child:BlocBuilder<RiderDashboardBloc, RiderDashboardState>(
-          builder: (context, state) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Dashboard",
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildDashboardContent(state),
-                ],
-              ),
-            );
-          },
-        ),
-      )
+    return WebShell(
+      title: AppConstants.appName,
+      child: BlocBuilder<RiderDashboardBloc, RiderDashboardState>(
+        builder: (context, state) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Dashboard",
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 20),
+                _buildDashboardContent(state),
+              ],
+            ),
+          );
+        },
+      ),
     );
-    
   }
 
   Widget _buildDashboardContent(RiderDashboardState state) {
@@ -102,7 +86,7 @@ class _MainAppState extends State<MainApp> {
       return Center(
         child: Text(
           state.message,
-          style: const TextStyle(color: Colors.red),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       );
     } else {

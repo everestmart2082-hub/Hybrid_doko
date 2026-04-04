@@ -126,6 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
         constraints: const BoxConstraints(maxWidth: 640),
         child: Card(
           elevation: 3,
+          color: theme.primaryColorLight,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
             padding: const EdgeInsets.all(28),
@@ -205,6 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
         constraints: const BoxConstraints(maxWidth: 560),
         child: Card(
           elevation: 3,
+          color: Theme.of(context).primaryColorLight,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
             padding: const EdgeInsets.all(28),

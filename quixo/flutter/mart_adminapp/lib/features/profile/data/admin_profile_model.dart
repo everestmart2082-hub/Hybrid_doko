@@ -1,27 +1,66 @@
 import 'package:equatable/equatable.dart';
 
+// ─── Inbox (contact / system messages on admin document) ─────────────────────
+
+class AdminInboxMessage extends Equatable {
+  final String type;
+  final String date;
+  final String description;
+
+  const AdminInboxMessage({
+    required this.type,
+    required this.date,
+    required this.description,
+  });
+
+  factory AdminInboxMessage.fromMap(Map<String, dynamic> map) =>
+      AdminInboxMessage(
+        type: map['type']?.toString() ?? '',
+        date: map['date']?.toString() ?? '',
+        description: map['description']?.toString() ?? '',
+      );
+
+  @override
+  List<Object?> get props => [type, date, description];
+}
+
 // ─── Profile Response ───────────────────────────────────────────────────────
-// Server returns: {"name":..., "number":..., "email":...}
+// Server returns: {"name":..., "number":..., "email":..., "messages": [...]}
 
 class AdminProfile extends Equatable {
   final String name;
   final String number;
   final String email;
+  final List<AdminInboxMessage> messages;
 
   const AdminProfile({
     required this.name,
     required this.number,
     required this.email,
+    this.messages = const [],
   });
 
-  factory AdminProfile.fromMap(Map<String, dynamic> map) => AdminProfile(
-        name: map['name'] as String? ?? '',
-        number: map['number'] as String? ?? '',
-        email: map['email'] as String? ?? '',
-      );
+  factory AdminProfile.fromMap(Map<String, dynamic> map) {
+    final raw = map['messages'];
+    final List<AdminInboxMessage> msgs = [];
+    if (raw is List) {
+      for (final e in raw) {
+        if (e is Map) {
+          msgs.add(
+              AdminInboxMessage.fromMap(Map<String, dynamic>.from(e)));
+        }
+      }
+    }
+    return AdminProfile(
+      name: map['name'] as String? ?? '',
+      number: map['number'] as String? ?? '',
+      email: map['email'] as String? ?? '',
+      messages: msgs,
+    );
+  }
 
   @override
-  List<Object?> get props => [name, number, email];
+  List<Object?> get props => [name, number, email, messages];
 }
 
 // ─── Update Request ─────────────────────────────────────────────────────────

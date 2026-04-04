@@ -1,3 +1,4 @@
+import 'package:mart_adminapp/core/constants/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mart_adminapp/features/rider/bloc/admin_rider_bloc.dart';
@@ -105,6 +106,26 @@ class _RiderCardState extends State<_RiderCard> {
   List<String> get _violations =>
       widget.rider.violations.map((e) => e.toString()).toList();
 
+  Widget _buildFilePreview(String label, String url) {
+    if (url.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        ClipRRect(
+          child: Image.network(
+            '${ApiEndpoints.baseImageUrl}${url.startsWith('/') ? '' : '/'}$url',
+            height: 80,
+            width: 80,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Chip(label: Text(label, style: const TextStyle(fontSize: 10))),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final r = widget.rider;
@@ -115,8 +136,8 @@ class _RiderCardState extends State<_RiderCard> {
       margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ExpansionTile(
-        title: Text(r.name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        subtitle: Text('ID: ${r.riderId}', style: Theme.of(context).textTheme.bodySmall),
+        title: Text('${r.name} (${r.type.isEmpty ? "No Vehicle" : r.type})', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        subtitle: Text('ID: ${r.riderId} | Ph: ${r.number} | Rev: Rs. ${r.revenue} | Rate: ${r.rating}', style: Theme.of(context).textTheme.bodySmall),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -131,9 +152,34 @@ class _RiderCardState extends State<_RiderCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('verified: ${r.status}', style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(height: 6),
-                Text('updateRequest: ${r.updateRequest}', style: Theme.of(context).textTheme.bodyMedium),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    Text('Email: ${r.email}', style: Theme.of(context).textTheme.bodyMedium),
+                    Text('Address: ${r.address}', style: Theme.of(context).textTheme.bodyMedium),
+                    Text('Verified: ${r.status}', style: Theme.of(context).textTheme.bodyMedium),
+                    Text('Suspended: ${r.suspended}', style: Theme.of(context).textTheme.bodyMedium),
+                    Text('Update Request: ${r.updateRequest}', style: Theme.of(context).textTheme.bodyMedium),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text('Vehicle: ${r.bikeColor} ${r.bikeModel} [${r.bikeNumber}]', style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    if (r.citizenshipFile.isNotEmpty)
+                      _buildFilePreview('Citizenship', r.citizenshipFile),
+                    if (r.panCardFile.isNotEmpty)
+                      _buildFilePreview('PAN Card', r.panCardFile),
+                    if (r.rcBookFile.isNotEmpty)
+                      _buildFilePreview('RC Book', r.rcBookFile),
+                    if (r.bikeInsuranceFile.isNotEmpty)
+                      _buildFilePreview('Insurance', r.bikeInsuranceFile),
+                  ],
+                ),
                 const SizedBox(height: 14),
                 Text(
                   'Violations',

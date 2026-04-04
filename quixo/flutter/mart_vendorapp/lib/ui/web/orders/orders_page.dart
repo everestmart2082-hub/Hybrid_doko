@@ -62,6 +62,8 @@ class _OrdersPageState extends State<OrdersPage>
           TabBar(
             controller: _tabs,
             isScrollable: true,
+            indicatorColor: Theme.of(context).primaryColor,
+            labelStyle: Theme.of(context).textTheme.bodyLarge,
             tabs: _statuses.map((s) => Tab(text: s)).toList(),
           ),
           // ── Filter row ───────────────────────────────────
@@ -88,6 +90,8 @@ class _OrdersPageState extends State<OrdersPage>
                 const SizedBox(width: 12),
                 Flexible(
                   child: DropdownButtonFormField<String>(
+                    dropdownColor: Theme.of(context).primaryColorLight,
+                    iconEnabledColor: Theme.of(context).primaryColorDark,
                     decoration: const InputDecoration(
                       labelText: 'Delivery Category',
                       border: OutlineInputBorder(),
@@ -194,6 +198,7 @@ class _OrderCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       elevation: 2,
+      color: theme.primaryColorLight,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: const EdgeInsets.all(14),

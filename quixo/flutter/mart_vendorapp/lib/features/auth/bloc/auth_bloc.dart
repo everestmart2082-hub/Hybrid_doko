@@ -12,6 +12,7 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
 
   final VenderAuthRemote authRemote;
   SharedPreferencesProvider s = SharedPreferencesProvider();
+  int _otpSession = 0;
 
   VenderAuthBloc(this.authRemote) : super(VenderAuthInitial()) {
 
@@ -24,6 +25,7 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
 
     on<VenderLogout>((event, emit) async {
       await s.clearkey(prefs.token.name);
+      await s.clearkey(prefs.vendorId.name);
       emit(VenderUnAuthenticated());
     });
   }
@@ -51,9 +53,10 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
 
     try {
 
-      bool b = await authRemote.register(event.input, event.files);
+      await authRemote.register(event.input, event.files);
 
-      emit(VenderAuthenticated(authenticated: false));
+      _otpSession++;
+      emit(VenderAuthOtpStep(forRegistration: true, session: _otpSession));
 
     } catch (e) {
 
@@ -74,6 +77,9 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
           await authRemote.verifyRegisterOtp(event.input);
 
       await s.setKey(prefs.token.name, token.token);
+      if (token.userId != null && token.userId!.isNotEmpty) {
+        await s.setKey(prefs.vendorId.name, token.userId!);
+      }
 
       emit(const VenderAuthenticated(authenticated: true));
 
@@ -92,9 +98,10 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
 
     try {
 
-      bool b = await authRemote.login(event.phone);
+      await authRemote.login(event.phone);
 
-      emit(VenderAuthenticated(authenticated: false));
+      _otpSession++;
+      emit(VenderAuthOtpStep(forRegistration: false, session: _otpSession));
 
     } catch (e) {
 
@@ -115,6 +122,9 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
           await authRemote.verifyLoginOtp(event.input);
 
       await s.setKey(prefs.token.name, token.token);
+      if (token.userId != null && token.userId!.isNotEmpty) {
+        await s.setKey(prefs.vendorId.name, token.userId!);
+      }
 
       emit(const VenderAuthenticated(authenticated: true));
 
@@ -126,12 +136,14 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
   }
 
   VenderAuthFailed _mapError(Object e) {
-
     if (e is Failure) {
       return VenderAuthFailed(message: e.message);
     }
-
-    return const VenderAuthFailed(message: "Something went wrong");
+    final msg = e.toString();
+    if (msg.startsWith('Exception: ')) {
+      return VenderAuthFailed(message: msg.substring('Exception: '.length));
+    }
+    return VenderAuthFailed(message: msg);
   }
 
   FutureOr<void> _onFetchBusinessTypes(

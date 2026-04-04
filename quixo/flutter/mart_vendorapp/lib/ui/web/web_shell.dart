@@ -20,8 +20,10 @@ class WebShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
-        title: Text(title),
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(title, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
         actions: actions,
       ),
@@ -29,7 +31,6 @@ class WebShell extends StatelessWidget {
       floatingActionButton: floatingActionButton,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // On very wide screens constrain content width
           final double maxWidth =
               constraints.maxWidth > 1200 ? 1100 : constraints.maxWidth;
           return Center(

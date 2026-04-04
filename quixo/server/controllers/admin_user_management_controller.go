@@ -50,13 +50,15 @@ func handleGetAll(c *gin.Context, collName, idKey string) {
 
 	var mapped []gin.H
 	for _, v := range results {
-		mapped = append(mapped, gin.H{
-			idKey:           v["_id"],
-			"name":          v["name"],
-			"violations":    v["violations"],
-			"status":        v["verified"],
-			"updateRequest": v["updation_requested"],
-		})
+		mappedDoc := gin.H{}
+		for k, val := range v {
+			mappedDoc[k] = val
+		}
+		// Explicit compatibility aliases
+		mappedDoc[idKey] = v["_id"]
+		mappedDoc["status"] = v["verified"]
+		mappedDoc["updateRequest"] = v["updation_requested"]
+		mapped = append(mapped, mappedDoc)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": mapped})

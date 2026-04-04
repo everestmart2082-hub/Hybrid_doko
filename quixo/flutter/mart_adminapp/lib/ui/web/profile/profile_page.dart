@@ -186,6 +186,28 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                         label: const Text('Edit'),
                       ),
                     ),
+                    if (p.messages.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        'Inbox (contact & notices)',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      ...p.messages.reversed.map(
+                        (m) => Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            title: Text(
+                              m.type.isEmpty ? 'message' : m.type,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            subtitle: Text(m.description),
+                            isThreeLine: true,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               );

@@ -44,13 +44,20 @@ class UnknownFailure extends Failure {
 }
 
 
-bool checkSuccess(Map<String, dynamic> map) {
-  final b = map["success"] is bool
-    ? map["success"]
-    : bool.tryParse(map["success"]?.toString() ?? '') ?? false;
-  
-  if(!b){
-    throw Exception(map["message"]);
+bool _isApiSuccess(dynamic raw) {
+  if (raw == true || raw == 1) return true;
+  if (raw == false || raw == 0) return false;
+  if (raw is String) {
+    final s = raw.trim().toLowerCase();
+    return s == 'true' || s == '1' || s == 'yes';
   }
-  return b;
+  return false;
+}
+
+bool checkSuccess(Map<String, dynamic> map) {
+  final ok = _isApiSuccess(map['success']);
+  if (!ok) {
+    throw Exception(map['message']?.toString() ?? 'Request failed');
+  }
+  return true;
 }
