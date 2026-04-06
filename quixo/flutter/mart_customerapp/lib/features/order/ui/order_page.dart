@@ -21,22 +21,15 @@ class _OrderPageState extends State<OrderPage> {
   @override
   void initState() {
     super.initState();
-    context.read<OrderBloc>().add(
-          const OrderFetchRequested(
-            OrderQueryModel(),
-          ),
-        );
+    context.read<OrderBloc>().add(const OrderFetchRequested(OrderQueryModel()));
   }
 
   void _applyFilters() {
     context.read<OrderBloc>().add(
-          OrderFetchRequested(
-            OrderQueryModel(
-              status: _status,
-              deliveryCategory: _deliveryCategory,
-            ),
-          ),
-        );
+      OrderFetchRequested(
+        OrderQueryModel(status: _status, deliveryCategory: _deliveryCategory),
+      ),
+    );
   }
 
   void _cancelAll(List<OrderModel> orders) {
@@ -55,7 +48,12 @@ class _OrderPageState extends State<OrderPage> {
       backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text('Orders', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        title: Text(
+          'Orders',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: Theme.of(context).primaryColorLight,
+          ),
+        ),
         elevation: 1,
       ),
       body: Padding(
@@ -69,13 +67,13 @@ class _OrderPageState extends State<OrderPage> {
               child: BlocConsumer<OrderBloc, OrderState>(
                 listener: (context, state) {
                   if (state is OrderActionSuccess) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.message)),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.message)));
                   } else if (state is OrderFailed) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.message)),
-                    );
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.message)));
                   }
                 },
                 builder: (context, state) {
@@ -90,7 +88,9 @@ class _OrderPageState extends State<OrderPage> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: OutlinedButton.icon(
-                            onPressed: orders.isEmpty ? null : () => _cancelAll(orders),
+                            onPressed: orders.isEmpty
+                                ? null
+                                : () => _cancelAll(orders),
                             icon: const Icon(Icons.cancel),
                             label: const Text('cancel All'),
                           ),
@@ -99,11 +99,21 @@ class _OrderPageState extends State<OrderPage> {
                         Expanded(
                           child: ListView.separated(
                             itemCount: orders.length,
-                            separatorBuilder: (_, __) => const Divider(height: 20),
+                            separatorBuilder: (_, __) =>
+                                const Divider(height: 20),
                             itemBuilder: (context, index) {
                               final order = orders[index];
                               final showCancel = _canCancel(order);
                               return ListTile(
+                                onTap: () {
+                                  if (order.productId.isNotEmpty) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/product-detail',
+                                      arguments: order.productId,
+                                    );
+                                  }
+                                },
                                 title: Text(
                                   'Order ${order.orderId} • ${order.productName}',
                                   maxLines: 2,
@@ -116,8 +126,8 @@ class _OrderPageState extends State<OrderPage> {
                                     ? TextButton(
                                         onPressed: () {
                                           context.read<OrderBloc>().add(
-                                                OrderCancelRequested(order.orderId),
-                                              );
+                                            OrderCancelRequested(order.orderId),
+                                          );
                                         },
                                         child: const Text('cancel this order'),
                                       )
@@ -174,12 +184,7 @@ class _OrderPageState extends State<OrderPage> {
                       border: OutlineInputBorder(),
                     ),
                     items: statuses
-                        .map(
-                          (s) => DropdownMenuItem(
-                            value: s,
-                            child: Text(s),
-                          ),
-                        )
+                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                         .toList(),
                     onChanged: (v) {
                       if (v == null) return;
@@ -196,10 +201,7 @@ class _OrderPageState extends State<OrderPage> {
                       border: OutlineInputBorder(),
                     ),
                     items: deliveryCats
-                        .map((s) => DropdownMenuItem(
-                              value: s,
-                              child: Text(s),
-                            ))
+                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                         .toList(),
                     onChanged: (v) {
                       if (v == null) return;
@@ -223,4 +225,3 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 }
-

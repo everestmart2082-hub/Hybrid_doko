@@ -10,7 +10,7 @@ class ProductGuestRemote {
   ProductGuestRemote({required this.dio});
 
   Future<ProductModel> getProductById(String id) async {
-    final map = await dio.get("/api/product/id", query: {"product id": id});
+    final map = await dio.get("/product/id", query: {"product id": id});
     _checkSuccess(map);
     return ProductModel.fromMap(map['message'] as Map<String, dynamic>);
   }
@@ -42,7 +42,7 @@ class ProductGuestRemote {
       if (rating != null) 'rating': rating,
     };
 
-    final map = await dio.get("/api/product/all", query: query);
+    final map = await dio.get("/product/all", query: query);
     _checkSuccess(map);
 
     final list = (map['message'] as List)
@@ -52,7 +52,7 @@ class ProductGuestRemote {
   }
 
   Future<List<ProductListItem>> getRecommendedProducts() async {
-    final map = await dio.get("/api/product/recommended");
+    final map = await dio.get("/product/recommended");
     _checkSuccess(map);
 
     final list = (map['message'] as List)

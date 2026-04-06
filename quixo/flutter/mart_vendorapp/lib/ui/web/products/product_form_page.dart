@@ -38,6 +38,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   String _unit = 'kg';
   String _category = '';
+  String _deliveryCategory = '';
   List<Map<String, dynamic>> _categories = [];
   List<XFile> _photos = [];
   bool _submitted = false;
@@ -70,6 +71,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
       _stock.text = p.stock.toString();
       _unit = p.unit.isNotEmpty ? p.unit : 'kg';
       _category = p.productCategory;
+      _deliveryCategory = p.deliveryCategory;
     }
     context.read<ProductBloc>().add(GetProductFilters());
   }
@@ -114,7 +116,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
       unit: _unit,
       discount: double.tryParse(_discount.text.trim()) ?? 0,
       productCategory: _category,
-      deliveryCategory: '',
+      deliveryCategory: _deliveryCategory,
       stock: int.tryParse(_stock.text.trim()) ?? 0,
       photos: _photos.map((f) => f.path).toList(),
     );
@@ -260,6 +262,24 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     'Discount %',
                     keyboardType: TextInputType.number,
                     validator: (v) => null,
+                  ),
+                  // Delivery Category dropdown
+                  const SizedBox(height: 14),
+                  DropdownButtonFormField<String>(
+                    dropdownColor: Theme.of(context).primaryColorLight,
+                    iconEnabledColor: Theme.of(context).primaryColorDark,
+                    value: _deliveryCategory.isNotEmpty ? _deliveryCategory : null,
+                    hint: const Text('Select Delivery Type'),
+                    decoration: const InputDecoration(
+                      labelText: 'Delivery Category',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'quick', child: Text('Quick Delivery')),
+                      DropdownMenuItem(value: 'normal', child: Text('Normal Delivery')),
+                    ],
+                    onChanged: (v) => setState(() => _deliveryCategory = v ?? ''),
+                    validator: (v) => null, // optional
                   ),
                   // Category dropdown
                   if (_categories.isNotEmpty) ...[

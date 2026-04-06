@@ -35,7 +35,7 @@ class ProductInput {
       "unit": unit,
       "discount": discount,
       "product catagory": productCategory,
-      "delivary categpory": deliveryCategory,
+      "delivary category": deliveryCategory,
       "stock": stock,
       "Photos": photos,
     };

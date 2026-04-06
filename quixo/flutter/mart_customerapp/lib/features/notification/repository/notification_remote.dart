@@ -12,7 +12,7 @@ class NotificationRemote {
   Future<List<NotificationModel>> getNotifications(
       NotificationQueryModel query) async {
     final response = await dio.post(
-      '/api/user/notification',
+      '/user/notification',
       FormData.fromMap(query.toJson()),
     );
 

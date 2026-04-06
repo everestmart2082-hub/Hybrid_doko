@@ -10,9 +10,9 @@ func SetupRiderRoutes(r *gin.Engine) {
 	riderGroup := r.Group("/api/rider")
 	{
 		// Authentication & Registration
-		riderGroup.POST("/registration/", controllers.RiderRegistration)
+		riderGroup.POST("/registration", controllers.RiderRegistration)
 		riderGroup.POST("/registration/otp", controllers.RiderRegistrationOTP)
-		riderGroup.POST("/login/", controllers.RiderLogin)
+		riderGroup.POST("/login", controllers.RiderLogin)
 		riderGroup.POST("/login/otp", controllers.RiderLoginOTP)
 
 		protected := riderGroup.Group("/")

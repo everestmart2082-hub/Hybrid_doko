@@ -14,7 +14,7 @@ class ProductRemote {
   ProductRemote({required this.dio});
 
   Future<ProductModel> getProductById(String id) async {
-    final map = await dio.get("/api/product/id", query: {"product id": id});
+    final map = await dio.get("/product/id", query: {"product id": id});
     _checkSuccess(map);
     return ProductModel.fromMap(map['message'] as Map<String, dynamic>);
   }
@@ -35,18 +35,18 @@ class ProductRemote {
     final query = {
       'page': page,
       'limit': limit,
-      if (minPrice != null) 'minPrice': minPrice,
-      if (maxPrice != null) 'maxPrice': maxPrice,
+      if (minPrice != null) 'min price': minPrice,
+      if (maxPrice != null) 'max price': maxPrice,
       if (productCategory != null) 'product category': productCategory,
-      if (deliveryCategory != null) 'deliveryCategory': deliveryCategory,
+      if (deliveryCategory != null) 'delivary category': deliveryCategory,
       if (vendorId != null) 'vender id': vendorId,
-      if (searchText != null) 'searchText': searchText,
-      if (stock != null) 'stock': stock,
-      if (brand != null) 'brand': brand,
+      if (searchText != null) 'search text': searchText,
+      if (stock != null) 'stock_status': stock ? 'in_stock' : 'out_of_stock',
+      if (brand != null) 'brand name': brand,
       if (rating != null) 'rating': rating,
     };
 
-    final map = await dio.get("/api/product/all", query: query);
+    final map = await dio.get("/product/all", query: query);
     _checkSuccess(map);
 
     final list = (map['message'] as List)
@@ -55,8 +55,18 @@ class ProductRemote {
     return list;
   }
 
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final map = await dio.get("/category/all");
+    _checkSuccess(map);
+    final raw = map["data"] ?? map["message"];
+    if (raw is List) {
+      return raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+    return const [];
+  }
+
   Future<List<ProductListItem>> getRecommendedProducts() async {
-    final map = await dio.get("/api/product/recommended");
+    final map = await dio.get("/product/recommended");
     _checkSuccess(map);
 
     final list = (map['message'] as List)
@@ -71,14 +81,13 @@ class ProductRemote {
       "message": review.message,
     });
 
-    final response = await dio.post(
-      ApiEndpoints.addReview,
-      formData,
-    );
+    final response = await dio.post(ApiEndpoints.addReview, formData);
 
     final data = response is Map<String, dynamic>
         ? response
-        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+        : (response is Map
+              ? response.cast<String, dynamic>()
+              : <String, dynamic>{});
 
     return SimpleResponseModel.fromJson(data);
   }
@@ -90,21 +99,22 @@ class ProductRemote {
       "rating": rating.rating.toInt().toString(),
     });
 
-    final response = await dio.post(
-      ApiEndpoints.addRating,
-      formData,
-    );
+    final response = await dio.post(ApiEndpoints.addRating, formData);
 
     final data = response is Map<String, dynamic>
         ? response
-        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+        : (response is Map
+              ? response.cast<String, dynamic>()
+              : <String, dynamic>{});
 
     return SimpleResponseModel.fromJson(data);
   }
 
   void _checkSuccess(Map<String, dynamic> map) {
     if (!(map['success'] as bool)) {
-      throw UnknownFailure( map['message']?.toString() ?? "Something went wrong");
+      throw UnknownFailure(
+        map['message']?.toString() ?? "Something went wrong",
+      );
     }
   }
 }

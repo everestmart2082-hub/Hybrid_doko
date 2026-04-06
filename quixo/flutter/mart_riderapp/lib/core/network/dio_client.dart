@@ -77,7 +77,7 @@ class DioClient implements ApiClient {
       final token = await tokenProvider.getToken();
       final response = await _dio.post(path, data: data, options: Options(headers: {
             'Authorization': 'Bearer $token', 
-            "context-type": "multipart/form-data"
+            "content-type": "multipart/form-data"
           },));
       return response.data;
     } 

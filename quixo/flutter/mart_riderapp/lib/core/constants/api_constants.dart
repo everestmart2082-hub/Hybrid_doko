@@ -12,9 +12,9 @@ class ApiEndpoints {
   static String get baseUrl => '$_host/api';
 
   // ========== AUTH ==========
-  static const String registration =  '/rider/registration/';
+  static const String registration =  '/rider/registration';
   static const String registrationOtp = '/rider/registration/otp';
-  static const String login = '/rider/login/';
+  static const String login = '/rider/login';
   static const String loginOtp = '/rider/login/otp';
 
   //=====Dashboard====

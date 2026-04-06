@@ -10,6 +10,15 @@ import 'package:quickmartcustomer/features/productGuest/bloc/product_bloc.dart';
 import 'package:quickmartcustomer/features/productGuest/bloc/product_event.dart';
 import 'package:quickmartcustomer/features/productGuest/bloc/product_state.dart';
 import 'package:quickmartcustomer/features/productGuest/data/product_list_item_model.dart';
+import 'package:quickmartcustomer/core/constants/api_constants.dart';
+
+String? _absolutePhotoUrl(String path) {
+  final t = path.trim();
+  if (t.isEmpty) return null;
+  if (t.startsWith('http://') || t.startsWith('https://')) return t;
+  final p = t.startsWith('/') ? t : '/$t';
+  return '${ApiEndpoints.baseImageUrl}$p';
+}
 
 class ProductGuestListPage extends StatefulWidget {
   const ProductGuestListPage({super.key});
@@ -121,12 +130,15 @@ class _ProductGuestListPageState extends State<ProductGuestListPage> {
         children: [
           Stack(
             children: [
-              p.images.isNotEmpty
+              p.images.isNotEmpty && _absolutePhotoUrl(p.images.first) != null
                   ? Image.network(
-                      p.images.first,
+                      _absolutePhotoUrl(p.images.first)!,
                       height: 160,
                       width: double.infinity,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 160, width: double.infinity, color: Colors.grey.shade200, child: const Icon(Icons.broken_image, size: 50),
+                      ),
                     )
                   : Container(
                       height: 160,

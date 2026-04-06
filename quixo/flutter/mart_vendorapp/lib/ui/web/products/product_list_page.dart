@@ -5,6 +5,7 @@ import 'package:quickmartvender/features/Product/bloc/product_bloc.dart';
 import 'package:quickmartvender/features/Product/bloc/product_event.dart';
 import 'package:quickmartvender/features/Product/bloc/product_state.dart';
 import 'package:quickmartvender/features/Product/data/product_model.dart';
+import 'package:quickmartvender/ui/web/products/product_detail_page.dart';
 import '../web_shell.dart';
 
 String _categoryIdHex(Map<String, dynamic> c) {
@@ -36,6 +37,7 @@ class _ProductListPageState extends State<ProductListPage> {
   String _brandQuery = '';
   String _stockFilter = '';
   List<Map<String, dynamic>> _categories = [];
+  List<Product> _lastProducts = [];
   double? _minPrice, _maxPrice;
   int _page = 1;
   static const int _limit = 12;
@@ -49,7 +51,7 @@ class _ProductListPageState extends State<ProductListPage> {
   @override
   void initState() {
     super.initState();
-    _load();
+    // Load filters first; _load() is triggered once filters arrive (via BlocListener).
     context.read<ProductBloc>().add(GetProductFilters());
   }
 
@@ -91,6 +93,11 @@ class _ProductListPageState extends State<ProductListPage> {
         listener: (context, state) {
           if (state is ProductFiltersLoaded) {
             setState(() => _categories = state.categories);
+            // Now that filters are loaded, trigger product load.
+            _load();
+          }
+          if (state is ProductListLoaded) {
+            setState(() => _lastProducts = state.products);
           }
         },
         child: Row(
@@ -155,16 +162,15 @@ class _ProductListPageState extends State<ProductListPage> {
                   Expanded(
                     child: BlocBuilder<ProductBloc, ProductState>(
                       builder: (context, state) {
-                        if (state is ProductLoading) {
+                        if (state is ProductLoading && _lastProducts.isEmpty) {
                           return const Center(child: CircularProgressIndicator());
                         }
                         if (state is ProductError) {
                           return Center(child: Text(state.error));
                         }
-                        if (state is ProductListLoaded) {
-                          return _buildGrid(state.products);
-                        }
-                        return const SizedBox();
+                        // Show cached products for ProductListLoaded, or keep
+                        // showing last products during loading / filter refresh.
+                        return _buildGrid(_lastProducts);
                       },
                     ),
                   ),
@@ -201,21 +207,43 @@ class _ProductListPageState extends State<ProductListPage> {
     if (products.isEmpty) {
       return const Center(child: Text('No products found.'));
     }
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 14,
-        crossAxisSpacing: 14,
-        childAspectRatio: 0.72,
-      ),
-      itemCount: products.length,
-      itemBuilder: (_, i) => _ProductCard(
-        product: products[i],
-        onTap: () => Navigator.pushNamed(context, '/product/detail',
-            arguments: products[i].id),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final cols = width > 900 ? 4 : width > 600 ? 3 : 2;
+        return GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: cols,
+            mainAxisSpacing: 14,
+            crossAxisSpacing: 14,
+            childAspectRatio: 0.75,
+          ),
+          itemCount: products.length,
+          itemBuilder: (_, i) => _ProductCard(
+            product: products[i],
+            categoryName: _resolveCategoryName(products[i].productCategory),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductDetailPage(id: products[i].id, categories: _categories,),
+              ),
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  // Resolves a category ObjectID hex to its display name.
+  String _resolveCategoryName(String catIdOrName) {
+    if (catIdOrName.isEmpty) return '';
+    for (final c in _categories) {
+      if (_categoryIdHex(c) == catIdOrName) {
+        return c['name']?.toString() ?? catIdOrName;
+      }
+    }
+    return catIdOrName;
   }
 }
 
@@ -372,8 +400,13 @@ class _FilterPanelState extends State<_FilterPanel> {
 
 class _ProductCard extends StatelessWidget {
   final Product product;
+  final String categoryName;
   final VoidCallback onTap;
-  const _ProductCard({required this.product, required this.onTap});
+  const _ProductCard({
+    required this.product,
+    required this.categoryName,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -436,14 +469,20 @@ class _ProductCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.star, size: 12, color: Colors.amber.shade700),
-                      const SizedBox(width: 2),
-                      Text(product.productCategory,
-                          style: theme.textTheme.labelSmall),
-                    ],
-                  ),
+                  if (categoryName.isNotEmpty)
+                    Row(
+                      children: [
+                        Icon(Icons.category, size: 12, color: theme.primaryColor),
+                        const SizedBox(width: 2),
+                        Expanded(
+                          child: Text(
+                            categoryName,
+                            style: theme.textTheme.labelSmall,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

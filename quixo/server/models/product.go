@@ -11,6 +11,7 @@ type ProductUpdateProposed struct {
 	Unit                 string               `json:"unit" bson:"unit"`
 	Discount             float64              `json:"discount" bson:"discount"`
 	ProductCategory      primitive.ObjectID   `json:"product_category" bson:"product_category"`
+	DeliveryCategory     string               `json:"delivery_category" bson:"delivery_category"`
 	Stock                int                  `json:"stock" bson:"stock"`
 	Photos               []string             `json:"photos" bson:"photos"`
 	VendorID             primitive.ObjectID   `json:"vendor_id" bson:"vendor_id"`
@@ -34,6 +35,7 @@ type Product struct {
 	Unit                 string                `json:"unit" bson:"unit"`
 	Discount             float64               `json:"discount" bson:"discount"`
 	ProductCategory      primitive.ObjectID    `json:"product_category" bson:"product_category"`
+	DeliveryCategory     string                `json:"delivery_category" bson:"delivery_category"`
 	Stock                int                   `json:"stock" bson:"stock"`
 	Photos               []string              `json:"photos" bson:"photos"`
 	VendorID             primitive.ObjectID    `json:"vendor_id" bson:"vendor_id"`

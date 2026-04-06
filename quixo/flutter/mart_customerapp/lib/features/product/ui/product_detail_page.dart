@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartcustomer/core/constants/api_constants.dart';
 
 import 'package:quickmartcustomer/features/cart/bloc/cart_bloc.dart';
 import 'package:quickmartcustomer/features/cart/bloc/cart_event.dart';
@@ -14,6 +15,7 @@ import 'package:quickmartcustomer/features/wishlist/data/wishlist_query_model.da
 import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_bloc.dart';
 import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_event.dart';
 import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_state.dart';
+import 'package:quickmartcustomer/ui/web_shell.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
@@ -22,6 +24,14 @@ class ProductDetailPage extends StatefulWidget {
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
+}
+
+String? _absolutePhotoUrl(String path) {
+  final t = path.trim();
+  if (t.isEmpty) return null;
+  if (t.startsWith('http://') || t.startsWith('https://')) return t;
+  final p = t.startsWith('/') ? t : '/$t';
+  return '${ApiEndpoints.baseImageUrl}$p';
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
@@ -35,11 +45,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void initState() {
     super.initState();
     context.read<ProductBloc>().add(
-          ProductFetchByIdRequested(widget.productId),
-        );
+      ProductFetchByIdRequested(widget.productId),
+    );
     context.read<WishlistBloc>().add(
-          const WishlistFetchRequested(WishlistQueryModel(page: 1, limit: 20)),
-        );
+      const WishlistFetchRequested(WishlistQueryModel(page: 1, limit: 20)),
+    );
   }
 
   @override
@@ -51,10 +61,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void _toggleWishlist(ProductModel product) {
     final already = _wishlisted.contains(product.id);
     context.read<WishlistBloc>().add(
-          already
-              ? WishlistRemoveItemRequested(product.id)
-              : WishlistAddItemRequested(product.id),
-        );
+      already
+          ? WishlistRemoveItemRequested(product.id)
+          : WishlistAddItemRequested(product.id),
+    );
     setState(() {
       if (already) {
         _wishlisted.remove(product.id);
@@ -66,14 +76,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColorLight,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text('Product Details', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
-        elevation: 1,
-      ),
-      body: BlocListener<WishlistBloc, WishlistState>(
+    return WebShell(
+      title: 'Product Details',
+      child: BlocListener<WishlistBloc, WishlistState>(
         listener: (context, state) {
           if (state is WishlistLoaded) {
             _wishlisted
@@ -84,13 +89,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         child: BlocListener<ProductBloc, ProductState>(
           listener: (context, state) {
             if (state is ProductActionSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
             } else if (state is ProductFailed) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
             }
           },
           child: Padding(
@@ -138,7 +143,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   clipBehavior: Clip.antiAlias,
                   child: photos.isNotEmpty
                       ? Image.network(
-                          photos.first,
+                          _absolutePhotoUrl(photos.first) ?? '',
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) =>
                               const Center(child: Icon(Icons.broken_image)),
@@ -152,14 +157,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p.name,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            )),
+                    Text(
+                      p.name,
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 8),
-                    Text(p.brand,
-                        style:
-                            TextStyle(color: Colors.grey.shade600, fontSize: 16)),
+                    Text(
+                      p.brand,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 16,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       '₹${p.pricePerUnit} / ${p.unit}',
@@ -174,8 +184,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     const SizedBox(height: 24),
                     Row(
                       children: [
-                        const Text('Quantity: ',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'Quantity: ',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         IconButton(
                           onPressed: () {
                             setState(() {
@@ -184,8 +199,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           },
                           icon: const Icon(Icons.remove_circle_outline),
                         ),
-                        Text('$_quantity',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(
+                          '$_quantity',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         IconButton(
                           onPressed: () {
                             setState(() {
@@ -203,13 +223,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           child: ElevatedButton.icon(
                             onPressed: () {
                               context.read<CartBloc>().add(
-                                    CartAddRequested(
-                                      CartAddRequestModel(
-                                        productId: p.id,
-                                        number: _quantity,
-                                      ),
-                                    ),
-                                  );
+                                CartAddRequested(
+                                  CartAddRequestModel(
+                                    productId: p.id,
+                                    number: _quantity,
+                                  ),
+                                ),
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Added to cart')),
                               );
@@ -235,9 +255,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           const Divider(height: 32),
 
           // Reviews placeholder + add review form
-          const Text('Reviews', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text(
+            'Reviews',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 12),
-          const Text('No review list is returned by current product API; you can add one below.'),
+          const Text(
+            'No review list is returned by current product API; you can add one below.',
+          ),
           const SizedBox(height: 24),
           Card(
             elevation: 1,
@@ -246,7 +271,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Add Review', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  const Text(
+                    'Add Review',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _reviewCtrl,
@@ -260,7 +288,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   DropdownButtonFormField<int>(
                     value: _ratingStars,
                     items: const [1, 2, 3, 4, 5]
-                        .map((s) => DropdownMenuItem(value: s, child: Text('$s stars')))
+                        .map(
+                          (s) => DropdownMenuItem(
+                            value: s,
+                            child: Text('$s stars'),
+                          ),
+                        )
                         .toList(),
                     onChanged: (v) {
                       if (v == null) return;
@@ -279,27 +312,26 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         final msg = _reviewCtrl.text.trim();
                         if (msg.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please enter review message')),
+                            const SnackBar(
+                              content: Text('Please enter review message'),
+                            ),
                           );
                           return;
                         }
 
                         context.read<ProductBloc>().add(
-                              ProductAddReviewRequested(
-                                ReviewRequestModel(
-                                  productId: p.id,
-                                  message: msg,
-                                ),
-                              ),
-                            );
+                          ProductAddReviewRequested(
+                            ReviewRequestModel(productId: p.id, message: msg),
+                          ),
+                        );
                         context.read<ProductBloc>().add(
-                              ProductAddRatingRequested(
-                                RatingRequestModel(
-                                  productId: p.id,
-                                  rating: _ratingStars.toDouble(),
-                                ),
-                              ),
-                            );
+                          ProductAddRatingRequested(
+                            RatingRequestModel(
+                              productId: p.id,
+                              rating: _ratingStars.toDouble(),
+                            ),
+                          ),
+                        );
                         _reviewCtrl.clear();
                       },
                       child: const Text('Add Review'),
@@ -314,4 +346,3 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 }
-

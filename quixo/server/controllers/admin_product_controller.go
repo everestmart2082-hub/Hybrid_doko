@@ -25,7 +25,50 @@ func AdminApproveProduct(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err := coll.UpdateOne(ctx, bson.M{"_id": productID}, bson.M{"$set": bson.M{"approved": approved}})
+	var productDoc bson.M
+	if err := coll.FindOne(ctx, bson.M{"_id": productID}).Decode(&productDoc); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "product not found"})
+		return
+	}
+
+	setFields := bson.M{}
+	unsetFields := bson.M{}
+	submittedForUpdate, hasUpdateProposal := productDoc["submitted_for_update"].(bool)
+
+	if hasUpdateProposal && submittedForUpdate {
+		// Reviewing a vendor update request:
+		// approved=true  => apply proposal and clear review flag.
+		// approved=false => reject proposal and clear review flag, keep current product approval state.
+		if approved {
+			if proposed, ok := productDoc["updates_proposed"].(bson.M); ok && len(proposed) > 0 {
+				for k, v := range proposed {
+					setFields[k] = v
+				}
+			} else if proposed, ok := productDoc["updates_proposed"].(primitive.M); ok && len(proposed) > 0 {
+				for k, v := range proposed {
+					setFields[k] = v
+				}
+			}
+		}
+		setFields["submitted_for_update"] = false
+		unsetFields["updates_proposed"] = ""
+	} else {
+		// Regular product approval flow (new product / visibility flow).
+		setFields["approved"] = approved
+	}
+
+	if approved {
+		if submittedDeletion, ok := productDoc["submitted_for_deletion"].(bool); ok && submittedDeletion {
+			setFields["submitted_for_deletion"] = false
+		}
+	}
+
+	updateDoc := bson.M{"$set": setFields}
+	if len(unsetFields) > 0 {
+		updateDoc["$unset"] = unsetFields
+	}
+
+	_, err := coll.UpdateOne(ctx, bson.M{"_id": productID}, updateDoc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
@@ -76,17 +119,18 @@ func AdminGetAllProduct(c *gin.Context) {
 	var mapped []gin.H
 	for _, p := range results {
 		mapped = append(mapped, gin.H{
-			"Product id":        p["_id"],
-			"name":              p["name"],
-			"short description": p["short_description"],
-			"price per unit":    p["price_per_unit"],
-			"product category":  p["product_category"],
-			"delivary category": p["delivery_category"],
-			"stock":             p["stock"],
-			"brand name":        p["brand_name"],
-			"hidden":            p["hidden"],
-			"approved":          p["approved"],
-			"toupdate":          p["toupdate"],
+			"Product id":           p["_id"],
+			"name":                 p["name"],
+			"short description":    p["short_descriptions"],
+			"price per unit":       p["price_per_unit"],
+			"product category":     p["product_category"],
+			"delivary category":    p["delivery_category"],
+			"stock":                p["stock"],
+			"brand name":           p["brand"],
+			"hidden":               p["hidden"],
+			"approved":             p["approved"],
+			"toupdate":             p["submitted_for_update"],
+			"submitted_for_update": p["submitted_for_update"],
 		})
 	}
 
@@ -223,21 +267,23 @@ func AdminProductGetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": gin.H{
-			"id":                 p["_id"],
-			"Name":               p["name"],
-			"brand":              p["brand_name"],
-			"description":        p["description"],
-			"short descriptions": p["short_description"],
-			"price per unit":     p["price_per_unit"],
-			"unit ( kg, .. )":    p["unit"],
-			"discount":           p["discount"],
-			"product catagory":   p["product_category"],
-			"delivary categpory": p["delivery_category"],
-			"stock : num":        p["stock"],
-			"Photos":             p["photos"],
-			"vender id":          p["vendor_id"],
-			"vender name":        "vender name", // Stub placeholder
-			"rating":             p["rating"],
+			"id":                   p["_id"],
+			"Name":                 p["name"],
+			"brand":                p["brand"],
+			"description":          p["description"],
+			"short descriptions":   p["short_descriptions"],
+			"price per unit":       p["price_per_unit"],
+			"unit ( kg, .. )":      p["unit"],
+			"discount":             p["discount"],
+			"product catagory":     p["product_category"],
+			"delivary categpory":   p["delivery_category"],
+			"stock : num":          p["stock"],
+			"Photos":               p["photos"],
+			"vender id":            p["vendor_id"],
+			"vender name":          "vender name", // Stub placeholder
+			"rating":               p["rating"],
+			"submitted_for_update": p["submitted_for_update"],
+			"updates_proposed":     p["updates_proposed"],
 		},
 	})
 }

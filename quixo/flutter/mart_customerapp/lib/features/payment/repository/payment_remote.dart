@@ -11,7 +11,7 @@ class PaymentRemote {
   /// CHECKOUT
   Future<SimpleResponseModel> checkout(CheckoutRequestModel request) async {
     final response = await dio.post(
-      '/api/user/checkout',
+      '/user/checkout',
       request.toFormData(),
     );
 
@@ -21,7 +21,7 @@ class PaymentRemote {
   /// PAYMENT STATUS
   Future<SimpleResponseModel> checkPaymentStatus(PaymentQueryModel query) async {
     final response = await dio.get(
-      '/api/user/payment',
+      '/user/payment',
       query: query.toQuery(),
     );
 

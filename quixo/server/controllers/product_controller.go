@@ -36,6 +36,16 @@ func GetAllProducts(c *gin.Context) {
 			filter["product_category"] = cat
 		}
 	}
+	delivery := strings.TrimSpace(c.Query("delivary category"))
+	if delivery == "" {
+		delivery = strings.TrimSpace(c.Query("delivery category"))
+	}
+	if delivery == "" {
+		delivery = strings.TrimSpace(c.Query("deliveryCategory"))
+	}
+	if delivery != "" {
+		filter["delivery_category"] = delivery
+	}
 	if vendorIDStr != "" {
 		if vid, err := primitive.ObjectIDFromHex(vendorIDStr); err == nil {
 			filter["vendor_id"] = vid
@@ -140,22 +150,23 @@ func GetProductByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": gin.H{
-			"id":                 p["_id"],
-			"Name":               p["name"],
-			"brand":              p["brand"],
-			"short description":  p["short_descriptions"],
-			"price per unit":     p["price_per_unit"],
-			"unit":               p["unit"],
-			"product catagory":   p["product_category"],
-			"delivary category":  p["delivery_category"],
-			"stock":              p["stock"],
-			"brand name":         p["brand"],
-			"photos":             p["photos"],
-			"rating":             p["rating"],
-			"discount":           p["discount"],
-			"vender name":        "stub",
-			"vender id":          p["vendor_id"],
-			"iswishlisted":       CheckWishlist(c, productID),
+			"id":                p["_id"],
+			"Name":              p["name"],
+			"brand":             p["brand"],
+			"description":       p["description"],
+			"short description": p["short_descriptions"],
+			"price per unit":    p["price_per_unit"],
+			"unit":              p["unit"],
+			"product catagory":  p["product_category"],
+			"delivary category": p["delivery_category"],
+			"stock":             p["stock"],
+			"brand name":        p["brand"],
+			"photos":            p["photos"],
+			"rating":            p["rating"],
+			"discount":          p["discount"],
+			"vender name":       "stub",
+			"vender id":         p["vendor_id"],
+			"iswishlisted":      CheckWishlist(c, productID),
 		},
 	})
 }

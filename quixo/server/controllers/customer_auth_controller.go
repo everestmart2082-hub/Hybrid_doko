@@ -43,6 +43,7 @@ func CustomerRegistration(c *gin.Context) {
 	otp, _ := GenerateOTP()
 	newUser := models.User{
 		ID:         primitive.NewObjectID(),
+		Name:       c.PostForm("name"),
 		Number:     phone,
 		Email:      email,
 		Suspend:    false,
@@ -98,7 +99,7 @@ func CustomerLogin(c *gin.Context) {
 	var user models.User
 	err := coll.FindOne(ctx, bson.M{"number": phone}).Decode(&user)
 	if err != nil || user.Deactivate {
-		c.JSON(http.StatusOK, gin.H{"success": false, "message": "verify otp"}) 
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "not registered"}) 
 		return
 	}
 

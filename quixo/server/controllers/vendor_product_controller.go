@@ -57,6 +57,10 @@ func VendorProductAdd(c *gin.Context) {
 	unit := c.PostForm("unit")
 	discountStr := c.PostForm("discount")
 	productCategoryStr := c.PostForm("product catagory")
+	deliveryCategory := c.PostForm("delivary category")
+	if deliveryCategory == "" {
+		deliveryCategory = c.PostForm("delivery category")
+	}
 	stockStr := c.PostForm("stock")
 
 	pricePerUnit, _ := strconv.ParseFloat(pricePerUnitStr, 64)
@@ -86,11 +90,12 @@ func VendorProductAdd(c *gin.Context) {
 		Unit:              unit,
 		Discount:          discount,
 		ProductCategory:   productCategory,
+		DeliveryCategory:  deliveryCategory,
 		Stock:             stock,
 		Photos:            photoPaths,
 		VendorID:          vendorID.(primitive.ObjectID),
 		Rating:            0,
-		Approved:          false,   // "submitted for verification"
+		Approved:          false, // "submitted for verification"
 		Hidden:            false,
 	}
 
@@ -130,6 +135,10 @@ func VendorProductEdit(c *gin.Context) {
 	unit := c.PostForm("unit")
 	discountStr := c.PostForm("discount")
 	productCategoryStr := c.PostForm("product catagory")
+	deliveryCategory := c.PostForm("delivary category")
+	if deliveryCategory == "" {
+		deliveryCategory = c.PostForm("delivery category")
+	}
 	stockStr := c.PostForm("stock")
 
 	pricePerUnit, _ := strconv.ParseFloat(pricePerUnitStr, 64)
@@ -172,6 +181,7 @@ func VendorProductEdit(c *gin.Context) {
 		Unit:              unit,
 		Discount:          discount,
 		ProductCategory:   productCategory,
+		DeliveryCategory:  deliveryCategory,
 		Stock:             stock,
 		Photos:            photoPaths,
 		VendorID:          vendorID.(primitive.ObjectID),

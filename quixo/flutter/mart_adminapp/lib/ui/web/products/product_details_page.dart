@@ -55,13 +55,13 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
           if (state is AdminProductDetailLoaded) {
             _detail = state.detail;
           } else if (state is AdminProductActionSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
             if (_productId != null) {
-              context
-                  .read<AdminProductBloc>()
-                  .add(AdminProductLoadById(_productId!));
+              context.read<AdminProductBloc>().add(
+                AdminProductLoadById(_productId!),
+              );
             }
           } else if (state is AdminProductFailed) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -89,8 +89,8 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                 Text(
                   d.name,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -101,7 +101,8 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                       children: [
                         Chip(label: Text('hidden: $_hidden')),
                         Chip(label: Text('approved: $_approved')),
-                        if (_toUpdate) const Chip(label: Text('toupdate: true')),
+                        if (_toUpdate)
+                          const Chip(label: Text('toupdate: true')),
                       ],
                     ),
                   ],
@@ -124,11 +125,11 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               Container(
-                            width: 160,
-                            height: 180,
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.image_not_supported),
-                          ),
+                                width: 160,
+                                height: 180,
+                                color: Colors.grey.shade200,
+                                child: const Icon(Icons.image_not_supported),
+                              ),
                         ),
                       );
                     },
@@ -142,33 +143,129 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('brand: ${d.brand}', style: Theme.of(context).textTheme.titleMedium),
+                        Text(
+                          'brand: ${d.brand}',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 6),
-                        Text('delivery category: ${d.deliveryCategory}', style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          'delivery category: ${d.deliveryCategory}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 6),
-                        Text('product category: ${d.productCategory}', style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          'product category: ${d.productCategory}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 6),
-                        Text('stock: ${d.stock}', style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          'stock: ${d.stock}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 6),
-                        Text('rating: ${d.rating}', style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          'rating: ${d.rating}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 6),
-                        Text('unit: ${d.unit}', style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          'unit: ${d.unit}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 6),
-                        Text('price per unit: ${d.pricePerUnit}', style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          'price per unit: ${d.pricePerUnit}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 6),
-                        Text('discount: ${d.discount}', style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          'discount: ${d.discount}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 12),
-                        Text('short description:', style: Theme.of(context).textTheme.titleSmall),
+                        Text(
+                          'short description:',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
                         const SizedBox(height: 6),
-                        Text(d.shortDescriptions, style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          d.shortDescriptions,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 12),
-                        Text('Long description:', style: Theme.of(context).textTheme.titleSmall),
+                        Text(
+                          'Long description:',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
                         const SizedBox(height: 6),
-                        Text(d.description, style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          d.description,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ],
                     ),
                   ),
                 ),
+                if (d.submittedForUpdate && d.updatesProposed.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Proposed update from vendor',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 10),
+                          ...d.updatesProposed.entries.map(
+                            (e) => Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Text(
+                                '${e.key}: ${e.value}',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.read<AdminProductBloc>().add(
+                              AdminProductApprove(
+                                productId: _productId!,
+                                approved: true,
+                              ),
+                            );
+                          },
+                          child: const Text('Approve Update'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            context.read<AdminProductBloc>().add(
+                              AdminProductApprove(
+                                productId: _productId!,
+                                approved: false,
+                              ),
+                            );
+                          },
+                          child: const Text('Reject Update'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -176,14 +273,16 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                       child: OutlinedButton(
                         onPressed: () {
                           context.read<AdminProductBloc>().add(
-                                AdminProductHide(
-                                  productId: _productId!,
-                                  hide: !_hidden,
-                                ),
-                              );
+                            AdminProductHide(
+                              productId: _productId!,
+                              hide: !_hidden,
+                            ),
+                          );
                           setState(() => _hidden = !_hidden);
                         },
-                        child: Text(_hidden ? 'Unhide Product' : 'Hide Product'),
+                        child: Text(
+                          _hidden ? 'Unhide Product' : 'Hide Product',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -191,15 +290,16 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                       child: OutlinedButton(
                         onPressed: () {
                           context.read<AdminProductBloc>().add(
-                                AdminProductApprove(
-                                  productId: _productId!,
-                                  approved: !_approved,
-                                ),
-                              );
+                            AdminProductApprove(
+                              productId: _productId!,
+                              approved: !_approved,
+                            ),
+                          );
                           setState(() => _approved = !_approved);
                         },
-                        child:
-                            Text(_approved ? 'Unapprove Product' : 'Approve Product'),
+                        child: Text(
+                          _approved ? 'Unapprove Product' : 'Approve Product',
+                        ),
                       ),
                     ),
                   ],
@@ -212,4 +312,3 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
     );
   }
 }
-

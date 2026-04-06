@@ -98,8 +98,12 @@ func RiderLogin(c *gin.Context) {
 
 	var rider models.Rider
 	err := coll.FindOne(ctx, bson.M{"number": phone}).Decode(&rider)
-	if err != nil || rider.Suspended {
-		c.JSON(http.StatusOK, gin.H{"success": false, "message": "server error"})
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "not registered. searched phone: " + phone + ". error: " + err.Error()})
+		return
+	}
+	if rider.Suspended {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "suspended. searched phone: " + phone})
 		return
 	}
 

@@ -15,7 +15,7 @@ class OrderRemote {
   /// GET ALL ORDERS
   Future<List<OrderModel>> getAllOrders(OrderQueryModel query) async {
     final response = await dio.get(
-      '/api/user/order/all',
+      '/user/order/all',
       query: query.toMap(),
     );
 
@@ -37,7 +37,7 @@ class OrderRemote {
   Future<SimpleResponseModel> cancelOrder(String orderId) async {
     final formData = FormData.fromMap({"order id": orderId});
     final response = await dio.post(
-      '/api/user/order/cancel',
+      '/user/order/cancel',
       formData,
     );
 
@@ -51,7 +51,7 @@ class OrderRemote {
   Future<SimpleResponseModel> reorder(String orderId) async {
     final formData = FormData.fromMap({"order id": orderId});
     final response = await dio.post(
-      '/api/user/orders/reorder',
+      '/user/orders/reorder',
       formData,
     );
 
@@ -70,7 +70,7 @@ class OrderRemote {
     });
 
     final response = await dio.post(
-      '/api/user/rider/rating',
+      '/user/rider/rating',
       formData,
     );
 

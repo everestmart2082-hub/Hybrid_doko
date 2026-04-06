@@ -14,7 +14,7 @@ class WishlistRemote {
   /// Backend route: `POST /api/user/wishlist/get`
   Future<List<WishlistItemModel>> getWishlist(WishlistQueryModel query) async {
     final response = await dio.post(
-      '/api/user/wishlist/get',
+      '/user/wishlist/get',
       FormData.fromMap(query.toJson()),
     );
 
@@ -36,7 +36,7 @@ class WishlistRemote {
   Future<SimpleResponseModel> addItem(String productId) async {
     final formData = FormData.fromMap({"product id": productId});
     final response = await dio.post(
-      '/api/user/wishlist/add',
+      '/user/wishlist/add',
       formData,
     );
     final data = response is Map<String, dynamic>
@@ -49,7 +49,7 @@ class WishlistRemote {
   Future<SimpleResponseModel> removeItem(String wishlistId) async {
     final formData = FormData.fromMap({"wishlist id": wishlistId});
     final response = await dio.post(
-      '/api/user/wishlist/remove',
+      '/user/wishlist/remove',
       formData,
     );
     final data = response is Map<String, dynamic>

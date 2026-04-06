@@ -16,6 +16,15 @@ import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_event.dart';
 import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_state.dart';
 import 'package:quickmartcustomer/features/wishlist/data/wishlist_query_model.dart';
 import 'package:quickmartcustomer/drawer.dart';
+import 'package:quickmartcustomer/core/constants/api_constants.dart';
+
+String? _absolutePhotoUrl(String path) {
+  final t = path.trim();
+  if (t.isEmpty) return null;
+  if (t.startsWith('http://') || t.startsWith('https://')) return t;
+  final p = t.startsWith('/') ? t : '/$t';
+  return '${ApiEndpoints.baseImageUrl}$p';
+}
 
 class ProductListPage extends StatefulWidget {
   const ProductListPage({super.key});
@@ -30,6 +39,12 @@ class _ProductListPageState extends State<ProductListPage> {
   final _searchCtrl = TextEditingController();
   final _minPriceCtrl = TextEditingController();
   final _maxPriceCtrl = TextEditingController();
+  final _brandCtrl = TextEditingController();
+  String _stockMode = '';
+  String _sortBy = 'default';
+  String _selectedCategory = '';
+  String _selectedDeliveryCategory = '';
+  List<Map<String, dynamic>> _categories = const [];
 
   // Wishlist cache for quick toggle UI.
   final Set<String> _wishlistedProductIds = <String>{};
@@ -39,18 +54,28 @@ class _ProductListPageState extends State<ProductListPage> {
     super.initState();
     _fetchDefault();
     _fetchWishlist();
+    _loadCategories();
   }
 
   void _fetchDefault() {
-    context.read<ProductBloc>().add(
-          const ProductFetchAll(page: 1, limit: 20),
-        );
+    context.read<ProductBloc>().add(const ProductFetchAll(page: 1, limit: 20));
   }
 
   void _fetchWishlist() {
     context.read<WishlistBloc>().add(
-          const WishlistFetchRequested(WishlistQueryModel()),
-        );
+      const WishlistFetchRequested(WishlistQueryModel()),
+    );
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final data = await context
+          .read<ProductBloc>()
+          .productRemote
+          .getCategories();
+      if (!mounted) return;
+      setState(() => _categories = data);
+    } catch (_) {}
   }
 
   @override
@@ -58,6 +83,7 @@ class _ProductListPageState extends State<ProductListPage> {
     _searchCtrl.dispose();
     _minPriceCtrl.dispose();
     _maxPriceCtrl.dispose();
+    _brandCtrl.dispose();
     super.dispose();
   }
 
@@ -74,6 +100,15 @@ class _ProductListPageState extends State<ProductListPage> {
       search: _searchCtrl.text.trim().isEmpty ? null : _searchCtrl.text.trim(),
       minPrice: _tryParseDouble(_minPriceCtrl.text),
       maxPrice: _tryParseDouble(_maxPriceCtrl.text),
+      brand: _brandCtrl.text.trim().isEmpty ? null : _brandCtrl.text.trim(),
+      inStock: _stockMode == 'in_stock'
+          ? true
+          : (_stockMode == 'out_of_stock' ? false : null),
+      sort: _sortBy == 'default' ? null : _sortBy,
+      category: _selectedCategory.isEmpty ? null : _selectedCategory,
+      deliveryCategory: _selectedDeliveryCategory.isEmpty
+          ? null
+          : _selectedDeliveryCategory,
     );
 
     context.read<ProductBloc>().add(ProductFetchRequested(query));
@@ -97,10 +132,10 @@ class _ProductListPageState extends State<ProductListPage> {
     }
 
     context.read<WishlistBloc>().add(
-          already
-              ? WishlistRemoveItemRequested(productId)
-              : WishlistAddItemRequested(productId),
-        );
+      already
+          ? WishlistRemoveItemRequested(productId)
+          : WishlistAddItemRequested(productId),
+    );
     // Optimistic UI; if backend rejects, user can refresh.
     setState(() {
       if (already) {
@@ -117,7 +152,12 @@ class _ProductListPageState extends State<ProductListPage> {
       backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text('Products', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
+        title: Text(
+          'Products',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: Theme.of(context).primaryColorLight,
+          ),
+        ),
         elevation: 1,
       ),
       drawer: buildAppDrawer(context),
@@ -135,9 +175,44 @@ class _ProductListPageState extends State<ProductListPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
+                      'Sort By',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _sortBy,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items:
+                          [
+                                'default',
+                                'price low to high',
+                                'price high to low',
+                                'rating',
+                                'discount',
+                                'newest',
+                                'oldest',
+                              ]
+                              .map(
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
+                              )
+                              .toList(),
+                      onChanged: (v) =>
+                          setState(() => _sortBy = v ?? 'default'),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
                       'search',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
@@ -145,14 +220,18 @@ class _ProductListPageState extends State<ProductListPage> {
                       decoration: const InputDecoration(
                         labelText: 'Search',
                         prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(width: 1.0),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
                     const Text(
                       'price range',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
@@ -173,6 +252,109 @@ class _ProductListPageState extends State<ProductListPage> {
                         isDense: true,
                       ),
                       keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'brand',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _brandCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Brand',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'product category',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: [
+                        const DropdownMenuItem(value: '', child: Text('All')),
+                        ..._categories.map((c) {
+                          final id = c['_id'];
+                          final idStr = id is Map
+                              ? (id[r'$oid']?.toString() ?? '')
+                              : id?.toString() ?? '';
+                          final name = c['name']?.toString() ?? idStr;
+                          return DropdownMenuItem(
+                            value: idStr,
+                            child: Text(name),
+                          );
+                        }),
+                      ],
+                      onChanged: (v) =>
+                          setState(() => _selectedCategory = v ?? ''),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'delivery category',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _selectedDeliveryCategory,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: '', child: Text('All')),
+                        DropdownMenuItem(value: 'quick', child: Text('Quick')),
+                        DropdownMenuItem(
+                          value: 'normal',
+                          child: Text('Normal'),
+                        ),
+                      ],
+                      onChanged: (v) =>
+                          setState(() => _selectedDeliveryCategory = v ?? ''),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'stock',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _stockMode,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: '', child: Text('Any')),
+                        DropdownMenuItem(
+                          value: 'in_stock',
+                          child: Text('In stock'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'out_of_stock',
+                          child: Text('Out of stock'),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _stockMode = v ?? ''),
                     ),
                     const SizedBox(height: 18),
                     ElevatedButton(
@@ -225,9 +407,7 @@ class _ProductListPageState extends State<ProductListPage> {
                     builder: (context, productState) {
                       if (productState is ProductLoading ||
                           productState is ProductInitial) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
+                        return const Center(child: CircularProgressIndicator());
                       }
                       if (productState is ProductListLoaded) {
                         final products = productState.products;
@@ -235,11 +415,11 @@ class _ProductListPageState extends State<ProductListPage> {
                           padding: const EdgeInsets.all(8),
                           gridDelegate:
                               const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 280,
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
-                            mainAxisExtent: 360,
-                          ),
+                                maxCrossAxisExtent: 280,
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                mainAxisExtent: 360,
+                              ),
                           itemCount: products.length,
                           itemBuilder: (context, index) {
                             final p = products[index];
@@ -251,7 +431,9 @@ class _ProductListPageState extends State<ProductListPage> {
                       if (productState is ProductFailed) {
                         return Center(child: Text(productState.message));
                       }
-                      return const Center(child: Text('No products available.'));
+                      return const Center(
+                        child: Text('No products available.'),
+                      );
                     },
                   );
                 },
@@ -277,12 +459,18 @@ class _ProductListPageState extends State<ProductListPage> {
           children: [
             Stack(
               children: [
-                p.images.isNotEmpty
+                p.images.isNotEmpty && _absolutePhotoUrl(p.images.first) != null
                     ? Image.network(
-                        p.images.first,
+                        _absolutePhotoUrl(p.images.first)!,
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: Colors.grey.shade200,
+                          child: const Icon(Icons.broken_image, size: 50),
+                        ),
                       )
                     : Container(
                         height: 160,
@@ -296,7 +484,7 @@ class _ProductListPageState extends State<ProductListPage> {
                   child: IconButton(
                     icon: Icon(
                       wished ? Icons.favorite : Icons.favorite_border,
-                      color: wished ? Colors.red : Colors.red,
+                      color: wished ? Colors.red : Colors.grey.shade700,
                     ),
                     onPressed: () => _toggleWishlist(p),
                     style: IconButton.styleFrom(
@@ -313,7 +501,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 children: [
                   Text(
                     p.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -335,7 +526,11 @@ class _ProductListPageState extends State<ProductListPage> {
                       ),
                       Row(
                         children: [
-                          const Icon(Icons.star, size: 14, color: Colors.orange),
+                          const Icon(
+                            Icons.star,
+                            size: 14,
+                            color: Colors.orange,
+                          ),
                           const Text('4.5', style: TextStyle(fontSize: 12)),
                         ],
                       ),
@@ -348,16 +543,18 @@ class _ProductListPageState extends State<ProductListPage> {
                       onPressed: () {
                         if (!_isLoggedIn(context)) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please login to add to cart')),
+                            const SnackBar(
+                              content: Text('Please login to add to cart'),
+                            ),
                           );
                           Navigator.pushNamed(context, '/login');
                           return;
                         }
                         context.read<CartBloc>().add(
-                              CartAddRequested(
-                                CartAddRequestModel(productId: p.id, number: 1),
-                              ),
-                            );
+                          CartAddRequested(
+                            CartAddRequestModel(productId: p.id, number: 1),
+                          ),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Added to Cart!')),
                         );
@@ -367,11 +564,10 @@ class _ProductListPageState extends State<ProductListPage> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-

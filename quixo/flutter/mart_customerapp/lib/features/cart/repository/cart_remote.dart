@@ -15,7 +15,7 @@ class CartRemote {
   Future<List<CartItemModel>> getCartItems(CartQueryModel query) async {
     // Controller doesn't actually paginate based on query payload for now, but we send it as query params just in case
     final map = await dio.post(
-      '/api/user/cart/get',
+      '/user/cart/get',
       FormData.fromMap(query.toJson()),
     );
     
@@ -30,14 +30,14 @@ class CartRemote {
 
   /// ADD TO CART
   Future<SimpleResponseModel> addToCart(CartAddRequestModel request) async {
-    final map = await dio.post('/api/user/cart/add', request.toFormData());
+    final map = await dio.post('/user/cart/add', request.toFormData());
     return SimpleResponseModel.fromJson(map as Map<String, dynamic>);
   }
 
   /// REMOVE FROM CART
   Future<SimpleResponseModel> removeFromCart(String cartId) async {
     final formData = FormData.fromMap({"cart id": cartId});
-    final map = await dio.delete('/api/user/cart/remove', formData);
+    final map = await dio.delete('/user/cart/remove', formData);
     return SimpleResponseModel.fromJson(map as Map<String, dynamic>);
   }
 }

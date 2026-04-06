@@ -9,7 +9,7 @@ class SettingsRemote {
 
   Future<SimpleResponseModel> sendMessage(SendMessageRequestModel request) async {
     final response = await dio.post(
-      '/api/user/sendmessage',
+      '/user/sendmessage',
       request.toFormData(),
     );
     // The server returns {"status": true, "message": "..."} for sendmessage
@@ -23,7 +23,7 @@ class SettingsRemote {
 
   Future<SimpleResponseModel> submitProductReview(ProductReviewRequestModel request) async {
     final response = await dio.post(
-      '/api/user/review',
+      '/user/review',
       request.toFormData(),
     );
     return SimpleResponseModel.fromJson(response.data ?? response);
@@ -31,7 +31,7 @@ class SettingsRemote {
 
   Future<SimpleResponseModel> submitProductRating(ProductRatingRequestModel request) async {
     final response = await dio.post(
-      '/api/user/product/rating',
+      '/user/product/rating',
       request.toFormData(),
     );
     return SimpleResponseModel.fromJson(response.data ?? response);

@@ -27,7 +27,8 @@ Drawer buildAppDrawer(BuildContext context) {
         onTap: onTap ??
             () {
               if (!selected) {
-                Navigator.pushNamed(context, route);
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, route);
               } else {
                 Navigator.pop(context);
               }

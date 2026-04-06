@@ -1,5 +1,25 @@
 import 'package:equatable/equatable.dart';
 
+bool _toBool(dynamic v) {
+  if (v is bool) return v;
+  if (v is num) return v != 0;
+  if (v is String) {
+    final s = v.trim().toLowerCase();
+    return s == 'true' || s == '1' || s == 'yes';
+  }
+  return false;
+}
+
+String _mongoFieldToHexString(dynamic v) {
+  if (v == null) return '';
+  if (v is String) return v;
+  if (v is Map) {
+    final oid = v[r'$oid'];
+    if (oid is String) return oid;
+  }
+  return v.toString();
+}
+
 // ─── Product List Item ───────────────────────────────────────────────────────
 // Maps AdminGetAllProduct server response keys (spaced/lowercased)
 
@@ -32,7 +52,9 @@ class AdminProductListItem extends Equatable {
 
   factory AdminProductListItem.fromMap(Map<String, dynamic> map) =>
       AdminProductListItem(
-        productId: map['Product id']?.toString() ?? '',
+        productId: _mongoFieldToHexString(
+          map['Product id'] ?? map['product id'],
+        ),
         name: map['name'] as String? ?? '',
         shortDescription: map['short description'] as String? ?? '',
         pricePerUnit: (map['price per unit'] as num?) ?? 0,
@@ -42,14 +64,23 @@ class AdminProductListItem extends Equatable {
         brandName: map['brand name'] as String? ?? '',
         hidden: map['hidden'] as bool? ?? false,
         approved: map['approved'] as bool? ?? false,
-        toUpdate: map['toupdate'] as bool? ?? false,
+        toUpdate: _toBool(map['toupdate'] ?? map['submitted_for_update']),
       );
 
   @override
   List<Object?> get props => [
-        productId, name, shortDescription, pricePerUnit, productCategory,
-        deliveryCategory, stock, brandName, hidden, approved, toUpdate,
-      ];
+    productId,
+    name,
+    shortDescription,
+    pricePerUnit,
+    productCategory,
+    deliveryCategory,
+    stock,
+    brandName,
+    hidden,
+    approved,
+    toUpdate,
+  ];
 }
 
 // ─── Product Detail ──────────────────────────────────────────────────────────
@@ -70,6 +101,8 @@ class AdminProductDetail extends Equatable {
   final List<String> photos;
   final String vendorId;
   final num rating;
+  final bool submittedForUpdate;
+  final Map<String, dynamic> updatesProposed;
 
   const AdminProductDetail({
     required this.id,
@@ -86,12 +119,14 @@ class AdminProductDetail extends Equatable {
     required this.photos,
     required this.vendorId,
     required this.rating,
+    required this.submittedForUpdate,
+    required this.updatesProposed,
   });
 
   factory AdminProductDetail.fromMap(Map<String, dynamic> map) {
     // The server wraps detail under map["message"] — caller must unwrap first.
     return AdminProductDetail(
-      id: map['id']?.toString() ?? '',
+      id: _mongoFieldToHexString(map['id']),
       name: map['Name'] as String? ?? '',
       brand: map['brand'] as String? ?? '',
       description: map['description'] as String? ?? '',
@@ -102,18 +137,39 @@ class AdminProductDetail extends Equatable {
       productCategory: map['product catagory']?.toString() ?? '',
       deliveryCategory: map['delivary categpory'] as String? ?? '',
       stock: (map['stock : num'] as num?) ?? 0,
-      photos: (map['Photos'] as List<dynamic>?)
+      photos:
+          (map['Photos'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      vendorId: map['vender id']?.toString() ?? '',
+      vendorId: _mongoFieldToHexString(map['vender id']),
       rating: (map['rating'] as num?) ?? 0,
+      submittedForUpdate: _toBool(map['submitted_for_update']),
+      updatesProposed: (map['updates_proposed'] is Map<String, dynamic>)
+          ? (map['updates_proposed'] as Map<String, dynamic>)
+          : (map['updates_proposed'] is Map
+                ? Map<String, dynamic>.from(map['updates_proposed'] as Map)
+                : const <String, dynamic>{}),
     );
   }
 
   @override
   List<Object?> get props => [
-        id, name, brand, description, shortDescriptions, pricePerUnit, unit,
-        discount, productCategory, deliveryCategory, stock, photos, vendorId, rating,
-      ];
+    id,
+    name,
+    brand,
+    description,
+    shortDescriptions,
+    pricePerUnit,
+    unit,
+    discount,
+    productCategory,
+    deliveryCategory,
+    stock,
+    photos,
+    vendorId,
+    rating,
+    submittedForUpdate,
+    updatesProposed,
+  ];
 }

@@ -16,7 +16,7 @@ class AddressRemote {
     required int limit,
   }) async {
     final response = await dio.post(
-      '/api/user/address/all',
+      '/user/address/all',
       FormData.fromMap({
         "page": page,
         "limit": limit,
@@ -40,7 +40,7 @@ class AddressRemote {
   // ADD
   Future<SimpleResponseModel> addAddress(AddressRequestModel address) async {
     final response = await dio.post(
-      '/api/user/address/add',
+      '/user/address/add',
       address.toFormData(),
     );
 
@@ -53,7 +53,7 @@ class AddressRemote {
   // UPDATE
   Future<SimpleResponseModel> updateAddress(AddressRequestModel address) async {
     final response = await dio.post(
-      '/api/user/address/update',
+      '/user/address/update',
       address.toFormData(),
     );
 
@@ -67,7 +67,7 @@ class AddressRemote {
   Future<SimpleResponseModel> deleteAddress(String addressId) async {
     final formData = FormData.fromMap({"address id": addressId});
     final response = await dio.post(
-      '/api/user/address/delete',
+      '/user/address/delete',
       formData,
     );
 

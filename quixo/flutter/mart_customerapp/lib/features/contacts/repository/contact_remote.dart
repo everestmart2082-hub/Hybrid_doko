@@ -24,7 +24,7 @@ class ContactRemote {
     });
 
     final response = await dio.post(
-      '/api/user/sendmessage',
+      '/user/sendmessage',
       formData,
     );
 

@@ -10,9 +10,9 @@ func SetupCustomerRoutes(r *gin.Engine) {
 	userGroup := r.Group("/api/user")
 	{
 		// Authentication & Registration
-		userGroup.POST("/registration/", controllers.CustomerRegistration)
+		userGroup.POST("/registration", controllers.CustomerRegistration)
 		userGroup.POST("/registration/otp", controllers.CustomerRegistrationOTP)
-		userGroup.POST("/login/", controllers.CustomerLogin)
+		userGroup.POST("/login", controllers.CustomerLogin)
 		userGroup.POST("/login/otp", controllers.CustomerLoginOTP)
 
 		// Protected Domain
