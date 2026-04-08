@@ -73,8 +73,8 @@ func RiderProfileUpdate(c *gin.Context) {
 	updates := bson.M{
 		"otp": otp,
 		"updates_proposed": bson.M{
-			"number": number,
-			"description": c.PostForm("description"),
+			"number":          number,
+			"description":     c.PostForm("description"),
 			"default address": c.PostForm("default address"),
 		},
 	}
@@ -93,7 +93,7 @@ func RiderProfileOTP(c *gin.Context) {
 	riderID, _ := c.Get("userID")
 
 	otp := c.PostForm("otp")
-	phone := c.PostForm("phone") 
+	phone := c.PostForm("phone")
 
 	coll := utils.GetCollection("riders")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -122,7 +122,7 @@ func RiderProfileDelete(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	coll.UpdateOne(ctx, bson.M{"_id": riderID}, bson.M{"$set": bson.M{"suspended": true}}) 
+	coll.UpdateOne(ctx, bson.M{"_id": riderID}, bson.M{"$set": bson.M{"suspended": true}})
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully submitted for ..."})
 }
@@ -132,7 +132,7 @@ func RiderDashboard(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": gin.H{
-			"earning":               1000,
+			"earning":                1000,
 			"order delivered number": 5,
 			"order ongoing number":   1,
 		},

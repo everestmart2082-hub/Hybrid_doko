@@ -20,9 +20,7 @@ class WebShell extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.primaryColorLight,
-      appBar: isDesktop
-          ? null 
-          : AppBar(
+      appBar:AppBar(
               title: Text(title,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.primaryColorLight,
@@ -31,7 +29,7 @@ class WebShell extends StatelessWidget {
               iconTheme: IconThemeData(color: theme.primaryColorLight),
               actions: actions,
             ),
-      drawer: isDesktop ? null : buildAppDrawer(context),
+      drawer:  buildAppDrawer(context),
       body: Row(
         children: [
           if (isDesktop)
@@ -41,17 +39,17 @@ class WebShell extends StatelessWidget {
             ),
           Expanded(
             child: Scaffold(
-              backgroundColor: theme.primaryColorLight,
-              appBar: isDesktop ? AppBar(
-                title: Text(title,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.primaryColorLight,
-                    )),
-                backgroundColor: theme.primaryColorDark,
-                iconTheme: IconThemeData(color: theme.primaryColorLight),
-                actions: actions,
-                automaticallyImplyLeading: false,
-              ) : null,
+            //   backgroundColor: theme.primaryColorLight,
+            //   appBar: isDesktop ? AppBar(
+            //     title: Text(title,
+            //         style: theme.textTheme.bodyLarge?.copyWith(
+            //           color: theme.primaryColorLight,
+            //         )),
+            //     backgroundColor: theme.primaryColorDark,
+            //     iconTheme: IconThemeData(color: theme.primaryColorLight),
+            //     actions: actions,
+            //     automaticallyImplyLeading: false,
+            //   ) : null,
               body: child,
             ),
           ),

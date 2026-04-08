@@ -34,11 +34,11 @@ func CustomerProductRating(c *gin.Context) {
 	defer cancel()
 
 	item := bson.M{
-		"user_id":    userID,
-		"target_id":  productID,
-		"type":       "product",
-		"rating":     rating,
-		"date":       time.Now(),
+		"user_id":   userID,
+		"target_id": productID,
+		"type":      "product",
+		"rating":    rating,
+		"date":      time.Now(),
 	}
 
 	_, err := coll.InsertOne(ctx, item)
@@ -68,11 +68,11 @@ func CustomerRiderRating(c *gin.Context) {
 	defer cancel()
 
 	item := bson.M{
-		"user_id":    userID,
-		"target_id":  riderID,
-		"type":       "rider",
-		"rating":     rating,
-		"date":       time.Now(),
+		"user_id":   userID,
+		"target_id": riderID,
+		"type":      "rider",
+		"rating":    rating,
+		"date":      time.Now(),
 	}
 
 	_, err := coll.InsertOne(ctx, item)
