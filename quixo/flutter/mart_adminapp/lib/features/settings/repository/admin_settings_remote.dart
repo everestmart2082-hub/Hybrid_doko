@@ -36,4 +36,11 @@ class AdminSettingsRemote {
             Map<String, dynamic>.from(e as Map)))
         .toList();
   }
+
+  Future<bool> deleteConstant(String name) async {
+    final formData = FormData.fromMap({'name': name});
+    final Map<String, dynamic> map =
+        await dio.post(ApiEndpoints.adminConstantsDelete, formData);
+    return checkSuccess(map);
+  }
 }

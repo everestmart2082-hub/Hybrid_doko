@@ -34,3 +34,11 @@ class PrepareOrder extends OrderEvent {
   @override
   List<Object?> get props => [orderId];
 }
+
+// class AssignRider extends OrderEvent {
+//   final String ordersId;
+//   final String riderId;
+//   const AssignRider({required this.ordersId, required this.riderId});
+//   @override
+//   List<Object?> get props => [ordersId, riderId];
+// }

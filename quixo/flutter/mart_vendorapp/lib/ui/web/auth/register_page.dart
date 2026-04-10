@@ -118,7 +118,7 @@ class _VenderRegisterPageState extends State<VenderRegisterPage> {
             _showOtpAndVerify().then((_) => _awaitingOtp = false);
           }
           if (state is VenderAuthenticated && state.authenticated) {
-            Navigator.pushReplacementNamed(context, '/mainapp');
+            Navigator.pushReplacementNamed(context, '/profile');
           }
           if (state is VenderAuthFailed) {
             setState(() => _loadingBizTypes = false);

@@ -19,7 +19,8 @@ class ProductRemote {
     return ProductModel.fromMap(map['message'] as Map<String, dynamic>);
   }
 
-  Future<List<ProductListItem>> getAllProducts({
+  /// Returns products and whether the server reports another page (`meta.has_more`).
+  Future<({List<ProductListItem> products, bool hasMore})> getAllProducts({
     int page = 1,
     int limit = 20,
     double? minPrice,
@@ -31,19 +32,24 @@ class ProductRemote {
     bool? stock,
     String? brand,
     double? rating,
+    String? sortBy,
   }) async {
     final query = {
       'page': page,
       'limit': limit,
       if (minPrice != null) 'min price': minPrice,
       if (maxPrice != null) 'max price': maxPrice,
-      if (productCategory != null) 'product category': productCategory,
-      if (deliveryCategory != null) 'delivary category': deliveryCategory,
+      if (productCategory != null && productCategory.isNotEmpty)
+        'product category': productCategory,
+      if (deliveryCategory != null && deliveryCategory.isNotEmpty)
+        'delivary category': deliveryCategory,
       if (vendorId != null) 'vender id': vendorId,
-      if (searchText != null) 'search text': searchText,
+      if (searchText != null && searchText.isNotEmpty) 'search text': searchText,
       if (stock != null) 'stock_status': stock ? 'in_stock' : 'out_of_stock',
-      if (brand != null) 'brand name': brand,
+      if (brand != null && brand.isNotEmpty) 'brand name': brand,
       if (rating != null) 'rating': rating,
+      if (sortBy != null && sortBy.isNotEmpty && sortBy != 'default')
+        'sort by': sortBy,
     };
 
     final map = await dio.get("/product/all", query: query);
@@ -52,7 +58,9 @@ class ProductRemote {
     final list = (map['message'] as List)
         .map((e) => ProductListItem.fromMap(e as Map<String, dynamic>))
         .toList();
-    return list;
+    final meta = map['meta'];
+    final hasMore = meta is Map && meta['has_more'] == true;
+    return (products: list, hasMore: hasMore);
   }
 
   Future<List<Map<String, dynamic>>> getCategories() async {
@@ -89,7 +97,11 @@ class ProductRemote {
               ? response.cast<String, dynamic>()
               : <String, dynamic>{});
 
-    return SimpleResponseModel.fromJson(data);
+    final model = SimpleResponseModel.fromJson(data);
+    if (!model.success) {
+      throw UnknownFailure(model.message.isNotEmpty ? model.message : 'Review failed');
+    }
+    return model;
   }
 
   Future<SimpleResponseModel> addRating(RatingRequestModel rating) async {
@@ -107,7 +119,11 @@ class ProductRemote {
               ? response.cast<String, dynamic>()
               : <String, dynamic>{});
 
-    return SimpleResponseModel.fromJson(data);
+    final model = SimpleResponseModel.fromJson(data);
+    if (!model.success) {
+      throw UnknownFailure(model.message.isNotEmpty ? model.message : 'Rating failed');
+    }
+    return model;
   }
 
   void _checkSuccess(Map<String, dynamic> map) {

@@ -1,3 +1,5 @@
+import 'package:quickmartvender/features/Product/data/product_review_row.dart';
+
 String _mongoFieldToHexString(dynamic v) {
   if (v == null) return '';
   if (v is String) return v;
@@ -6,6 +8,13 @@ String _mongoFieldToHexString(dynamic v) {
     if (oid is String) return oid;
   }
   return v.toString();
+}
+
+Map<String, String> _categoryAttrsFromMessage(dynamic v) {
+  if (v == null || v is! Map) return {};
+  return v.map(
+    (k, e) => MapEntry(k.toString(), e?.toString() ?? ''),
+  );
 }
 
 class ProductDetail {
@@ -24,6 +33,8 @@ class ProductDetail {
   final String vendorId;
   final String vendorName;
   final double rating;
+  final Map<String, String> categoryAttributes;
+  final List<ProductReviewRow> reviews;
 
   ProductDetail({
     required this.id,
@@ -41,6 +52,8 @@ class ProductDetail {
     required this.vendorId,
     required this.vendorName,
     required this.rating,
+    this.categoryAttributes = const {},
+    this.reviews = const [],
   });
 
   factory ProductDetail.fromMap(Map<String, dynamic> map) {
@@ -48,6 +61,17 @@ class ProductDetail {
     List<String> photos = [];
     if (ph is List) {
       photos = ph.map((e) => e.toString()).toList();
+    }
+    final List<ProductReviewRow> revs = [];
+    final rr = map['reviews'];
+    if (rr is List) {
+      for (final e in rr) {
+        if (e is Map<String, dynamic>) {
+          revs.add(ProductReviewRow.fromMap(e));
+        } else if (e is Map) {
+          revs.add(ProductReviewRow.fromMap(Map<String, dynamic>.from(e)));
+        }
+      }
     }
     return ProductDetail(
       id: _mongoFieldToHexString(map["id"]),
@@ -69,6 +93,8 @@ class ProductDetail {
       vendorId: map["vender id"]?.toString() ?? "",
       vendorName: map["vender name"]?.toString() ?? "",
       rating: (map["rating"] ?? 0).toDouble(),
+      categoryAttributes: _categoryAttrsFromMessage(map["category attributes"]),
+      reviews: revs,
     );
   }
 }

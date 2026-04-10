@@ -9,6 +9,7 @@ import 'package:quickmartcustomer/features/cart/bloc/cart_state.dart';
 import 'package:quickmartcustomer/features/cart/data/cart_model.dart';
 import 'package:quickmartcustomer/features/cart/data/cart_query_model.dart';
 import 'package:quickmartcustomer/features/cart/data/cart_item_model.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 String? _absolutePhotoUrl(String path) {
   final t = path.trim();
@@ -68,6 +69,7 @@ class _CartPageState extends State<CartPage> {
           ),
         ),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       body: BlocListener<CartBloc, CartState>(
         listener: (context, state) {
@@ -92,25 +94,28 @@ class _CartPageState extends State<CartPage> {
                 final quick = state.items.where(_isQuick).toList();
                 final normal = state.items.where((e) => !_isQuick(e)).toList();
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSection('Quick Products', quick),
-                    const SizedBox(height: 24),
-                    _buildSection('Normal Products', normal),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () =>
-                                Navigator.pushNamed(context, '/payment'),
-                            child: const Text('Checkout'),
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSection('Quick Products', quick),
+                      const SizedBox(height: 24),
+                      _buildSection('Normal Products', normal),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/payment'),
+                              child: const Text('Checkout'),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 );
               }
               if (state is CartFailed) {
@@ -142,6 +147,8 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget _buildCartRow(CartItemModel item) {
+    final discountedUnit = item.pricePerUnit * (1 - (item.discount / 100));
+    final lineTotal = discountedUnit * item.number;
     return InkWell(
       onTap: () {
         Navigator.pushNamed(
@@ -180,10 +187,34 @@ class _CartPageState extends State<CartPage> {
                     const SizedBox(height: 6),
                     Text(item.brandName),
                     const SizedBox(height: 6),
-                    Text('Price: ${item.pricePerUnit} / ${item.unit}'),
+                    Wrap(
+                      spacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          'Price: ₹${discountedUnit.toStringAsFixed(2)} / ${item.unit}',
+                        ),
+                        if (item.discount > 0)
+                          Text(
+                            '₹${item.pricePerUnit.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        if (item.discount > 0)
+                          Text(
+                            '${item.discount.toStringAsFixed(0)}% OFF',
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColorDark,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     Text(
-                      'Total: ${(item.pricePerUnit * item.number).toStringAsFixed(2)}',
+                      'Total: ₹${lineTotal.toStringAsFixed(2)}',
                     ),
                   ],
                 ),
@@ -199,7 +230,7 @@ class _CartPageState extends State<CartPage> {
                           final newQty = (item.number - 1).clamp(0, 999999);
                           _updateQty(item, newQty);
                         },
-                        icon: const Icon(Icons.remove_circle_outline),
+                        icon: Icon(Icons.remove_circle_outline, color: Theme.of(context).primaryColor,),
                       ),
                       Text(
                         '${item.number}',
@@ -210,7 +241,7 @@ class _CartPageState extends State<CartPage> {
                         onPressed: () {
                           _updateQty(item, item.number + 1);
                         },
-                        icon: const Icon(Icons.add_circle_outline),
+                        icon: Icon(Icons.add_circle_outline, color: Theme.of(context).primaryColor,),
                       ),
                     ],
                   ),

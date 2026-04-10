@@ -54,41 +54,46 @@ class DioClient implements ApiClient {
   Future<dynamic> post(String path, dynamic data) async {
     try {
       final token = await tokenProvider.getToken();
-      final response = await _dio.post(path, data: data, options: Options(headers: {
-            'Authorization': 'Bearer $token', 
-          },));
+      final headers = <String, dynamic>{};
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      final response = await _dio.post(
+        path,
+        data: data,
+        options: Options(headers: headers),
+      );
       return response.data;
-    } 
-    on DioException catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
       throw ApiException.from(e).failure;
-    } 
-    catch (e) {
-      // throw NetworkException.noInternet();
+    } catch (e) {
       debugPrint(e.toString());
-      // debugPrintStack(e.);
+      rethrow;
     }
   }
 
-  
   @override
   Future<dynamic> postWithFile(String path, dynamic data) async {
     try {
       final token = await tokenProvider.getToken();
-      final response = await _dio.post(path, data: data, options: Options(headers: {
-            'Authorization': 'Bearer $token', 
-            "content-type": "multipart/form-data"
-          },));
+      final headers = <String, dynamic>{};
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      // Let Dio set multipart boundary — a bare "multipart/form-data" header breaks uploads.
+      final response = await _dio.post(
+        path,
+        data: data,
+        options: Options(headers: headers),
+      );
       return response.data;
-    } 
-    on DioException catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
       throw ApiException.from(e).failure;
-    } 
-    catch (e) {
-      // throw NetworkException.noInternet();
+    } catch (e) {
       debugPrint(e.toString());
-      // debugPrintStack(e.);
+      rethrow;
     }
   }
 

@@ -20,6 +20,7 @@ func SetupCustomerRoutes(r *gin.Engine) {
 		protected.Use(controllers.AuthMiddleware("user"))
 		{
 			// Profile Management
+			protected.GET("/profile/get", controllers.CustomerProfileGet)
 			protected.POST("/profile/get", controllers.CustomerProfileGet)
 			protected.POST("/profile/update", controllers.CustomerProfileUpdate)
 			protected.POST("/profile/otp", controllers.CustomerProfileUpdateOTP)
@@ -45,7 +46,9 @@ func SetupCustomerRoutes(r *gin.Engine) {
 			protected.POST("/checkout", controllers.CustomerCheckout)
 			protected.GET("/payment", controllers.CustomerPayment)
 			protected.GET("/order/all", controllers.CustomerOrderAll)
+			protected.POST("/order/cancel", controllers.CustomerOrderCancel)
 			protected.DELETE("/order/cancel", controllers.CustomerOrderCancel)
+			protected.POST("/orders/reorder", controllers.CustomerOrderReorder)
 			protected.DELETE("/orders/reorder", controllers.CustomerOrderReorder)
 
 			// Ratings & Reviews
@@ -56,6 +59,7 @@ func SetupCustomerRoutes(r *gin.Engine) {
 			// Messages & Notifications
 			protected.POST("/sendmessage", controllers.CustomerSendMessage)
 			protected.POST("/notification", controllers.CustomerNotification)
+			protected.GET("/hub-counts", controllers.CustomerHubCounts)
 		}
 	}
 }

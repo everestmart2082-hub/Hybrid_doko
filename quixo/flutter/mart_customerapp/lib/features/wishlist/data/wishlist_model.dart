@@ -17,6 +17,7 @@ class WishlistItemModel extends Equatable {
   final String image;
   final String number;
   final double pricePerUnit;
+  final double discount;
   final String unit;
   final String deliveryCategory;
   final String productCategory;
@@ -29,6 +30,7 @@ class WishlistItemModel extends Equatable {
     required this.image,
     required this.number,
     required this.pricePerUnit,
+    required this.discount,
     required this.unit,
     required this.deliveryCategory,
     required this.productCategory,
@@ -51,6 +53,7 @@ class WishlistItemModel extends Equatable {
       image: (json["image"] ?? fallbackImage).toString(),
       number: (json["number"] ?? "").toString(),
       pricePerUnit: (json["priceperunit"] as num?)?.toDouble() ?? 0.0,
+      discount: (json["discount"] as num?)?.toDouble() ?? 0.0,
       unit: json["unit"] ?? "",
       deliveryCategory:
           json["delivary category"] ?? json["delivary_category"] ?? "",
@@ -68,6 +71,7 @@ class WishlistItemModel extends Equatable {
     image,
     number,
     pricePerUnit,
+    discount,
     unit,
     deliveryCategory,
     productCategory,

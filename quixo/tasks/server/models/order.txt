@@ -1,7 +1,7 @@
 order
 status : preparing, pending, delivered, cancelledByUser, cancelledByVender, returned
 product id: number
-type : grocery / ecommerce
+type : quick / normal
 dateoforder
 dateofdelivary
 rider id

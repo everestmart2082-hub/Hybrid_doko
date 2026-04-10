@@ -38,11 +38,27 @@ class OrderRemote {
   Future<void> markOrderPrepared(String orderId) async {
     final map = await dio.post(
       ApiEndpoints.orderPrepared,
-      FormData.fromMap({"order id": orderId}),
+      FormData.fromMap({"orders id": orderId}),
     );
 
     if (!(map["success"] ?? false)) {
       throw Exception(map["message"] ?? "Server error");
     }
   }
-}
+
+  // Future<void> assignRider({
+  //   required String ordersId,
+  //   required String riderId,
+  // }) async {
+  //   final map = await dio.post(
+  //     '/api/vender/order/assign-rider',
+  //     FormData.fromMap({
+  //       "orders id": ordersId,
+  //       "rider id": riderId,
+  //     }),
+  //   );
+  //   if (!(map["success"] ?? false)) {
+  //     throw Exception(map["message"] ?? "Server error");
+  //   }
+  // }
+}

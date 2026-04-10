@@ -25,9 +25,19 @@ class OrderRemote {
 
     if (data["success"] == true) {
       final list = data["message"] as List? ?? const [];
-      return list
-          .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final flattened = <Map<String, dynamic>>[];
+      for (final entry in list) {
+        if (entry is Map<String, dynamic> && entry["items"] is List) {
+          for (final child in (entry["items"] as List)) {
+            if (child is Map) {
+              flattened.add(child.cast<String, dynamic>());
+            }
+          }
+        } else if (entry is Map) {
+          flattened.add(entry.cast<String, dynamic>());
+        }
+      }
+      return flattened.map(OrderModel.fromJson).toList();
     } else {
       throw Exception(data["message"]);
     }

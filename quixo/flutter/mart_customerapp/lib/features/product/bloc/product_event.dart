@@ -69,3 +69,19 @@ class ProductAddRatingRequested extends ProductEvent {
   @override
   List<Object?> get props => [rating];
 }
+
+/// Submits review text and star rating in one flow, then reloads the product.
+class ProductSubmitReviewRequested extends ProductEvent {
+  final String productId;
+  final String message;
+  final int ratingStars;
+
+  const ProductSubmitReviewRequested({
+    required this.productId,
+    required this.message,
+    required this.ratingStars,
+  });
+
+  @override
+  List<Object?> get props => [productId, message, ratingStars];
+}

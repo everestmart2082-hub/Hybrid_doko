@@ -44,6 +44,7 @@ import 'package:quickmartcustomer/features/settings/ui/contact_us_page.dart';
 import 'package:quickmartcustomer/features/settings/ui/settings_page.dart';
 import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_bloc.dart';
 import 'package:quickmartcustomer/features/wishlist/repository/wishlist_remote.dart';
+import 'package:quickmartcustomer/features/hub/repository/hub_counts_remote.dart';
 import 'package:quickmartcustomer/features/settings/repository/settings_remote.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -142,6 +143,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context)=>WishlistRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>NotificationRemote(dio: dioClient)),
         RepositoryProvider(create: (context)=>SettingsRemote(dio: dioClient)),
+        RepositoryProvider(create: (context)=>HubCountsRemote(dio: dioClient)),
       ],
       child: 
       MultiBlocProvider(

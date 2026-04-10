@@ -45,4 +45,7 @@ class ApiEndpoints {
   //===Notifications===
   static const String getNotifications = '/user/notification';
 
+  /// Cart lines, wishlist rows, non-terminal orders (auth).
+  static const String userHubCounts = '/user/hub-counts';
+
 }

@@ -146,10 +146,23 @@ class _AdminProductsPageState extends State<AdminProductsPage> {
                       },
                       items: [
                         DropdownMenuItem(value: 'all', child: Text('All categories', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),)),
-                        ..._categories.map((c) => DropdownMenuItem(
-                              value: c.name,
-                              child: Text(c.name,style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),),
-                            )),
+                        ..._categories.map((c) {
+                          final vid = c.objectId.isNotEmpty
+                              ? c.objectId
+                              : 'name:${c.name}';
+                          return DropdownMenuItem(
+                            value: vid,
+                            child: Text(
+                              c.name,
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.color,
+                              ),
+                            ),
+                          );
+                        }),
                       ],
                     ),
                     const SizedBox(width: 16),

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quickmartcustomer/core/network/shared_pref.dart';
+import 'package:quickmartcustomer/drawer.dart';
 import 'package:quickmartcustomer/features/addresss/bloc/addresses_bloc.dart';
 import 'package:quickmartcustomer/features/addresss/bloc/addresses_event.dart';
 import 'package:quickmartcustomer/features/addresss/bloc/addresses_state.dart';
 import 'package:quickmartcustomer/features/addresss/data/address_model.dart';
 import 'package:quickmartcustomer/features/addresss/data/address_request_model.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class AddressPage extends StatefulWidget {
   const AddressPage({super.key});
@@ -15,6 +17,7 @@ class AddressPage extends StatefulWidget {
 }
 
 class _AddressPageState extends State<AddressPage> {
+  static const List<String> _labelOptions = ['Home', 'Work', 'Office'];
   final _labelCtrl = TextEditingController();
   final _cityCtrl = TextEditingController();
   final _stateCtrl = TextEditingController();
@@ -59,12 +62,16 @@ class _AddressPageState extends State<AddressPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    controller: _labelCtrl,
+                  DropdownButtonFormField<String>(
+                    value: _labelOptions.contains(_labelCtrl.text) ? _labelCtrl.text : _labelOptions.first,
                     decoration: const InputDecoration(
                       labelText: 'Label',
                       border: OutlineInputBorder(),
                     ),
+                    items: _labelOptions
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => _labelCtrl.text = v ?? _labelOptions.first,
                   ),
                   const SizedBox(height: 10),
                   TextField(
@@ -183,12 +190,16 @@ class _AddressPageState extends State<AddressPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    controller: _labelCtrl,
+                  DropdownButtonFormField<String>(
+                    value: _labelOptions.contains(_labelCtrl.text) ? _labelCtrl.text : _labelOptions.first,
                     decoration: const InputDecoration(
                       labelText: 'Label',
                       border: OutlineInputBorder(),
                     ),
+                    items: _labelOptions
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => _labelCtrl.text = v ?? _labelOptions.first,
                   ),
                   const SizedBox(height: 10),
                   TextField(
@@ -317,6 +328,7 @@ class _AddressPageState extends State<AddressPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorLight,
+      drawer: buildAppDrawer(context),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text(
@@ -326,6 +338,7 @@ class _AddressPageState extends State<AddressPage> {
           ),
         ),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       body: BlocListener<AddressBloc, AddressState>(
         listener: (context, state) {

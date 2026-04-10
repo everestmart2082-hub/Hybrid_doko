@@ -267,6 +267,37 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(p.description, style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 24),
+                Text(
+                  'Customer reviews',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (p.reviews.isEmpty)
+                  Text(
+                    'No reviews yet.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.hintColor,
+                    ),
+                  )
+                else
+                  ...p.reviews.map(
+                    (r) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        title: Text(
+                          r.userName.isNotEmpty ? r.userName : 'Customer',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          r.message,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

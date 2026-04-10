@@ -5,23 +5,23 @@ import 'package:equatable/equatable.dart';
 class AdminInboxMessage extends Equatable {
   final String type;
   final String date;
-  final String description;
+  final String message;
 
   const AdminInboxMessage({
     required this.type,
     required this.date,
-    required this.description,
+    required this.message,
   });
 
   factory AdminInboxMessage.fromMap(Map<String, dynamic> map) =>
       AdminInboxMessage(
         type: map['type']?.toString() ?? '',
         date: map['date']?.toString() ?? '',
-        description: map['description']?.toString() ?? '',
+        message: map['message']?.toString() ?? map['description']?.toString() ?? '',
       );
 
   @override
-  List<Object?> get props => [type, date, description];
+  List<Object?> get props => [type, date, message];
 }
 
 // ─── Profile Response ───────────────────────────────────────────────────────

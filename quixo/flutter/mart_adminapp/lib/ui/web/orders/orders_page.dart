@@ -4,6 +4,7 @@ import 'package:mart_adminapp/features/orders/bloc/admin_order_bloc.dart';
 import 'package:mart_adminapp/features/orders/bloc/admin_order_event.dart';
 import 'package:mart_adminapp/features/orders/bloc/admin_order_state.dart';
 import 'package:mart_adminapp/features/orders/data/admin_order_model.dart';
+import 'package:mart_adminapp/features/orders/repository/admin_orders_remote.dart';
 import 'package:mart_adminapp/ui/web/web_shell.dart';
 
 class AdminOrdersPage extends StatefulWidget {
@@ -25,12 +26,12 @@ class _AdminOrdersPageState extends State<AdminOrdersPage>
   List<AdminOrderItem> _all = const [];
 
   static const _tabs = <_OrderTab>[
-    _OrderTab(label: 'Preparing', status: 'prepared'),
-    _OrderTab(label: 'Pending', status: 'accepted'),
+    _OrderTab(label: 'Preparing', status: 'preparing'),
+    _OrderTab(label: 'Pending', status: 'pending'),
     _OrderTab(label: 'Delivered', status: 'delivered'),
-    _OrderTab(label: 'CancelledByUser', status: 'cancelled'),
-    _OrderTab(label: 'CancelledByVender', status: 'cancelled'),
-    _OrderTab(label: 'Returned', status: 'rejected'),
+    _OrderTab(label: 'CancelledByUser', status: 'cancelledByUser'),
+    _OrderTab(label: 'CancelledByVender', status: 'cancelledByVender'),
+    _OrderTab(label: 'Returned', status: 'returned'),
   ];
 
   _OrderTab get _activeTab => _tabs[_tabController.index];
@@ -165,10 +166,53 @@ class _AdminOrdersPageState extends State<AdminOrdersPage>
                             const SizedBox(height: 10),
                             _InfoRow(label: 'product category', value: o.productCategory),
                             _InfoRow(label: 'product id', value: o.productId),
+                            _InfoRow(label: 'quantity', value: o.productNumber.toString()),
                             _InfoRow(label: 'vender id', value: o.venderId),
+                            _InfoRow(label: 'vendor name', value: o.vendorName),
+                            _InfoRow(label: 'user', value: '${o.userName} (${o.userNumber})'),
+                            _InfoRow(label: 'rider', value: o.riderName.isEmpty ? 'Not assigned' : '${o.riderName} (${o.riderNumber})'),
                             _InfoRow(label: 'order date', value: o.orderTime),
                             _InfoRow(label: 'delivary category', value: o.deliveryCategory),
                             _InfoRow(label: 'order status', value: o.orderStatus),
+                            const SizedBox(height: 8),
+                            if(_tabController.index == 0 || _tabController.index == 1)
+                            OutlinedButton(
+                              onPressed: () async {
+                                final ctrl = TextEditingController(text: o.riderId);
+                                final riderId = await showDialog<String>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Assign Rider'),
+                                    content: TextField(
+                                      controller: ctrl,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Rider ID',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                                      ElevatedButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Assign')),
+                                    ],
+                                  ),
+                                );
+                                if (riderId == null || riderId.isEmpty) return;
+                                try {
+                                  await context.read<AdminOrdersRemote>().assignRider(
+                                        ordersId: o.ordersId.isEmpty ? o.orderId : o.ordersId,
+                                        riderId: riderId,
+                                      );
+                                  if (!context.mounted) return;
+                                  context.read<AdminOrderBloc>().add(AdminOrderLoad());
+                                } catch (e) {
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+                                  );
+                                }
+                              },
+                              child: Text(o.riderId.isEmpty ? 'Assign Rider' : 'Change Rider'),
+                            ),
                           ],
                         ),
                       ),

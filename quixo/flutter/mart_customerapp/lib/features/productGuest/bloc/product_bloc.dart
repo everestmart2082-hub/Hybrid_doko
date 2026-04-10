@@ -11,18 +11,34 @@ class ProductGuestBloc extends Bloc<ProductGuestEvent, ProductGuestState> {
     on<ProductFetchById>(_onFetchById);
     on<ProductFetchAll>(_onFetchAll);
     on<ProductFetchRecommended>(_onFetchRecommended);
-     on<ProductFetchRequested>(_onFetchProducts);
+    on<ProductFetchRequested>(_onFetchProducts);
     on<ProductFetchByIdRequested>(_onFetchProductById);
     on<ProductFetchRecommendedRequested>(_onFetchRecommendedRequested);
   }
 
-   FutureOr<void> _onFetchProducts(
+  FutureOr<void> _onFetchProducts(
       ProductFetchRequested event, Emitter<ProductGuestState> emit) async {
     emit(ProductLoading());
     try {
       final query = event.query;
-      final products = await productRemote.getAllProducts(minPrice: query.minPrice, maxPrice: query.maxPrice, productCategory: query.category, deliveryCategory: query.deliveryCategory, vendorId: query.vendorId, searchText: query.search, stock: query.inStock, brand: query.brand, rating: query.rating);
-      emit(ProductListLoaded(products));
+      final sortKey = query.sort == null || query.sort == 'default'
+          ? null
+          : query.sort;
+      final res = await productRemote.getAllProducts(
+        page: query.page,
+        limit: query.limit,
+        minPrice: query.minPrice,
+        maxPrice: query.maxPrice,
+        productCategory: query.category,
+        deliveryCategory: query.deliveryCategory,
+        vendorId: query.vendorId,
+        searchText: query.search,
+        stock: query.inStock,
+        brand: query.brand,
+        rating: query.rating,
+        sortBy: sortKey,
+      );
+      emit(ProductListLoaded(res.products, hasMore: res.hasMore));
     } catch (e) {
       emit(ProductFailed(e.toString()));
     }
@@ -63,8 +79,11 @@ class ProductGuestBloc extends Bloc<ProductGuestEvent, ProductGuestState> {
   FutureOr<void> _onFetchAll(ProductFetchAll event, Emitter<ProductGuestState> emit) async {
     emit(ProductLoading());
     try {
-      final products = await productRemote.getAllProducts(page: event.page, limit: event.limit);
-      emit(ProductListLoaded(products));
+      final res = await productRemote.getAllProducts(
+        page: event.page,
+        limit: event.limit,
+      );
+      emit(ProductListLoaded(res.products, hasMore: res.hasMore));
     } catch (e) {
       emit(ProductFailed(e.toString()));
     }
@@ -74,7 +93,7 @@ class ProductGuestBloc extends Bloc<ProductGuestEvent, ProductGuestState> {
     emit(ProductLoading());
     try {
       final products = await productRemote.getRecommendedProducts();
-      emit(ProductListLoaded(products));
+      emit(ProductListLoaded(products, hasMore: false));
     } catch (e) {
       emit(ProductFailed(e.toString()));
     }

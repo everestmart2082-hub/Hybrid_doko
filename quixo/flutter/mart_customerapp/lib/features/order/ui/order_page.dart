@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartcustomer/drawer.dart';
+import 'package:quickmartcustomer/core/constants/api_constants.dart';
 
 import 'package:quickmartcustomer/features/order/bloc/order_bloc.dart';
 import 'package:quickmartcustomer/features/order/bloc/order_event.dart';
 import 'package:quickmartcustomer/features/order/bloc/order_state.dart';
 import 'package:quickmartcustomer/features/order/data/order_query_model.dart';
 import 'package:quickmartcustomer/features/order/data/order_model.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({super.key});
@@ -15,25 +18,40 @@ class OrderPage extends StatefulWidget {
 }
 
 class _OrderPageState extends State<OrderPage> {
-  String _status = 'preparing';
-  String _deliveryCategory = 'quick'; // UI-only toggle
+  int _tabIndex = 0;
+  final _searchCtrl = TextEditingController();
+  static const _tabs = <String>[
+    'preparing',
+    'pending',
+    'delivered',
+    'cancelledByUser',
+    'cancelledByVender',
+    'returned',
+  ];
 
   @override
   void initState() {
     super.initState();
-    context.read<OrderBloc>().add(const OrderFetchRequested(OrderQueryModel()));
+    _applyFilters();
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
   }
 
   void _applyFilters() {
     context.read<OrderBloc>().add(
       OrderFetchRequested(
-        OrderQueryModel(status: _status, deliveryCategory: _deliveryCategory),
+        OrderQueryModel(status: _tabs[_tabIndex], search: _searchCtrl.text.trim().isEmpty ? null : _searchCtrl.text.trim()),
       ),
     );
   }
 
   void _cancelAll(List<OrderModel> orders) {
-    final ids = orders.map((o) => o.orderId).toList();
+    final ids = orders.where(_canCancel).map((o) => o.orderId).toList();
+    if (ids.isEmpty) return;
     context.read<OrderBloc>().add(OrderCancelAllRequested(ids));
   }
 
@@ -46,6 +64,7 @@ class _OrderPageState extends State<OrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorLight,
+      drawer: buildAppDrawer(context),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text(
@@ -55,13 +74,44 @@ class _OrderPageState extends State<OrderPage> {
           ),
         ),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildFilters(),
+            TextField(
+              controller: _searchCtrl,
+              decoration: InputDecoration(
+                labelText: 'Search',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  onPressed: _applyFilters,
+                  icon: const Icon(Icons.search),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(_tabs.length, (index) {
+                  final active = index == _tabIndex;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      selected: active,
+                      label: Text(_tabs[index]),
+                      onSelected: (_) {
+                        setState(() => _tabIndex = index);
+                        _applyFilters();
+                      },
+                    ),
+                  );
+                }),
+              ),
+            ),
             const SizedBox(height: 16),
             Expanded(
               child: BlocConsumer<OrderBloc, OrderState>(
@@ -82,58 +132,30 @@ class _OrderPageState extends State<OrderPage> {
                   }
                   if (state is OrderLoaded) {
                     final orders = state.orders;
+                    final quick = orders.where((o) => o.deliveryCategory.toLowerCase() == 'quick').toList();
+                    final normal = orders.where((o) => o.deliveryCategory.toLowerCase() != 'quick').toList();
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if(_tabIndex == 0 || _tabIndex == 1)
                         Align(
                           alignment: Alignment.centerRight,
-                          child: OutlinedButton.icon(
-                            onPressed: orders.isEmpty
+                            child: OutlinedButton.icon(
+                              onPressed: orders.where(_canCancel).isEmpty
                                 ? null
                                 : () => _cancelAll(orders),
                             icon: const Icon(Icons.cancel),
-                            label: const Text('cancel All'),
+                              label: Text('cancel All (${orders.where(_canCancel).length})'),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Expanded(
-                          child: ListView.separated(
-                            itemCount: orders.length,
-                            separatorBuilder: (_, __) =>
-                                const Divider(height: 20),
-                            itemBuilder: (context, index) {
-                              final order = orders[index];
-                              final showCancel = _canCancel(order);
-                              return ListTile(
-                                onTap: () {
-                                  if (order.productId.isNotEmpty) {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/product-detail',
-                                      arguments: order.productId,
-                                    );
-                                  }
-                                },
-                                title: Text(
-                                  'Order ${order.orderId} • ${order.productName}',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                subtitle: Text(
-                                  'Status: ${order.status}\nDelivery: ${order.deliveryCategory}',
-                                ),
-                                trailing: showCancel
-                                    ? TextButton(
-                                        onPressed: () {
-                                          context.read<OrderBloc>().add(
-                                            OrderCancelRequested(order.orderId),
-                                          );
-                                        },
-                                        child: const Text('cancel this order'),
-                                      )
-                                    : const Text('-'),
-                              );
-                            },
+                          child: ListView(
+                            children: [
+                              _buildDeliverySection('Quick', quick),
+                              const SizedBox(height: 16),
+                              _buildDeliverySection('Normal', normal),
+                            ],
                           ),
                         ),
                       ],
@@ -152,72 +174,66 @@ class _OrderPageState extends State<OrderPage> {
     );
   }
 
-  Widget _buildFilters() {
-    const statuses = <String>[
-      'preparing',
-      'pending',
-      'delivered',
-      'cancelledByUser',
-      'cancelledByVender',
-      'returned',
-    ];
-    const deliveryCats = <String>['quick', 'normal'];
-
+  Widget _buildDeliverySection(String label, List<OrderModel> items) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Filter',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 12),
+            Text('$label Delivery', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const SizedBox(height: 10),
+            if (items.isEmpty)
+              const Text('No orders')
+            else
+              ...items.map((order) {
+                final showCancel = _canCancel(order);
+                final imageUrl = order.productImage.isEmpty
+                    ? null
+                    : (order.productImage.startsWith('http')
+                        ? order.productImage
+                        : '${ApiEndpoints.baseImageUrl}${order.productImage.startsWith('/') ? '' : '/'}${order.productImage}');
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: ListTile(
+                    onTap: () {
+                      if (order.productId.isNotEmpty) {
+                        Navigator.pushNamed(context, '/product-detail', arguments: order.productId);
+                      }
+                    },
+                    leading: SizedBox(
+                      width: 56,
+                      height: 56,
+                      child: imageUrl == null
+                          ? const Icon(Icons.image)
+                          : Image.network(imageUrl, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.broken_image)),
+                    ),
+                    title: Text('${order.productName} (${order.ordersId})'),
+                    subtitle: Text(
+                      '${order.brandName}\nQty: ${order.productNumber}\n${order.shortDescription}\nStatus: ${order.status}${order.riderName.isEmpty ? '' : '\nRider: ${order.riderName} (${order.riderNumber})'}',
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: showCancel
+                        ? TextButton(
+                            onPressed: () => context.read<OrderBloc>().add(OrderCancelRequested(order.orderId)),
+                            child: const Text('cancel this order'),
+                          )
+                        : const Text('-'),
+                  ),
+                );
+              }),
+            const SizedBox(height: 8),
+            if(_tabIndex == 0 || _tabIndex == 1)
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _status,
-                    decoration: const InputDecoration(
-                      labelText: 'Order Status',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: statuses
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v == null) return;
-                      setState(() => _status = v);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _deliveryCategory,
-                    decoration: const InputDecoration(
-                      labelText: 'Delivery Category',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: deliveryCats
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v == null) return;
-                      setState(() => _deliveryCategory = v);
-                    },
-                  ),
+                OutlinedButton.icon(
+                  onPressed: items.isEmpty ? null : () => _cancelAll(items),
+                  icon: const Icon(Icons.cancel),
+                  label: const Text('cancel All'),
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: _applyFilters,
-                child: const Text('Apply'),
-              ),
             ),
           ],
         ),

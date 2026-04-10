@@ -51,7 +51,8 @@ class RiderOrderRemote {
 
     final itemsByOrderId = <String, List<RiderOrderItem>>{};
     for (final item in items) {
-      itemsByOrderId.putIfAbsent(item.orderId, () => []).add(item);
+      final groupKey = item.ordersId.isNotEmpty ? item.ordersId : item.orderId;
+      itemsByOrderId.putIfAbsent(groupKey, () => []).add(item);
     }
 
     final groups = itemsByOrderId.entries

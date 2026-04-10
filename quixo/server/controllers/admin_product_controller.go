@@ -40,13 +40,25 @@ func AdminApproveProduct(c *gin.Context) {
 		// approved=true  => apply proposal and clear review flag.
 		// approved=false => reject proposal and clear review flag, keep current product approval state.
 		if approved {
+			// Only merge vendor-editable product fields. The proposed struct may contain zero values
+			// for approved, rating, review_ids, etc. — copying those would wipe live data.
+			allowed := map[string]struct{}{
+				"name": {}, "brand": {}, "short_descriptions": {}, "description": {},
+				"price_per_unit": {}, "unit": {}, "discount": {}, "product_category": {},
+				"delivery_category": {}, "stock": {}, "photos": {}, "vendor_id": {},
+				"category_attributes": {},
+			}
 			if proposed, ok := productDoc["updates_proposed"].(bson.M); ok && len(proposed) > 0 {
 				for k, v := range proposed {
-					setFields[k] = v
+					if _, ok := allowed[k]; ok {
+						setFields[k] = v
+					}
 				}
 			} else if proposed, ok := productDoc["updates_proposed"].(primitive.M); ok && len(proposed) > 0 {
 				for k, v := range proposed {
-					setFields[k] = v
+					if _, ok := allowed[k]; ok {
+						setFields[k] = v
+					}
 				}
 			}
 		}
@@ -284,6 +296,8 @@ func AdminProductGetByID(c *gin.Context) {
 			"rating":               p["rating"],
 			"submitted_for_update": p["submitted_for_update"],
 			"updates_proposed":     p["updates_proposed"],
+			"category_attributes":  p["category_attributes"],
+			"reviews":              BuildReviewsPayload(ctx, productID),
 		},
 	})
 }

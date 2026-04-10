@@ -1,6 +1,9 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type ProductUpdateProposed struct {
 	Name                 string               `json:"name" bson:"name"`
@@ -16,6 +19,7 @@ type ProductUpdateProposed struct {
 	Photos               []string             `json:"photos" bson:"photos"`
 	VendorID             primitive.ObjectID   `json:"vendor_id" bson:"vendor_id"`
 	Rating               float64              `json:"rating" bson:"rating"`
+	CategoryAttributes   bson.M               `json:"category_attributes,omitempty" bson:"category_attributes,omitempty"`
 	Approved             bool                 `json:"approved" bson:"approved"`
 	ReviewIDs            []primitive.ObjectID `json:"review_ids" bson:"review_ids"`
 	ReasonForAdminHidden string               `json:"reason_for_admin_hidden" bson:"reason_for_admin_hidden"`
@@ -40,6 +44,7 @@ type Product struct {
 	Photos               []string              `json:"photos" bson:"photos"`
 	VendorID             primitive.ObjectID    `json:"vendor_id" bson:"vendor_id"`
 	Rating               float64               `json:"rating" bson:"rating"`
+	CategoryAttributes   bson.M                `json:"category_attributes,omitempty" bson:"category_attributes,omitempty"`
 	Approved             bool                  `json:"approved" bson:"approved"`
 	ReviewIDs            []primitive.ObjectID  `json:"review_ids" bson:"review_ids"`
 	ReasonForAdminHidden string                `json:"reason_for_admin_hidden" bson:"reason_for_admin_hidden"`

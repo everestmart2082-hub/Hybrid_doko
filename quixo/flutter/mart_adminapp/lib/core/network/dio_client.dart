@@ -51,22 +51,25 @@ class DioClient implements ApiClient {
   }
 
   @override
-  Future<dynamic> post(String path, dynamic data) async {
+  Future<dynamic> post(String path, dynamic data, {Options? options}) async {
     try {
       final token = await tokenProvider.getToken();
-      final response = await _dio.post(path, data: data, options: Options(headers: {
-            'Authorization': 'Bearer $token',
-          },));
+      final headers = Map<String, dynamic>.from(options?.headers ?? {});
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      final response = await _dio.post(
+        path,
+        data: data,
+        options: (options ?? Options()).copyWith(headers: headers),
+      );
       return response.data;
-    } 
-    on DioException catch (e) {
+    } on DioException catch (e) {
       debugPrint(e.message);
       throw ApiException.from(e);
-    } 
-    catch (e) {
-      // throw NetworkException.noInternet();
+    } catch (e) {
       debugPrint(e.toString());
-      // debugPrintStack(e.);
+      rethrow;
     }
   }
 

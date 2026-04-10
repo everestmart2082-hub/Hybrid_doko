@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartcustomer/drawer.dart';
 
 import 'package:quickmartcustomer/features/auth/bloc/auth_bloc.dart';
 import 'package:quickmartcustomer/features/auth/bloc/auth_state.dart';
@@ -10,7 +11,14 @@ import 'package:quickmartcustomer/features/productGuest/bloc/product_bloc.dart';
 import 'package:quickmartcustomer/features/productGuest/bloc/product_event.dart';
 import 'package:quickmartcustomer/features/productGuest/bloc/product_state.dart';
 import 'package:quickmartcustomer/features/productGuest/data/product_list_item_model.dart';
+import 'package:quickmartcustomer/features/productGuest/data/product_query_model.dart';
+import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_bloc.dart';
+import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_event.dart';
+import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_state.dart';
+import 'package:quickmartcustomer/features/wishlist/data/wishlist_query_model.dart';
 import 'package:quickmartcustomer/core/constants/api_constants.dart';
+import 'package:quickmartcustomer/core/utils/mongo_json.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 String? _absolutePhotoUrl(String path) {
   final t = path.trim();
@@ -30,10 +38,82 @@ class ProductGuestListPage extends StatefulWidget {
 class _ProductGuestListPageState extends State<ProductGuestListPage> {
   int _currentPage = 1;
 
+  final _searchCtrl = TextEditingController();
+  final _minPriceCtrl = TextEditingController();
+  final _maxPriceCtrl = TextEditingController();
+  final _brandCtrl = TextEditingController();
+  String _stockMode = '';
+  String _sortBy = 'default';
+  String _selectedCategory = '';
+  String _selectedDeliveryCategory = '';
+  List<Map<String, dynamic>> _categories = const [];
+
+  final Set<String> _wishlistedProductIds = <String>{};
+
   @override
   void initState() {
     super.initState();
-    context.read<ProductGuestBloc>().add(ProductFetchAll(page: 1, limit: 20));
+    _goToPage(1);
+    _fetchWishlist();
+    _loadCategories();
+  }
+
+  void _fetchWishlist() {
+    context.read<WishlistBloc>().add(
+          const WishlistFetchRequested(WishlistQueryModel()),
+        );
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final data = await context
+          .read<ProductGuestBloc>()
+          .productRemote
+          .getCategories();
+      if (!mounted) return;
+      setState(() => _categories = data);
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    _minPriceCtrl.dispose();
+    _maxPriceCtrl.dispose();
+    _brandCtrl.dispose();
+    super.dispose();
+  }
+
+  double? _tryParseDouble(String s) {
+    final v = s.trim();
+    if (v.isEmpty) return null;
+    return double.tryParse(v);
+  }
+
+  ProductQuery _buildQuery(int page) {
+    return ProductQuery(
+      page: page,
+      limit: 20,
+      search: _searchCtrl.text.trim().isEmpty ? null : _searchCtrl.text.trim(),
+      minPrice: _tryParseDouble(_minPriceCtrl.text),
+      maxPrice: _tryParseDouble(_maxPriceCtrl.text),
+      brand: _brandCtrl.text.trim().isEmpty ? null : _brandCtrl.text.trim(),
+      inStock: _stockMode == 'in_stock'
+          ? true
+          : (_stockMode == 'out_of_stock' ? false : null),
+      sort: _sortBy == 'default' ? null : _sortBy,
+      category: _selectedCategory.isEmpty ? null : _selectedCategory,
+      deliveryCategory: _selectedDeliveryCategory.isEmpty
+          ? null
+          : _selectedDeliveryCategory,
+    );
+  }
+
+  void _goToPage(int page) {
+    setState(() => _currentPage = page);
+    context
+        .read<ProductGuestBloc>()
+        .add(ProductFetchRequested(_buildQuery(page)));
   }
 
   bool _isLoggedIn(BuildContext context) {
@@ -41,170 +121,486 @@ class _ProductGuestListPageState extends State<ProductGuestListPage> {
     return state is AuthAuthenticated && state.authenticated;
   }
 
+  void _toggleWishlist(ProductListItem p) {
+    final productId = p.id;
+    final already = _wishlistedProductIds.contains(productId);
+
+    if (!_isLoggedIn(context)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to use wishlist')),
+      );
+      Navigator.pushNamed(context, '/login');
+      return;
+    }
+
+    context.read<WishlistBloc>().add(
+          already
+              ? WishlistRemoveItemRequested(productId)
+              : WishlistAddItemRequested(productId),
+        );
+    setState(() {
+      if (already) {
+        _wishlistedProductIds.remove(productId);
+      } else {
+        _wishlistedProductIds.add(productId);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorLight,
+      drawer: buildAppDrawer(context),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
-        title: Text('Products', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
-        elevation: 1,
-      ),
-      drawer: null,
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: BlocBuilder<ProductGuestBloc, ProductGuestState>(
-          builder: (context, state) {
-            if (state is ProductLoading || state is ProductInitial) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is ProductListLoaded) {
-              final products = state.products;
-              return Column(
-                children: [
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 280,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        mainAxisExtent: 360,
-                      ),
-                      itemCount: products.length,
-                      itemBuilder: (context, index) {
-                        final p = products[index];
-                        return _buildProductCard(p);
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: _currentPage > 1
-                              ? () {
-                                  setState(() => _currentPage--);
-                                  context.read<ProductGuestBloc>().add(
-                                      ProductFetchAll(
-                                          page: _currentPage, limit: 20));
-                                }
-                              : null,
-                          child: const Text('Prev'),
-                        ),
-                        Text('Page $_currentPage'),
-                        TextButton(
-                          onPressed: () {
-                            setState(() => _currentPage++);
-                            context.read<ProductGuestBloc>().add(
-                                ProductFetchAll(
-                                    page: _currentPage, limit: 20));
-                          },
-                          child: const Text('Next'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }
-            if (state is ProductFailed) {
-              return Center(child: Text(state.message));
-            }
-            return const SizedBox.shrink();
-          },
+        title: Text(
+          'Products',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).primaryColorLight,
+              ),
         ),
+        elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
-    );
-  }
-
-  Widget _buildProductCard(ProductListItem p) {
-    return Card(
-      elevation: 2,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
+      body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              p.images.isNotEmpty && _absolutePhotoUrl(p.images.first) != null
-                  ? Image.network(
-                      _absolutePhotoUrl(p.images.first)!,
-                      height: 160,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 160, width: double.infinity, color: Colors.grey.shade200, child: const Icon(Icons.broken_image, size: 50),
+          Expanded(
+            flex: 2,
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Sort By',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
-                    )
-                  : Container(
-                      height: 160,
-                      width: double.infinity,
-                      color: Colors.grey.shade200,
-                      child: const Icon(Icons.image, size: 50),
                     ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(p.brandName, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-                const SizedBox(height: 8),
-                Text('₹${p.pricePerUnit}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (!_isLoggedIn(context)) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Please login to add to cart')),
-                        );
-                        Navigator.pushNamed(context, '/login');
-                        return;
-                      }
-                      context.read<CartBloc>().add(
-                            CartAddRequested(
-                              CartAddRequestModel(productId: p.id, number: 1),
-                            ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _sortBy,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: [
+                        'default',
+                        'price low to high',
+                        'price high to low',
+                        'rating',
+                        'discount',
+                        'newest',
+                        'oldest',
+                      ]
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (v) {
+                        setState(() => _sortBy = v ?? 'default');
+                        _goToPage(1);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'search',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _searchCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Search',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(width: 1.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'price range',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _minPriceCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Min price',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _maxPriceCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Max price',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'brand',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _brandCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Brand',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'product category',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: [
+                        const DropdownMenuItem(value: '', child: Text('All')),
+                        ..._categories.map((c) {
+                          final idStr = mongoIdToString(c['_id']);
+                          final name = c['name']?.toString() ?? idStr;
+                          return DropdownMenuItem(
+                            value: idStr,
+                            child: Text(name),
                           );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Added to Cart!')),
+                        }),
+                      ],
+                      onChanged: (v) =>
+                          setState(() => _selectedCategory = v ?? ''),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'delivery category',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _selectedDeliveryCategory,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: '', child: Text('All')),
+                        DropdownMenuItem(value: 'quick', child: Text('Quick')),
+                        DropdownMenuItem(
+                          value: 'normal',
+                          child: Text('Normal'),
+                        ),
+                      ],
+                      onChanged: (v) =>
+                          setState(() => _selectedDeliveryCategory = v ?? ''),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'stock',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _stockMode,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: '', child: Text('Any')),
+                        DropdownMenuItem(
+                          value: 'in_stock',
+                          child: Text('In stock'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'out_of_stock',
+                          child: Text('Out of stock'),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _stockMode = v ?? ''),
+                    ),
+                    const SizedBox(height: 18),
+                    ElevatedButton(
+                      onPressed: () => _goToPage(1),
+                      child: const Text('Apply Filter'),
+                    ),
+                    const SizedBox(height: 24),
+                    BlocBuilder<ProductGuestBloc, ProductGuestState>(
+                      buildWhen: (prev, next) =>
+                          next is ProductListLoaded ||
+                          next is ProductLoading ||
+                          next is ProductFailed,
+                      builder: (context, productState) {
+                        final hasMore = productState is ProductListLoaded &&
+                            productState.hasMore;
+                        return Row(
+                          children: [
+                            TextButton(
+                              onPressed: _currentPage > 1
+                                  ? () => _goToPage(_currentPage - 1)
+                                  : null,
+                              child: const Text('Prev'),
+                            ),
+                            Text('Page $_currentPage'),
+                            TextButton(
+                              onPressed: hasMore
+                                  ? () => _goToPage(_currentPage + 1)
+                                  : null,
+                              child: const Text('Next'),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: BlocConsumer<WishlistBloc, WishlistState>(
+                listener: (context, state) {
+                  if (state is WishlistLoaded) {
+                    _wishlistedProductIds
+                      ..clear()
+                      ..addAll(state.items.map((e) => e.productId));
+                  }
+                },
+                builder: (context, wishlistState) {
+                  return BlocBuilder<ProductGuestBloc, ProductGuestState>(
+                    builder: (context, productState) {
+                      if (productState is ProductLoading ||
+                          productState is ProductInitial) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (productState is ProductListLoaded) {
+                        final products = productState.products;
+                        return GridView.builder(
+                          padding: const EdgeInsets.all(8),
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 280,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            mainAxisExtent: 360,
+                          ),
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            final p = products[index];
+                            final wished =
+                                _wishlistedProductIds.contains(p.id);
+                            return _buildProductCard(p, wished);
+                          },
+                        );
+                      }
+                      if (productState is ProductFailed) {
+                        return Center(child: Text(productState.message));
+                      }
+                      return const Center(
+                        child: Text('No products available.'),
                       );
                     },
-                    child: const Text('Add To Cart'),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: () => Navigator.pushNamed(
-                      context,
-                      '/product-detail',
-                      arguments: p.id,
-                    ),
-                    child: const Text('View details'),
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
           ),
         ],
       ),
     );
   }
-}
 
+  Widget _buildProductCard(ProductListItem p, bool wished) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/product-detail', arguments: p.id);
+      },
+      child: Card(
+        elevation: 2,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                p.images.isNotEmpty && _absolutePhotoUrl(p.images.first) != null
+                    ? Image.network(
+                        _absolutePhotoUrl(p.images.first)!,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: Colors.grey.shade200,
+                          child: const Icon(Icons.broken_image, size: 50),
+                        ),
+                      )
+                    : Container(
+                        height: 160,
+                        width: double.infinity,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image, size: 50),
+                      ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: Icon(
+                      wished ? Icons.favorite : Icons.favorite_border,
+                      color: wished ? Colors.red : Colors.grey.shade700,
+                    ),
+                    onPressed: () => _toggleWishlist(p),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white70,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    p.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    p.brandName,
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (p.discount > 0) ...[
+                            Text(
+                              '₹${(p.pricePerUnit * (1 - p.discount / 100)).toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '₹${p.pricePerUnit.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                decoration: TextDecoration.lineThrough,
+                                color: Colors.grey.shade600,
+                                fontSize: 11,
+                              ),
+                            ),
+                            Text(
+                              '${p.discount.toStringAsFixed(0)}% off',
+                              style: TextStyle(
+                                color: Colors.orange.shade800,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ] else
+                            Text(
+                              '₹${p.pricePerUnit}',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            size: 14,
+                            color: Colors.orange,
+                          ),
+                          const Text('4.5', style: TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (!_isLoggedIn(context)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please login to add to cart'),
+                            ),
+                          );
+                          Navigator.pushNamed(context, '/login');
+                          return;
+                        }
+                        context.read<CartBloc>().add(
+                              CartAddRequested(
+                                CartAddRequestModel(
+                                    productId: p.id, number: 1),
+                              ),
+                            );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Added to Cart!')),
+                        );
+                      },
+                      child: const Text('Add To Cart'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

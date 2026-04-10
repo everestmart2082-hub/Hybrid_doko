@@ -5,6 +5,8 @@ import 'package:quickmartcustomer/features/notification/bloc/notification_bloc.d
 import 'package:quickmartcustomer/features/notification/bloc/notification_event.dart';
 import 'package:quickmartcustomer/features/notification/bloc/notification_state.dart';
 import 'package:quickmartcustomer/features/notification/data/notification_query_model.dart';
+import 'package:quickmartcustomer/drawer.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -30,7 +32,9 @@ class _NotificationPageState extends State<NotificationPage> {
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text('Notifications', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
+      drawer: buildAppDrawer(context),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: BlocBuilder<NotificationBloc, NotificationState>(

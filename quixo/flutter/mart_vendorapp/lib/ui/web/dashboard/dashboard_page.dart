@@ -4,6 +4,8 @@ import 'package:quickmartvender/features/Dashboard/bloc/dashboard_bloc.dart';
 import 'package:quickmartvender/features/Dashboard/bloc/dashboard_event.dart';
 import 'package:quickmartvender/features/Dashboard/bloc/dashboard_state.dart';
 import 'package:quickmartvender/features/Dashboard/data/dashboard_model.dart';
+import 'package:quickmartvender/features/auth/bloc/auth_bloc.dart';
+import 'package:quickmartvender/features/auth/bloc/auth_event.dart';
 import '../web_shell.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -17,6 +19,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
+    context.read<VenderAuthBloc>().add(VenderAuthCheck());
     context.read<DashboardBloc>().add(LoadDashboardData());
   }
 

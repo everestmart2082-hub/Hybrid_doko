@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // Navigate to home after successful Auth
             // Based on route map, mainapp manages Shell, wait mainapp resolves auth automatically
             // But let's pushReplacement to mainapp to be safe
-            Navigator.pushReplacementNamed(context, '/mainapp');
+            Navigator.pushReplacementNamed(context, '/profile');
           } else if (state is AuthFailed) {
             if (Navigator.canPop(context)) Navigator.pop(context);
             ScaffoldMessenger.of(

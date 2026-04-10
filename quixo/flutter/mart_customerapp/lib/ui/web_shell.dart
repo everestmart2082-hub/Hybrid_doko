@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../drawer.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class WebShell extends StatelessWidget {
   final Widget child;
@@ -27,7 +28,10 @@ class WebShell extends StatelessWidget {
                   )),
               backgroundColor: theme.primaryColorDark,
               iconTheme: IconThemeData(color: theme.primaryColorLight),
-              actions: actions,
+              actions: [
+                ...?actions,
+                const CustomerHubBarIcons(),
+              ],
             ),
       drawer:  buildAppDrawer(context),
       body: Row(

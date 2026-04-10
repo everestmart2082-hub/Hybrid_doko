@@ -55,6 +55,7 @@ func CustomerGetCart(c *gin.Context) {
 	}
 
 	coll := utils.GetCollection("carts")
+	productColl := utils.GetCollection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -69,17 +70,32 @@ func CustomerGetCart(c *gin.Context) {
 
 	var mapped []gin.H
 	for _, item := range results {
+		productID, _ := item["product_id"].(primitive.ObjectID)
+		var product bson.M
+		if err := productColl.FindOne(ctx, bson.M{"_id": productID, "hidden": bson.M{"$ne": true}}).Decode(&product); err != nil {
+			continue
+		}
+
+		image := ""
+		if photos, ok := product["photos"].(primitive.A); ok && len(photos) > 0 {
+			if first, ok := photos[0].(string); ok {
+				image = first
+			}
+		}
+
 		mapped = append(mapped, gin.H{
 			"cart id":           item["_id"],
 			"product id":        item["product_id"],
-			"name":              "Product Name", // Mocked product aggregation stub
-			"image":             "url",
+			"name":              product["name"],
+			"image":             image,
+			"photos":            product["photos"],
 			"number":            item["number"],
-			"priceperunit":      0,
-			"unit":              "kg",
-			"delivary category": "",
-			"product category":  "",
-			"brandname":         "",
+			"priceperunit":      product["price_per_unit"],
+			"discount":          product["discount"],
+			"unit":              product["unit"],
+			"delivary category": product["delivery_category"],
+			"product category":  product["product_category"],
+			"brandname":         product["brand"],
 		})
 	}
 

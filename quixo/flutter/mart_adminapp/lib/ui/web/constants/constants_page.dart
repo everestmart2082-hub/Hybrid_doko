@@ -106,6 +106,114 @@ class _AdminConstantsPageState extends State<AdminConstantsPage> {
     }
   }
 
+  Future<void> _addConstant() async {
+    final nameCtrl = TextEditingController();
+    final valuesCtrl = TextEditingController();
+    final submitted = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add constant'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: valuesCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Values (comma separated)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Create')),
+        ],
+      ),
+    );
+    if (submitted != true) return;
+    final name = nameCtrl.text.trim();
+    if (name.isEmpty) return;
+    final values = valuesCtrl.text
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    try {
+      await context.read<AdminSettingsRemote>().changeConstants(
+            AdminConstantUpdateRequest(name: name, typesList: values, action: 'update'),
+          );
+      await _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteConstant(String name) async {
+    try {
+      await context.read<AdminSettingsRemote>().deleteConstant(name);
+      await _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _editType(String constantName, String oldValue) async {
+    final ctrl = TextEditingController(text: oldValue);
+    final next = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit value'),
+        content: TextField(
+          controller: ctrl,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Value',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Save')),
+        ],
+      ),
+    );
+    if (next == null || next.isEmpty || next == oldValue) return;
+    try {
+      final constant = _list.firstWhere((e) => e.name == constantName);
+      final updated = constant.typesList.map((e) => e == oldValue ? next : e).toList();
+      await context.read<AdminSettingsRemote>().changeConstants(
+            AdminConstantUpdateRequest(
+              name: constantName,
+              typesList: updated,
+              action: 'update',
+            ),
+          );
+      await _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WebShell(
@@ -119,6 +227,15 @@ class _AdminConstantsPageState extends State<AdminConstantsPage> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton.icon(
+                          onPressed: _addConstant,
+                          icon: const Icon(Icons.add),
+                          label: const Text('Add Constant'),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       Text(
                         'Lists such as Business type (used at vendor registration) and other shared options.',
                         style: Theme.of(context).textTheme.bodyMedium,
@@ -131,6 +248,11 @@ class _AdminConstantsPageState extends State<AdminConstantsPage> {
                           child: ExpansionTile(
                             title: Text(name.isEmpty ? '(unnamed)' : name),
                             initiallyExpanded: name == 'Business type',
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: 'Delete constant',
+                              onPressed: name.isEmpty ? null : () => _deleteConstant(name),
+                            ),
                             children: [
                               Padding(
                                 padding:
@@ -140,10 +262,19 @@ class _AdminConstantsPageState extends State<AdminConstantsPage> {
                                   runSpacing: 8,
                                   children: [
                                     for (final t in c.typesList)
-                                      InputChip(
-                                        label: Text(t),
-                                        onDeleted: () =>
-                                            _removeType(name, t),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          InputChip(
+                                            label: Text(t),
+                                            onDeleted: () => _removeType(name, t),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.edit, size: 18),
+                                            onPressed: () => _editType(name, t),
+                                            tooltip: 'Edit',
+                                          ),
+                                        ],
                                       ),
                                   ],
                                 ),

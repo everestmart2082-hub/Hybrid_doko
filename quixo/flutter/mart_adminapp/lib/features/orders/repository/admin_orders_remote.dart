@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:mart_adminapp/core/constants/api_constants.dart';
 import 'package:mart_adminapp/core/failures/failures.dart';
 import 'package:mart_adminapp/core/network/dio_client.dart';
@@ -18,5 +19,19 @@ class AdminOrdersRemote {
     return list
         .map((e) => AdminOrderItem.fromMap(e as Map<String, dynamic>))
         .toList();
+  }
+
+  Future<bool> assignRider({
+    required String ordersId,
+    required String riderId,
+  }) async {
+    final map = await dio.post(
+      '/admin/order/assign-rider',
+      FormData.fromMap({
+        'orders id': ordersId,
+        'rider id': riderId,
+      }),
+    );
+    return checkSuccess(map);
   }
 }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartrider/core/constants/api_constants.dart';
 import 'package:quickmartrider/features/profile/bloc/profile_bloc.dart';
 import 'package:quickmartrider/features/profile/bloc/profile_event.dart';
 import 'package:quickmartrider/features/profile/bloc/profile_state.dart';
 import 'package:quickmartrider/features/profile/data/rider_profile_model.dart';
 import 'package:quickmartrider/features/profile/data/rider_profile_update_model.dart';
-import 'package:quickmartrider/ui/web_shell.dart';
+import 'package:quickmartrider/drawer.dart';
 
 class RiderProfilePage extends StatefulWidget {
   const RiderProfilePage({super.key});
@@ -181,9 +182,20 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return WebShell(
-      title: 'Profile',
-      child: BlocListener<RiderProfileBloc, RiderProfileState>(
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(
+          'Profile',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: Theme.of(context).primaryColorLight),
+        ),
+      ),
+      drawer: buildAppDrawer(context),
+      body: BlocListener<RiderProfileBloc, RiderProfileState>(
         listener: (context, state) async {
           if (state is RiderProfileFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -264,22 +276,26 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
                               const SizedBox(height: 14),
                               const Divider(),
                               const SizedBox(height: 10),
-                              Text('Rc Book file: ${profile.blueBookUrl ?? ''}', style: Theme.of(context).textTheme.bodySmall),
+                              Text('Rc Book file:', style: Theme.of(context).textTheme.bodySmall),
+                              Image.network(_absolutePhotoUrl(profile.blueBookUrl ?? "") ?? ""),
                               const SizedBox(height: 6),
                               Text(
-                                'Citizenship file: ${profile.citizenshipUrl ?? ''}',
+                                'Citizenship file:',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
+                              Image.network(_absolutePhotoUrl(profile.citizenshipUrl ?? "") ?? ""),
                               const SizedBox(height: 6),
                               Text(
-                                'pan card file: ${profile.panCardUrl ?? ''}',
+                                'pan card file:',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
+                              Image.network(_absolutePhotoUrl(profile.panCardUrl ?? "") ?? ""),
                               const SizedBox(height: 6),
                               Text(
-                                'bike insurance paper file: ${profile.insurancePaperUrl ?? ''}',
+                                'bike insurance paper file:',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
+                              Image.network(_absolutePhotoUrl(profile.insurancePaperUrl ?? "") ?? ""),
                             ],
                           ),
                         ),
@@ -316,4 +332,14 @@ class _RiderProfilePageState extends State<RiderProfilePage> {
       ),
     );
   }
+
+  
+  String? _absolutePhotoUrl(String path) {
+    final t = path.trim();
+    if (t.isEmpty) return null;
+    if (t.startsWith('http://') || t.startsWith('https://')) return t;
+    final p = t.startsWith('/') ? t : '/$t';
+    return '${ApiEndpoints.baseImageUrl}$p';
+  }
+
 }

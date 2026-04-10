@@ -72,7 +72,7 @@ func CustomerAddToWishList(c *gin.Context) {
 	}
 
 	// Schema textual duplication check
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully added to cart"}) 
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully added to cart"})
 }
 
 // CustomerRemoveFromWishList handles /api/user/wishlist/remove
@@ -102,6 +102,7 @@ func CustomerGetWishList(c *gin.Context) {
 	}
 
 	coll := utils.GetCollection("wishlists")
+	productColl := utils.GetCollection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -116,16 +117,32 @@ func CustomerGetWishList(c *gin.Context) {
 
 	var mapped []gin.H
 	for _, w := range results {
+		productID, _ := w["product_id"].(primitive.ObjectID)
+		var product bson.M
+		if err := productColl.FindOne(ctx, bson.M{"_id": productID, "hidden": bson.M{"$ne": true}}).Decode(&product); err != nil {
+			continue
+		}
+
+		image := ""
+		if photos, ok := product["photos"].(primitive.A); ok && len(photos) > 0 {
+			if first, ok := photos[0].(string); ok {
+				image = first
+			}
+		}
+
 		mapped = append(mapped, gin.H{
+			"wishlist id":       w["_id"],
 			"product id":        w["product_id"],
-			"name":              "Product Name", // Stub
-			"image":             "url",
+			"name":              product["name"],
+			"image":             image,
+			"photos":            product["photos"],
 			"number":            1,
-			"priceperunit":      0,
-			"unit":              "kg",
-			"delivary category": "",
-			"product category":  "",
-			"brandname":         "",
+			"priceperunit":      product["price_per_unit"],
+			"discount":          product["discount"],
+			"unit":              product["unit"],
+			"delivary category": product["delivery_category"],
+			"product category":  product["product_category"],
+			"brandname":         product["brand"],
 		})
 	}
 

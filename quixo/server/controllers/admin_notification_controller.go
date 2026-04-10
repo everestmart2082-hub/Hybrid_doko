@@ -53,20 +53,22 @@ func handleNotification(c *gin.Context, idField, collName string) {
 	}
 
 	ncoll := utils.GetCollection("notifications")
-	notif := models.Notification{
-		ID:       primitive.NewObjectID(),
-		Type:     notificationTypeForCollection(collName),
-		Message:  messageText,
-		TargetID: targetID,
-		Date:     time.Now(),
-		Received: false,
+	doc := bson.M{
+		"_id":        primitive.NewObjectID(),
+		"type":       notificationTypeForCollection(collName),
+		"message":    messageText,
+		"target_id":  targetID,
+		"date":       time.Now(),
+		"received":   false,
+		"category":   "admin_push",
+		"from_admin": true,
 	}
-	if _, insErr := ncoll.InsertOne(ctx, notif); insErr != nil {
+	if _, insErr := ncoll.InsertOne(ctx, doc); insErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully deleted"})
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "notification sent"})
 }
 
 func AdminVendorNotification(c *gin.Context) { handleNotification(c, "vender id", "vendors") }

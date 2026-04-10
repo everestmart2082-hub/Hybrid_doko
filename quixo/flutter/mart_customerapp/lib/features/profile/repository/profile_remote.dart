@@ -12,7 +12,7 @@ class ProfileRemote {
   ProfileRemote({required this.dio});
 
   Future<ProfileModel> getProfile() async {
-    final map = await dio.get(ApiEndpoints.profileGet);
+    final map = await dio.post(ApiEndpoints.profileGet, {});
     checkSuccess(map);
     return ProfileModel.fromMap(map["message"]);
   }
@@ -31,4 +31,4 @@ class ProfileRemote {
     final map = await dio.post(ApiEndpoints.profileOtp, model.toFormData());
     return checkSuccess(map);
   }
-}
+}

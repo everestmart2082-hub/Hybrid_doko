@@ -8,6 +8,7 @@ import 'package:quickmartcustomer/features/product/bloc/product_bloc.dart';
 import 'package:quickmartcustomer/features/product/bloc/product_event.dart';
 import 'package:quickmartcustomer/features/product/bloc/product_state.dart';
 import 'package:quickmartcustomer/features/product/data/product_list_item_model.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class ProductListPage extends StatefulWidget {
   const ProductListPage({super.key});
@@ -48,6 +49,7 @@ class _ProductListPageState extends State<ProductListPage> {
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text('Products', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       drawer: buildAppDrawer(context),
       body: Row(

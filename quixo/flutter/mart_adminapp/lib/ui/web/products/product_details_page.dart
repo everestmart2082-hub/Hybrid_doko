@@ -7,6 +7,17 @@ import 'package:mart_adminapp/features/products/bloc/admin_product_state.dart';
 import 'package:mart_adminapp/features/products/data/admin_product_model.dart';
 import 'package:mart_adminapp/ui/web/web_shell.dart';
 
+String _formatProposedFieldValue(dynamic v) {
+  if (v == null) return '';
+  if (v is Map) {
+    return v.entries.map((e) => '${e.key}: ${e.value}').join('; ');
+  }
+  if (v is List) {
+    return v.map((e) => e.toString()).join(', ');
+  }
+  return v.toString();
+}
+
 class AdminProductDetailsPage extends StatefulWidget {
   const AdminProductDetailsPage({super.key});
 
@@ -182,6 +193,20 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                           'discount: ${d.discount}',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
+                        if (d.categoryAttributes.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            'Category attributes (live)',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                          const SizedBox(height: 6),
+                          SelectableText(
+                            d.categoryAttributes.entries
+                                .map((e) => '${e.key}: ${e.value}')
+                                .join('\n'),
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
                         const SizedBox(height: 12),
                         Text(
                           'short description:',
@@ -206,6 +231,61 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
+                Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Customer reviews',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 10),
+                        if (d.reviews.isEmpty)
+                          Text(
+                            'No reviews yet.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          )
+                        else
+                          ...d.reviews.map(
+                            (r) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    r.userName.isNotEmpty
+                                        ? r.userName
+                                        : 'Customer',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  if (r.date.isNotEmpty)
+                                    Text(
+                                      r.date,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall,
+                                    ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    r.message,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  const Divider(height: 20),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
                 if (d.submittedForUpdate && d.updatesProposed.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Card(
@@ -223,8 +303,8 @@ class _AdminProductDetailsPageState extends State<AdminProductDetailsPage> {
                           ...d.updatesProposed.entries.map(
                             (e) => Padding(
                               padding: const EdgeInsets.only(bottom: 6),
-                              child: Text(
-                                '${e.key}: ${e.value}',
+                              child: SelectableText(
+                                '${e.key}: ${_formatProposedFieldValue(e.value)}',
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ),

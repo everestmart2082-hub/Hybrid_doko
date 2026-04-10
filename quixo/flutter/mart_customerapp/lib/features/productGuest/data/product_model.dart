@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
+import 'package:quickmartcustomer/core/utils/mongo_json.dart';
 
 class ProductModel extends Equatable {
   final String id;
@@ -113,19 +114,19 @@ class ProductModel extends Equatable {
 
   factory ProductModel.fromMap(Map<String, dynamic> map) {
     return ProductModel(
-      id: (map['id'] ?? '').toString(),
+      id: mongoIdToString(map['id']),
       name: map['Name'] as String? ?? '',
       brand: map['brand'] as String? ?? '',
-      description: map['short description'] as String? ?? '', // API only sends short_description
-      shortDescription: map['short description'] as String? ?? '',
+      description: map['description']?.toString() ?? '',
+      shortDescription: map['short description']?.toString() ?? '',
       pricePerUnit: (map['price per unit'] as num?)?.toDouble() ?? 0.0,
       unit: map['unit'] as String? ?? '',
-      discount: (map['discount'] as num?)?.toDouble() ?? 0.0,
-      productCategory: map['product catagory'] as String? ?? '',
+      discount: parseDiscountField(map['discount']),
+      productCategory: mongoIdToString(map['product catagory']),
       deliveryCategory: map['delivary category'] as String? ?? '',
       stock: (map['stock'] as num?)?.toInt() ?? 0,
       photos: List<String>.from(map['photos'] ?? []),
-      vendorId: map['vender id'] as String? ?? '',
+      vendorId: mongoIdToString(map['vender id']),
       vendorName: map['vender name'] as String? ?? '',
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
     );

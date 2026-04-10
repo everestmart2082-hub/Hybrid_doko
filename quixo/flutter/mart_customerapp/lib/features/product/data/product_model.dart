@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
+import 'package:quickmartcustomer/core/utils/mongo_json.dart';
+import 'package:quickmartcustomer/features/product/data/product_review_item.dart';
 
 class ProductModel extends Equatable {
   final String id;
@@ -17,6 +19,7 @@ class ProductModel extends Equatable {
   final String vendorId;
   final String vendorName;
   final double rating;
+  final List<ProductReviewItem> reviews;
 
   const ProductModel({
     required this.id,
@@ -34,6 +37,7 @@ class ProductModel extends Equatable {
     required this.vendorId,
     required this.vendorName,
     required this.rating,
+    this.reviews = const [],
   });
 
   @override
@@ -53,6 +57,7 @@ class ProductModel extends Equatable {
         vendorId,
         vendorName,
         rating,
+        reviews,
       ];
 
   ProductModel copyWith({
@@ -71,6 +76,7 @@ class ProductModel extends Equatable {
     String? vendorId,
     String? vendorName,
     double? rating,
+    List<ProductReviewItem>? reviews,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -88,6 +94,7 @@ class ProductModel extends Equatable {
       vendorId: vendorId ?? this.vendorId,
       vendorName: vendorName ?? this.vendorName,
       rating: rating ?? this.rating,
+      reviews: reviews ?? this.reviews,
     );
   }
 
@@ -108,26 +115,41 @@ class ProductModel extends Equatable {
       'vendorId': vendorId,
       'vendorName': vendorName,
       'rating': rating,
+      'reviews': reviews.map((e) => {'message': e.message, 'user name': e.userName, 'date': e.dateStr}).toList(),
     };
   }
 
   factory ProductModel.fromMap(Map<String, dynamic> map) {
+    final revRaw = map['reviews'];
+    final List<ProductReviewItem> revs = [];
+    if (revRaw is List) {
+      for (final e in revRaw) {
+        if (e is Map<String, dynamic>) {
+          revs.add(ProductReviewItem.fromMap(e));
+        } else if (e is Map) {
+          revs.add(ProductReviewItem.fromMap(Map<String, dynamic>.from(e)));
+        }
+      }
+    }
     return ProductModel(
-      id: (map['id'] ?? '').toString(),
+      id: mongoIdToString(map['id']),
       name: map['Name'] as String? ?? '',
       brand: map['brand'] as String? ?? '',
-      description: map['short description'] as String? ?? '', // API only sends short_description
-      shortDescription: map['short description'] as String? ?? '',
+      description: map['description']?.toString() ?? '',
+      shortDescription: map['short description']?.toString() ?? '',
       pricePerUnit: (map['price per unit'] as num?)?.toDouble() ?? 0.0,
       unit: map['unit'] as String? ?? '',
-      discount: (map['discount'] as num?)?.toDouble() ?? 0.0,
-      productCategory: map['product catagory'] as String? ?? '',
+      discount: parseDiscountField(map['discount']),
+      productCategory: mongoIdToString(
+        map['product catagory'] ?? map['product category'],
+      ),
       deliveryCategory: map['delivary category'] as String? ?? '',
       stock: (map['stock'] as num?)?.toInt() ?? 0,
       photos: List<String>.from(map['photos'] ?? []),
-      vendorId: map['vender id'] as String? ?? '',
+      vendorId: mongoIdToString(map['vender id']),
       vendorName: map['vender name'] as String? ?? '',
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
+      reviews: revs,
     );
   }
 

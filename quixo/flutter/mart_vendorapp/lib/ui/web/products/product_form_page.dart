@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +16,26 @@ String _categoryIdHex(Map<String, dynamic> c) {
   if (v is String) return v;
   if (v is Map && v[r'$oid'] is String) return v[r'$oid'] as String;
   return '';
+}
+
+/// Parses admin-entered category field specs (comma/newline/semicolon list or JSON array).
+List<String> parseCategoryFieldSpec(String raw) {
+  final t = raw.trim();
+  if (t.isEmpty) return [];
+  try {
+    final decoded = json.decode(t);
+    if (decoded is List) {
+      return decoded
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+  } catch (_) {}
+  return t
+      .split(RegExp(r'[,\n;]'))
+      .map((s) => s.trim())
+      .where((s) => s.isNotEmpty)
+      .toList();
 }
 
 class ProductFormPage extends StatefulWidget {
@@ -40,6 +62,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
   String _category = '';
   String _deliveryCategory = '';
   List<Map<String, dynamic>> _categories = [];
+  final Map<String, TextEditingController> _categoryFieldCtrls = {};
+  List<String> _requiredCategoryFieldNames = [];
+  List<String> _optionalCategoryFieldNames = [];
   List<XFile> _photos = [];
   bool _submitted = false;
 
@@ -76,6 +101,48 @@ class _ProductFormPageState extends State<ProductFormPage> {
     context.read<ProductBloc>().add(GetProductFilters());
   }
 
+  void _disposeCategoryFieldControllers() {
+    for (final c in _categoryFieldCtrls.values) {
+      c.dispose();
+    }
+    _categoryFieldCtrls.clear();
+    _requiredCategoryFieldNames = [];
+    _optionalCategoryFieldNames = [];
+  }
+
+  void _applyCategoryFieldControllersFromSelection() {
+    _disposeCategoryFieldControllers();
+    if (_category.isEmpty) {
+      setState(() {});
+      return;
+    }
+    Map<String, dynamic>? selected;
+    for (final c in _categories) {
+      if (_categoryIdHex(c) == _category) {
+        selected = c;
+        break;
+      }
+    }
+    if (selected == null) {
+      setState(() {});
+      return;
+    }
+    _requiredCategoryFieldNames =
+        parseCategoryFieldSpec(selected['required_fields']?.name.toString() ?? '');
+    _optionalCategoryFieldNames =
+        parseCategoryFieldSpec(selected['other_fields']?.toString() ?? '');
+    final initial = _isEdit ? widget.existing!.categoryAttributes : const <String, String>{};
+    final names = {
+      ..._requiredCategoryFieldNames,
+      ..._optionalCategoryFieldNames,
+    };
+    for (final name in names) {
+      _categoryFieldCtrls[name] =
+          TextEditingController(text: initial[name] ?? '');
+    }
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _name.dispose();
@@ -85,6 +152,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     _price.dispose();
     _discount.dispose();
     _stock.dispose();
+    _disposeCategoryFieldControllers();
     super.dispose();
   }
 
@@ -107,6 +175,21 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    for (final name in _requiredCategoryFieldNames) {
+      final v = _categoryFieldCtrls[name]?.text.trim() ?? '';
+      if (v.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Required category field: $name'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+    final attrs = <String, String>{
+      for (final e in _categoryFieldCtrls.entries) e.key: e.value.text.trim(),
+    };
     final input = ProductInput(
       name: _name.text.trim(),
       brand: _brand.text.trim(),
@@ -119,6 +202,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
       deliveryCategory: _deliveryCategory,
       stock: int.tryParse(_stock.text.trim()) ?? 0,
       photos: _photos.map((f) => f.path).toList(),
+      categoryAttributes: attrs,
     );
     final files = await _buildMultiparts();
 
@@ -165,7 +249,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
       child: BlocListener<ProductBloc, ProductState>(
         listener: (context, state) {
           if (state is ProductFiltersLoaded) {
-            setState(() => _categories = state.categories);
+            _categories = state.categories;
+            _applyCategoryFieldControllersFromSelection();
           }
           if (state is ProductSuccess) {
             if (_isEdit) {
@@ -279,7 +364,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
                       DropdownMenuItem(value: 'normal', child: Text('Normal Delivery')),
                     ],
                     onChanged: (v) => setState(() => _deliveryCategory = v ?? ''),
-                    validator: (v) => null, // optional
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? 'Required' : null,
                   ),
                   // Category dropdown
                   if (_categories.isNotEmpty) ...[
@@ -307,8 +393,44 @@ class _ProductFormPageState extends State<ProductFormPage> {
                           })
                           .whereType<DropdownMenuItem<String>>()
                           .toList(),
-                      onChanged: (v) => setState(() => _category = v ?? ''),
+                      onChanged: (v) {
+                        setState(() => _category = v ?? '');
+                        _applyCategoryFieldControllersFromSelection();
+                      },
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Required' : null,
                     ),
+                  ],
+                  if (_categoryFieldCtrls.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'Category fields',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Fill every required field. Optional fields can be left blank.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    ..._requiredCategoryFieldNames.map(
+                      (name) => _categoryFieldTile(
+                        context,
+                        name,
+                        requiredField: true,
+                      ),
+                    ),
+                    ..._optionalCategoryFieldNames
+                        .where((n) => !_requiredCategoryFieldNames.contains(n))
+                        .map(
+                          (name) => _categoryFieldTile(
+                            context,
+                            name,
+                            requiredField: false,
+                          ),
+                        ),
                   ],
                   const SizedBox(height: 14),
                   _field(_stock, 'Stock', keyboardType: TextInputType.number),
@@ -387,6 +509,29 @@ class _ProductFormPageState extends State<ProductFormPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _categoryFieldTile(
+    BuildContext context,
+    String name, {
+    required bool requiredField,
+  }) {
+    final ctrl = _categoryFieldCtrls[name];
+    if (ctrl == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: TextFormField(
+        controller: ctrl,
+        decoration: InputDecoration(
+          labelText: requiredField ? '$name *' : '$name (optional)',
+          border: const OutlineInputBorder(),
+        ),
+        validator: requiredField
+            ? (v) =>
+                (v == null || v.trim().isEmpty) ? 'Required' : null
+            : (_) => null,
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:mart_adminapp/core/utils/mongo_json.dart';
 
 // ─── Category List Item (public endpoint) ───────────────────────────────────
 // GET /category/all returns: {"id": 1, "name": "...", "_id": ObjectID}
@@ -23,7 +24,7 @@ class CategoryListItem extends Equatable {
   factory CategoryListItem.fromMap(Map<String, dynamic> map) => CategoryListItem(
         id: (map['id'] as num?)?.toInt() ?? 0,
         name: map['name'] as String? ?? '',
-        objectId: map['_id']?.toString() ?? '',
+        objectId: mongoIdToString(map['_id']),
         deliveryType: map['delivery_type']?.toString() ?? '',
         requiredFields: map['required_fields']?.toString() ?? '',
         otherFields: map['other_fields']?.toString() ?? '',

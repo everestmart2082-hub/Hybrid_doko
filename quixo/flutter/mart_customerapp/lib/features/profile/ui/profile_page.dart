@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartcustomer/drawer.dart';
 
 import 'package:quickmartcustomer/features/profile/bloc/profile_bloc.dart';
 import 'package:quickmartcustomer/features/profile/bloc/profile_event.dart';
@@ -7,6 +8,7 @@ import 'package:quickmartcustomer/features/profile/bloc/profile_state.dart';
 import 'package:quickmartcustomer/features/profile/data/profile_delete_model.dart';
 import 'package:quickmartcustomer/features/profile/data/profile_otp_model.dart';
 import 'package:quickmartcustomer/features/profile/data/profile_model.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,6 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _phoneCtrl = TextEditingController();
 
   String? _lastPhoneForOtp;
+  String? _currentPhoneForOtp;
   bool _awaitingOtpVerification = false;
 
   @override
@@ -87,6 +90,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _emailCtrl.text = profile.email;
     _phoneCtrl.text = profile.phone;
     _lastPhoneForOtp = null;
+    _currentPhoneForOtp = profile.phone;
 
     showDialog<void>(
       context: context,
@@ -149,7 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                 );
-                _lastPhoneForOtp = _phoneCtrl.text.trim();
+                _lastPhoneForOtp = _currentPhoneForOtp;
                 _awaitingOtpVerification = true;
                 Navigator.pop(context);
               },
@@ -165,6 +169,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorLight,
+      drawer: buildAppDrawer(context),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text(
@@ -174,6 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       body: BlocListener<ProfileBloc, ProfileState>(
         listener: (context, state) async {

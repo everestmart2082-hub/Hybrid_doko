@@ -58,7 +58,9 @@ class AdminProductListItem extends Equatable {
         name: map['name'] as String? ?? '',
         shortDescription: map['short description'] as String? ?? '',
         pricePerUnit: (map['price per unit'] as num?) ?? 0,
-        productCategory: map['product category']?.toString() ?? '',
+        productCategory: _mongoFieldToHexString(
+          map['product category'] ?? map['product catagory'],
+        ),
         deliveryCategory: map['delivary category'] as String? ?? '',
         stock: (map['stock'] as num?) ?? 0,
         brandName: map['brand name'] as String? ?? '',
@@ -83,6 +85,31 @@ class AdminProductListItem extends Equatable {
   ];
 }
 
+// ─── Product reviews (admin detail) ───────────────────────────────────────────
+
+class AdminProductReview extends Equatable {
+  final String message;
+  final String userName;
+  final String date;
+
+  const AdminProductReview({
+    required this.message,
+    required this.userName,
+    required this.date,
+  });
+
+  factory AdminProductReview.fromMap(Map<String, dynamic> map) {
+    return AdminProductReview(
+      message: map['message']?.toString() ?? '',
+      userName: map['user name']?.toString() ?? '',
+      date: map['date']?.toString() ?? '',
+    );
+  }
+
+  @override
+  List<Object?> get props => [message, userName, date];
+}
+
 // ─── Product Detail ──────────────────────────────────────────────────────────
 // Maps AdminProductGetByID response — keys have deliberate server typos preserved
 
@@ -103,6 +130,8 @@ class AdminProductDetail extends Equatable {
   final num rating;
   final bool submittedForUpdate;
   final Map<String, dynamic> updatesProposed;
+  final Map<String, dynamic> categoryAttributes;
+  final List<AdminProductReview> reviews;
 
   const AdminProductDetail({
     required this.id,
@@ -121,9 +150,22 @@ class AdminProductDetail extends Equatable {
     required this.rating,
     required this.submittedForUpdate,
     required this.updatesProposed,
+    this.categoryAttributes = const {},
+    this.reviews = const [],
   });
 
   factory AdminProductDetail.fromMap(Map<String, dynamic> map) {
+    final List<AdminProductReview> revs = [];
+    final raw = map['reviews'];
+    if (raw is List) {
+      for (final e in raw) {
+        if (e is Map<String, dynamic>) {
+          revs.add(AdminProductReview.fromMap(e));
+        } else if (e is Map) {
+          revs.add(AdminProductReview.fromMap(Map<String, dynamic>.from(e)));
+        }
+      }
+    }
     // The server wraps detail under map["message"] — caller must unwrap first.
     return AdminProductDetail(
       id: _mongoFieldToHexString(map['id']),
@@ -150,6 +192,12 @@ class AdminProductDetail extends Equatable {
           : (map['updates_proposed'] is Map
                 ? Map<String, dynamic>.from(map['updates_proposed'] as Map)
                 : const <String, dynamic>{}),
+      categoryAttributes: (map['category_attributes'] is Map<String, dynamic>)
+          ? (map['category_attributes'] as Map<String, dynamic>)
+          : (map['category_attributes'] is Map
+                ? Map<String, dynamic>.from(map['category_attributes'] as Map)
+                : const <String, dynamic>{}),
+      reviews: revs,
     );
   }
 
@@ -171,5 +219,7 @@ class AdminProductDetail extends Equatable {
     rating,
     submittedForUpdate,
     updatesProposed,
+    categoryAttributes,
+    reviews,
   ];
 }

@@ -61,29 +61,35 @@ Drawer buildAppDrawer(BuildContext context) {
               tile(title: 'Home', icon: Icons.home, route: '/mainapp'),
           
               // ═══════════════ LOGGED IN ONLY ════════════════
-              if (isLoggedIn) ...[
-                tile(title: 'Orders', icon: Icons.receipt_long, route: '/orders'),
-                tile(title: 'Products', icon: Icons.inventory, route: '/products'),
-                tile(title: 'Categories', icon: Icons.category, route: '/categories'),
-                tile(title: 'Vendors', icon: Icons.store, route: '/vendors'),
-                tile(title: 'Customers', icon: Icons.people, route: '/customers'),
-                tile(title: 'Riders', icon: Icons.two_wheeler, route: '/riders'),
-                tile(title: 'Employees', icon: Icons.badge, route: '/employees'),
-              ],
-          
-              tile(title: 'Settings', icon: Icons.settings, route: '/settings'),
-              if (isLoggedIn)
-                tile(
-                    title: 'Constants',
-                    icon: Icons.tune,
-                    route: '/constants'),
-              if (isLoggedIn)
-              tile(
-                  title: 'Contact Us',
-                  icon: Icons.support_agent,
-                  route: '/contact'),
-          
-              const Spacer(),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    if (isLoggedIn) ...[
+                      tile(title: 'Orders', icon: Icons.receipt_long, route: '/orders'),
+                      tile(title: 'Products', icon: Icons.inventory, route: '/products'),
+                      tile(title: 'Categories', icon: Icons.category, route: '/categories'),
+                      tile(title: 'Vendors', icon: Icons.store, route: '/vendors'),
+                      tile(title: 'Customers', icon: Icons.people, route: '/customers'),
+                      tile(title: 'Riders', icon: Icons.two_wheeler, route: '/riders'),
+                      tile(title: 'Employees', icon: Icons.badge, route: '/employees'),
+                      tile(title: 'Notifications', icon: Icons.notifications, route: '/notifications'),
+                    ],
+                    tile(title: 'Settings', icon: Icons.settings, route: '/settings'),
+                    if (isLoggedIn)
+                      tile(
+                          title: 'Constants',
+                          icon: Icons.tune,
+                          route: '/constants'),
+                    if (isLoggedIn)
+                      tile(
+                          title: 'Contact Us',
+                          icon: Icons.support_agent,
+                          route: '/contact'),
+                  ],
+                ),
+              ),
+
               const Divider(),
           
               // ═══════════════ AUTH SECTION ════════════════
@@ -106,7 +112,7 @@ Drawer buildAppDrawer(BuildContext context) {
                 ),
               ],
           
-              const SizedBox(height: 12),
+              // const SizedBox(height: 12),
             ],
           ),
         );

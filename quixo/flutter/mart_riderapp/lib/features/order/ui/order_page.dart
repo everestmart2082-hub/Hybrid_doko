@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartrider/core/utils/external_map_launcher.dart';
 import 'package:quickmartrider/features/order/bloc/order_bloc.dart';
 import 'package:quickmartrider/features/order/bloc/order_event.dart';
 import 'package:quickmartrider/features/order/bloc/order_state.dart';
 import 'package:quickmartrider/features/order/data/order_model.dart';
 import 'package:quickmartrider/features/order/data/otp_model.dart';
-import 'package:quickmartrider/ui/web_shell.dart';
+import 'package:quickmartrider/drawer.dart';
 
 class RiderOrdersTabsPage extends StatefulWidget {
   const RiderOrdersTabsPage({super.key});
@@ -24,12 +25,12 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
   String? _deliverOrderId;
 
   static const _tabs = <_OrderTab>[
-    _OrderTab(label: 'Preparing', status: 'prepared'),
-    _OrderTab(label: 'Pending', status: 'accepted'),
+    _OrderTab(label: 'Preparing', status: 'preparing'),
+    _OrderTab(label: 'Pending', status: 'pending'),
     _OrderTab(label: 'Delivered', status: 'delivered'),
-    _OrderTab(label: 'CancelledByUser', status: 'cancelled'),
-    _OrderTab(label: 'CancelledByVender', status: 'cancelled'),
-    _OrderTab(label: 'Returned', status: 'rejected'),
+    _OrderTab(label: 'CancelledByUser', status: 'cancelledByUser'),
+    _OrderTab(label: 'CancelledByVender', status: 'cancelledByVender'),
+    _OrderTab(label: 'Returned', status: 'returned'),
   ];
 
   _OrderTab get _activeTab => _tabs[_tabController.index];
@@ -183,17 +184,30 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
         );
   }
 
+  Future<void> _openInMaps(String query) async => openMapSearch(query);
+
   @override
   Widget build(BuildContext context) {
-    return WebShell(
-      title: 'Orders',
-      bottom: TabBar(
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(
+          'Orders',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: Theme.of(context).primaryColorLight),
+        ),
+        bottom: TabBar(
         indicatorColor: Theme.of(context).primaryColor,
         controller: _tabController,
         isScrollable: true,
         tabs: _tabs.map((t) => Tab(child: Text(t.label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight),),)).toList(),
       ),
-      child: BlocListener<RiderOrderBloc, RiderOrderState>(
+      ),
+      drawer: buildAppDrawer(context),
+      body: BlocListener<RiderOrderBloc, RiderOrderState>(
         listener: (context, state) async {
           if (state is RiderOrderActionSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -246,8 +260,8 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
                       itemCount: orders.length,
                       itemBuilder: (context, index) {
                         final group = orders[index];
-                        final canAccept = _activeTab.status == 'prepared';
-                        final canDeliver = _activeTab.status == 'accepted';
+                        final canAccept = _activeTab.status == 'preparing';
+                        final canDeliver = _activeTab.status == 'pending';
 
                         return Card(
                           margin: const EdgeInsets.only(bottom: 12),
@@ -264,6 +278,21 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
                                       .titleMedium
                                       ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
+                                if (_activeTab.status == 'preparing' && group.items.any((e) => e.accepted))
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 6),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withOpacity(0.12),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Text(
+                                        'Accepted',
+                                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
                                 const SizedBox(height: 10),
                                 ...group.items.map(
                                   (item) => Padding(
@@ -271,14 +300,35 @@ class _RiderOrdersTabsPageState extends State<RiderOrdersTabsPage>
                                     child: _OrderItemRow(item: item),
                                   ),
                                 ),
+                                if (group.items.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: [
+                                      OutlinedButton.icon(
+                                        onPressed: () => _openInMaps(group.items.first.vendorAddress),
+                                        icon: const Icon(Icons.store_mall_directory),
+                                        label: const Text('Open Vendor in Map'),
+                                      ),
+                                      OutlinedButton.icon(
+                                        onPressed: () => _openInMaps(group.items.first.userAddress),
+                                        icon: const Icon(Icons.person_pin_circle),
+                                        label: const Text('Open Customer in Map'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                                 const SizedBox(height: 12),
                                 if (canAccept)
                                   SizedBox(
                                     width: double.infinity,
                                     child: OutlinedButton.icon(
-                                      onPressed: () => _onAccept(group.orderId),
+                                      onPressed: group.items.any((e) => e.accepted)
+                                          ? null
+                                          : () => _onAccept(group.orderId),
                                       icon: const Icon(Icons.check_circle_outline),
-                                      label: const Text('Accept Order'),
+                                      label: Text(group.items.any((e) => e.accepted) ? 'Accepted' : 'Accept Order'),
                                     ),
                                   ),
                                 if (canDeliver) ...[
@@ -358,8 +408,18 @@ class _OrderItemRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Product: ${item.productCategory}',
+          'Product: ${item.productName.isEmpty ? item.productCategory : item.productName}',
           style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Vendor: ${item.vendorName}',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Customer: ${item.userName} (${item.userNumber})',
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 4),
         Text(

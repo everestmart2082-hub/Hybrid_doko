@@ -17,9 +17,13 @@ class _OrdersPageState extends State<OrdersPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
 
-  static const _statuses = [
-    'Preparing', 'Prepared', 'Delivered',
-    'CancelledByUser', 'CancelledByVender', 'Returned',
+  static const _tabsConfig = [
+    ('Preparing', 'preparing'),
+    ('Pending', 'pending'),
+    ('Delivered', 'delivered'),
+    ('CancelledByUser', 'cancelledByUser'),
+    ('CancelledByVender', 'cancelledByVender'),
+    ('Returned', 'returned'),
   ];
 
   int _page = 1;
@@ -29,7 +33,7 @@ class _OrdersPageState extends State<OrdersPage>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: _statuses.length, vsync: this)
+    _tabs = TabController(length: _tabsConfig.length, vsync: this)
       ..addListener(() {
         if (!_tabs.indexIsChanging) _load();
       });
@@ -41,7 +45,7 @@ class _OrdersPageState extends State<OrdersPage>
       page: _page,
       limit: 15,
       searchText: _search,
-      status: _statuses[_tabs.index],
+      status: _tabsConfig[_tabs.index].$2,
       deliveryCategory: _deliveryCategory,
     ));
   }
@@ -64,7 +68,7 @@ class _OrdersPageState extends State<OrdersPage>
             isScrollable: true,
             indicatorColor: Theme.of(context).primaryColor,
             labelStyle: Theme.of(context).textTheme.bodyLarge,
-            tabs: _statuses.map((s) => Tab(text: s)).toList(),
+            tabs: _tabsConfig.map((s) => Tab(text: s.$1)).toList(),
           ),
           // ── Filter row ───────────────────────────────────
           Padding(
@@ -101,8 +105,8 @@ class _OrdersPageState extends State<OrdersPage>
                     hint: const Text('All'),
                     items: const [
                       DropdownMenuItem(value: '', child: Text('All')),
-                      DropdownMenuItem(value: 'Normal', child: Text('Normal')),
-                      DropdownMenuItem(value: 'Quick', child: Text('Quick')),
+                      DropdownMenuItem(value: 'normal', child: Text('Normal')),
+                      DropdownMenuItem(value: 'quick', child: Text('Quick')),
                     ],
                     onChanged: (v) {
                       setState(() { _deliveryCategory = v ?? ''; _page = 1; });
@@ -117,9 +121,9 @@ class _OrdersPageState extends State<OrdersPage>
           Expanded(
             child: TabBarView(
               controller: _tabs,
-              children: _statuses.map((status) {
+              children: _tabsConfig.map((statusPair) {
                 // Only the "Preparing" tab (index 0) shows the Prepared button
-                final showAction = status == 'Preparing';
+                final showAction = statusPair.$2 == 'preparing';
                 return BlocBuilder<OrderBloc, OrderState>(
                   builder: (context, state) {
                     if (state is OrderLoading) {
@@ -173,8 +177,12 @@ class _OrdersPageState extends State<OrdersPage>
       itemBuilder: (_, i) => _OrderCard(
         order: orders[i],
         showPreparedButton: showPreparedButton,
+        // onAssignRider: (riderId) {
+        //   context.read<OrderBloc>().add(AssignRider(ordersId: orders[i].ordersId.isEmpty ? orders[i].orderId : orders[i].ordersId, riderId: riderId));
+        //   Future.delayed(const Duration(milliseconds: 400), _load);
+        // },
         onPrepared: () {
-          context.read<OrderBloc>().add(PrepareOrder(orders[i].orderId));
+          context.read<OrderBloc>().add(PrepareOrder(orders[i].ordersId.isEmpty ? orders[i].orderId : orders[i].ordersId));
           // Reload after a short delay
           Future.delayed(const Duration(milliseconds: 400), _load);
         },
@@ -255,10 +263,40 @@ class _OrderCard extends StatelessWidget {
                     Text('Rider: ${order.riderName} | ${order.riderNumber}',
                         style: theme.textTheme.bodySmall),
                   ],
+                  const SizedBox(height: 4),
+                  Text('Customer: ${order.userName} | ${order.userNumber}',
+                      style: theme.textTheme.bodySmall),
+                  const SizedBox(height: 8),
+                  // OutlinedButton(
+                  //   onPressed: () async {
+                  //     final ctrl = TextEditingController(text: order.riderId);
+                  //     final riderId = await showDialog<String>(
+                  //       context: context,
+                  //       builder: (context) => AlertDialog(
+                  //         title: const Text('Assign Rider'),
+                  //         content: TextField(
+                  //           controller: ctrl,
+                  //           decoration: const InputDecoration(
+                  //             labelText: 'Rider ID',
+                  //             border: OutlineInputBorder(),
+                  //           ),
+                  //         ),
+                  //         actions: [
+                  //           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                  //           ElevatedButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Assign')),
+                  //         ],
+                  //       ),
+                  //     );
+                  //     if (riderId != null && riderId.isNotEmpty) {
+                  //       onAssignRider(riderId);
+                  //     }
+                  //   },
+                  //   child: Text(order.riderId.isEmpty ? 'Assign Rider' : 'Change Rider'),
+                  // ),
                   if (showPreparedButton) ...[
                     const SizedBox(height: 10),
                     ElevatedButton(
-                      onPressed: onPrepared,
+                      onPressed: order.riderId.isEmpty ? null : onPrepared,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                         textStyle: const TextStyle(fontSize: 12),

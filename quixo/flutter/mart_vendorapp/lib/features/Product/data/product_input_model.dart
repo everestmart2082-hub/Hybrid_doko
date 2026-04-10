@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class ProductInput {
   final String name;
   final String brand;
@@ -10,6 +12,7 @@ class ProductInput {
   final String deliveryCategory;
   final int stock;
   final List<String> photos;
+  final Map<String, String> categoryAttributes;
 
   ProductInput({
     required this.name,
@@ -23,6 +26,7 @@ class ProductInput {
     required this.deliveryCategory,
     required this.stock,
     required this.photos,
+    this.categoryAttributes = const {},
   });
 
   Map<String, dynamic> toMap() {
@@ -38,6 +42,7 @@ class ProductInput {
       "delivary category": deliveryCategory,
       "stock": stock,
       "Photos": photos,
+      "category attributes": jsonEncode(categoryAttributes),
     };
   }
 }

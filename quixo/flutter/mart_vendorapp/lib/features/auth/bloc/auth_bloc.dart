@@ -36,13 +36,15 @@ class VenderAuthBloc extends Bloc<VenderAuthEvent, VenderAuthState> {
 
     emit(VenderAuthLoading());
 
-    bool b = (await s.getKey(prefs.token.name))!.isNotEmpty;
+    final raw = await s.getKey(prefs.token.name);
+    final hasToken = raw != null && raw.isNotEmpty;
 
-    if (!b) {
-      emit(const VenderAuthFailed(message: "Token not found"));
+    if (!hasToken) {
+      emit(VenderUnAuthenticated());
+      return;
     }
 
-    emit(VenderAuthenticated(authenticated: b));
+    emit(const VenderAuthenticated(authenticated: true));
   }
 
   FutureOr<void> _onRegister(

@@ -12,8 +12,13 @@ import (
 )
 
 // pushContactToAllAdmins appends a message to every admin document (shared inbox).
-func pushContactToAllAdmins(ctx context.Context, senderLabel, displayName, email, messageBody, footer string) error {
+// msgType categorizes the inbox for the admin UI: contact | order | product | register | (anything else → Others).
+func pushContactToAllAdmins(ctx context.Context, senderLabel, displayName, email, messageBody, footer string, msgType ...string) error {
 	coll := utils.GetCollection("admins")
+	t := "contact"
+	if len(msgType) > 0 && msgType[0] != "" {
+		t = msgType[0]
+	}
 	desc := messageBody
 	if footer != "" {
 		desc = fmt.Sprintf("%s\n\n%s", messageBody, footer)
@@ -24,7 +29,7 @@ func pushContactToAllAdmins(ctx context.Context, senderLabel, displayName, email
 		desc = fmt.Sprintf("[%s]\n\n%s", senderLabel, desc)
 	}
 	msg := models.Message{
-		Type:        "contact",
+		Type:        t,
 		Date:        time.Now().Format(time.RFC3339),
 		Description: desc,
 	}

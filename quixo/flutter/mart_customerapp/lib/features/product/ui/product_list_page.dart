@@ -17,6 +17,8 @@ import 'package:quickmartcustomer/features/wishlist/bloc/wishlist_state.dart';
 import 'package:quickmartcustomer/features/wishlist/data/wishlist_query_model.dart';
 import 'package:quickmartcustomer/drawer.dart';
 import 'package:quickmartcustomer/core/constants/api_constants.dart';
+import 'package:quickmartcustomer/core/utils/mongo_json.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 String? _absolutePhotoUrl(String path) {
   final t = path.trim();
@@ -52,13 +54,9 @@ class _ProductListPageState extends State<ProductListPage> {
   @override
   void initState() {
     super.initState();
-    _fetchDefault();
+    _goToPage(1);
     _fetchWishlist();
     _loadCategories();
-  }
-
-  void _fetchDefault() {
-    context.read<ProductBloc>().add(const ProductFetchAll(page: 1, limit: 20));
   }
 
   void _fetchWishlist() {
@@ -93,9 +91,9 @@ class _ProductListPageState extends State<ProductListPage> {
     return double.tryParse(v);
   }
 
-  void _applyFilters() {
-    final query = ProductQuery(
-      page: _currentPage,
+  ProductQuery _buildQuery(int page) {
+    return ProductQuery(
+      page: page,
       limit: 20,
       search: _searchCtrl.text.trim().isEmpty ? null : _searchCtrl.text.trim(),
       minPrice: _tryParseDouble(_minPriceCtrl.text),
@@ -110,8 +108,11 @@ class _ProductListPageState extends State<ProductListPage> {
           ? null
           : _selectedDeliveryCategory,
     );
+  }
 
-    context.read<ProductBloc>().add(ProductFetchRequested(query));
+  void _goToPage(int page) {
+    setState(() => _currentPage = page);
+    context.read<ProductBloc>().add(ProductFetchRequested(_buildQuery(page)));
   }
 
   bool _isLoggedIn(BuildContext context) {
@@ -159,6 +160,7 @@ class _ProductListPageState extends State<ProductListPage> {
           ),
         ),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       drawer: buildAppDrawer(context),
       body: Row(
@@ -203,8 +205,10 @@ class _ProductListPageState extends State<ProductListPage> {
                                     DropdownMenuItem(value: e, child: Text(e)),
                               )
                               .toList(),
-                      onChanged: (v) =>
-                          setState(() => _sortBy = v ?? 'default'),
+                      onChanged: (v) {
+                        setState(() => _sortBy = v ?? 'default');
+                        _goToPage(1);
+                      },
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -288,10 +292,7 @@ class _ProductListPageState extends State<ProductListPage> {
                       items: [
                         const DropdownMenuItem(value: '', child: Text('All')),
                         ..._categories.map((c) {
-                          final id = c['_id'];
-                          final idStr = id is Map
-                              ? (id[r'$oid']?.toString() ?? '')
-                              : id?.toString() ?? '';
+                          final idStr = mongoIdToString(c['_id']);
                           final name = c['name']?.toString() ?? idStr;
                           return DropdownMenuItem(
                             value: idStr,
@@ -358,30 +359,36 @@ class _ProductListPageState extends State<ProductListPage> {
                     ),
                     const SizedBox(height: 18),
                     ElevatedButton(
-                      onPressed: _applyFilters,
+                      onPressed: () => _goToPage(1),
                       child: const Text('Apply Filter'),
                     ),
                     const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        TextButton(
-                          onPressed: _currentPage > 1
-                              ? () {
-                                  setState(() => _currentPage--);
-                                  _applyFilters();
-                                }
-                              : null,
-                          child: const Text('Prev'),
-                        ),
-                        Text('Page $_currentPage'),
-                        TextButton(
-                          onPressed: () {
-                            setState(() => _currentPage++);
-                            _applyFilters();
-                          },
-                          child: const Text('Next'),
-                        ),
-                      ],
+                    BlocBuilder<ProductBloc, ProductState>(
+                      buildWhen: (prev, next) =>
+                          next is ProductListLoaded ||
+                          next is ProductLoading ||
+                          next is ProductFailed,
+                      builder: (context, productState) {
+                        final hasMore = productState is ProductListLoaded &&
+                            productState.hasMore;
+                        return Row(
+                          children: [
+                            TextButton(
+                              onPressed: _currentPage > 1
+                                  ? () => _goToPage(_currentPage - 1)
+                                  : null,
+                              child: const Text('Prev'),
+                            ),
+                            Text('Page $_currentPage'),
+                            TextButton(
+                              onPressed: hasMore
+                                  ? () => _goToPage(_currentPage + 1)
+                                  : null,
+                              child: const Text('Next'),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -446,9 +453,11 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 
   Widget _buildProductCard(ProductListItem p, bool wished) {
+    // print(p.name);
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/product-detail', arguments: p);
+      onTap: () async{
+        await Navigator.pushNamed(context, '/product-detail', arguments: p);
+        context.read<ProductBloc>().add(ProductFetchAll());
       },
       child: Card(
         elevation: 2,
@@ -517,12 +526,41 @@ class _ProductListPageState extends State<ProductListPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '₹${p.pricePerUnit}',
-                        style: const TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (p.discount > 0) ...[
+                            Text(
+                              '₹${(p.pricePerUnit * (1 - p.discount / 100)).toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '₹${p.pricePerUnit.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                decoration: TextDecoration.lineThrough,
+                                color: Colors.grey.shade600,
+                                fontSize: 11,
+                              ),
+                            ),
+                            Text(
+                              '${p.discount.toStringAsFixed(0)}% off',
+                              style: TextStyle(
+                                color: Colors.orange.shade800,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ] else
+                            Text(
+                              '₹${p.pricePerUnit}',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                        ],
                       ),
                       Row(
                         children: [

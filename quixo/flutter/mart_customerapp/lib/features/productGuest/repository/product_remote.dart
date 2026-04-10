@@ -15,7 +15,17 @@ class ProductGuestRemote {
     return ProductModel.fromMap(map['message'] as Map<String, dynamic>);
   }
 
-  Future<List<ProductListItem>> getAllProducts({
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final map = await dio.get("/category/all");
+    _checkSuccess(map);
+    final raw = map["data"] ?? map["message"];
+    if (raw is List) {
+      return raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+    return const [];
+  }
+
+  Future<({List<ProductListItem> products, bool hasMore})> getAllProducts({
     int page = 1,
     int limit = 20,
     double? minPrice,
@@ -27,19 +37,24 @@ class ProductGuestRemote {
     bool? stock,
     String? brand,
     double? rating,
+    String? sortBy,
   }) async {
     final query = {
       'page': page,
       'limit': limit,
-      if (minPrice != null) 'minPrice': minPrice,
-      if (maxPrice != null) 'maxPrice': maxPrice,
-      if (productCategory != null) 'product category': productCategory,
-      if (deliveryCategory != null) 'deliveryCategory': deliveryCategory,
+      if (minPrice != null) 'min price': minPrice,
+      if (maxPrice != null) 'max price': maxPrice,
+      if (productCategory != null && productCategory.isNotEmpty)
+        'product category': productCategory,
+      if (deliveryCategory != null && deliveryCategory.isNotEmpty)
+        'delivary category': deliveryCategory,
       if (vendorId != null) 'vender id': vendorId,
-      if (searchText != null) 'searchText': searchText,
-      if (stock != null) 'stock': stock,
-      if (brand != null) 'brand': brand,
+      if (searchText != null && searchText.isNotEmpty) 'search text': searchText,
+      if (stock != null) 'stock_status': stock ? 'in_stock' : 'out_of_stock',
+      if (brand != null && brand.isNotEmpty) 'brand name': brand,
       if (rating != null) 'rating': rating,
+      if (sortBy != null && sortBy.isNotEmpty && sortBy != 'default')
+        'sort by': sortBy,
     };
 
     final map = await dio.get("/product/all", query: query);
@@ -48,7 +63,9 @@ class ProductGuestRemote {
     final list = (map['message'] as List)
         .map((e) => ProductListItem.fromMap(e as Map<String, dynamic>))
         .toList();
-    return list;
+    final meta = map['meta'];
+    final hasMore = meta is Map && meta['has_more'] == true;
+    return (products: list, hasMore: hasMore);
   }
 
   Future<List<ProductListItem>> getRecommendedProducts() async {
@@ -66,4 +83,4 @@ class ProductGuestRemote {
       throw UnknownFailure( map['message']?.toString() ?? "Something went wrong");
     }
   }
-}
+}

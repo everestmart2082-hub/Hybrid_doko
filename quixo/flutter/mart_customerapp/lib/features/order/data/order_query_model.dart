@@ -22,7 +22,7 @@ class OrderQueryModel extends Equatable {
       if (search != null) "search": search,
       if (status != null) "status": status,
       if (deliveryCategory != null)
-        "delivery_category": deliveryCategory,
+        "delivary category": deliveryCategory,
     };
   }
 
@@ -32,7 +32,7 @@ class OrderQueryModel extends Equatable {
       "limit": limit,
       if (search != null) "search": search,
       if (status != null) "status": status,
-      if (deliveryCategory != null) "delivery_category": deliveryCategory,
+      if (deliveryCategory != null) "delivary category": deliveryCategory,
     };
   }
 
@@ -46,7 +46,7 @@ class OrderQueryModel extends Equatable {
       "limit": limit,
       if (search != null) "search": search,
       if (status != null) "status": status,
-      if (deliveryCategory != null) "delivery_category": deliveryCategory,
+      if (deliveryCategory != null) "delivary category": deliveryCategory,
     };
   }
 

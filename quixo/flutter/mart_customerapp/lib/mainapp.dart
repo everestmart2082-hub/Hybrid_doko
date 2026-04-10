@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartcustomer/core/constants/api_constants.dart';
 import 'package:quickmartcustomer/core/constants/app_constants.dart';
 import 'package:quickmartcustomer/features/auth/bloc/auth_bloc.dart';
 import 'package:quickmartcustomer/features/auth/bloc/auth_event.dart';
@@ -12,7 +13,16 @@ import 'package:quickmartcustomer/features/product/bloc/product_state.dart';
 import 'package:quickmartcustomer/features/product/data/product_list_item_model.dart';
 
 import 'drawer.dart';
-import 'ui/web_shell.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
+
+
+String? _absolutePhotoUrl(String path) {
+  final t = path.trim();
+  if (t.isEmpty) return null;
+  if (t.startsWith('http://') || t.startsWith('https://')) return t;
+  final p = t.startsWith('/') ? t : '/$t';
+  return '${ApiEndpoints.baseImageUrl}$p';
+}
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -31,9 +41,22 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return WebShell(
-      title: AppConstants.appName,
-      child: Container(
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        title: Text(
+          AppConstants.appName,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: Theme.of(context).primaryColorLight),
+        ),
+        backgroundColor: Theme.of(context).primaryColorDark,
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColorLight),
+        actions: const [CustomerHubBarIcons()],
+      ),
+      drawer: buildAppDrawer(context),
+      body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
@@ -51,8 +74,8 @@ class _MainAppState extends State<MainApp> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _heroSection(context),
-              const SizedBox(height: 24),
-              _categoriesSection(),
+              // const SizedBox(height: 24),
+              // _categoriesSection(),
               const SizedBox(height: 24),
               _recommendedSection(),
               const SizedBox(height: 24),
@@ -192,7 +215,7 @@ class _MainAppState extends State<MainApp> {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 260,
+            height: 300,
             child: BlocBuilder<ProductBloc, ProductState>(
               builder: (context, state) {
                 if (state is ProductLoading) {
@@ -240,7 +263,7 @@ class _MainAppState extends State<MainApp> {
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(14)),
               child: Image.network(
-                p.images.first,
+                _absolutePhotoUrl(p.images.first) ?? "",
                 height: 140,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -256,7 +279,31 @@ class _MainAppState extends State<MainApp> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  Text('₹${p.pricePerUnit}'),
+                  if (p.discount > 0) ...[
+                    Text(
+                      '₹${(p.pricePerUnit * (1 - p.discount / 100)).toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    Text(
+                      '₹${p.pricePerUnit.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        decoration: TextDecoration.lineThrough,
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(
+                      '${p.discount.toStringAsFixed(0)}% off',
+                      style: TextStyle(color: Colors.orange.shade800, fontSize: 11),
+                    ),
+                  ] else
+                    Text(
+                      '₹${p.pricePerUnit}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,

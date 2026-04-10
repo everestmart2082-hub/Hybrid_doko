@@ -4,7 +4,7 @@ import 'package:quickmartrider/features/notification/bloc/notification_bloc.dart
 import 'package:quickmartrider/features/notification/bloc/notification_event.dart';
 import 'package:quickmartrider/features/notification/bloc/notification_state.dart';
 import 'package:quickmartrider/features/notification/data/notification_model.dart';
-import 'package:quickmartrider/ui/web_shell.dart';
+import 'package:quickmartrider/drawer.dart';
 
 class RiderNotificationPage extends StatefulWidget {
   const RiderNotificationPage({super.key});
@@ -33,9 +33,20 @@ class _RiderNotificationPageState extends State<RiderNotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WebShell(
-      title: 'Notifications',
-      child: Column(
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(
+          'Notifications',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: Theme.of(context).primaryColorLight),
+        ),
+      ),
+      drawer: buildAppDrawer(context),
+      body: Column(
         children: [
           Expanded(
             child: BlocBuilder<RiderNotificationBloc, RiderNotificationState>(

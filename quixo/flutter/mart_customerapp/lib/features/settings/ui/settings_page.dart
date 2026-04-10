@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartcustomer/drawer.dart';
 import 'package:quickmartcustomer/features/settings/bloc/settings_bloc.dart';
 import 'package:quickmartcustomer/features/settings/bloc/settings_event.dart';
 import 'package:quickmartcustomer/features/settings/bloc/settings_state.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -22,10 +24,12 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorLight,
+      drawer: buildAppDrawer(context),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text('Settings', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       body: BlocBuilder<SettingsBloc, SettingsState>(
         builder: (context, state) {

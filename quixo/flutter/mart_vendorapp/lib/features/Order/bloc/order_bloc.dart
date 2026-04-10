@@ -11,6 +11,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
     on<LoadOrders>(_onLoadOrders);
     on<PrepareOrder>(_onPrepareOrder);
+    // on<AssignRider>(_onAssignRider);
 
   }
 
@@ -39,4 +40,14 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       emit(OrderError(e.toString()));
     }
   }
+
+  // FutureOr<void> _onAssignRider(AssignRider event, Emitter<OrderState> emit) async {
+  //   emit(OrderLoading());
+  //   try {
+  //     await repo.assignRider(ordersId: event.ordersId, riderId: event.riderId);
+  //     emit(const OrderPrepared("Rider assigned successfully"));
+  //   } catch (e) {
+  //     emit(OrderError(e.toString()));
+  //   }
+  // }
 }

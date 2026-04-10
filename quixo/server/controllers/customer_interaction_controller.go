@@ -101,16 +101,22 @@ func CustomerReview(c *gin.Context) {
 	defer cancel()
 
 	item := bson.M{
-		"user_id":    userID,
-		"product_id": productID,
-		"message":    message,
-		"date":       time.Now(),
+		"user_id":     userID,
+		"product_id":  productID,
+		"message":     message,
+		"description": message,
+		"date":        time.Now(),
 	}
 
-	_, err := coll.InsertOne(ctx, item)
+	res, err := coll.InsertOne(ctx, item)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
+	}
+
+	if rid, ok := res.InsertedID.(primitive.ObjectID); ok && !rid.IsZero() {
+		pcoll := utils.GetCollection("products")
+		_, _ = pcoll.UpdateOne(ctx, bson.M{"_id": productID}, bson.M{"$addToSet": bson.M{"review_ids": rid}})
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully added"})

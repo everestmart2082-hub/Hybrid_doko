@@ -51,10 +51,12 @@ class AdminVendorRemote {
   // POST /admin/vender/notification
   Future<bool> sendNotification(
       AdminNotificationRequest req) async {
-    final Map<String, dynamic> map = await dio.post(
+    final raw = await dio.post(
       ApiEndpoints.adminVendorNotification,
-      FormData.fromMap({'vender id': req.targetId, 'message': req.message}),
+      {'vender id': req.targetId, 'message': req.message},
+      options: Options(contentType: Headers.formUrlEncodedContentType),
     );
+    final map = Map<String, dynamic>.from(raw as Map);
     return checkSuccess(map);
   }
 

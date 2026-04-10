@@ -62,8 +62,10 @@ class ApiEndpoints {
 
   // ========== ORDERS ==========
   static const String adminOrderAll = '/admin/order/all';
+  static const String adminDashboard = '/admin/dashboard';
 
   // ========== SETTINGS / CONSTANTS ==========
   static const String adminChangeConstants = '/admin/changeConstants';
   static const String adminConstantsAll = '/admin/constants/all';
+  static const String adminConstantsDelete = '/admin/constants/delete';
 }

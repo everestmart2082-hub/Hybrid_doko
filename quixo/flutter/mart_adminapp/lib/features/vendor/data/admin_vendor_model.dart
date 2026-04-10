@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:mart_adminapp/core/utils/mongo_json.dart';
 
 // ─── Vendor List Item ───────────────────────────────────────────────────────
 // Server returns key: "vender id" (note the typo — kept to match server exactly)
@@ -37,11 +38,11 @@ class AdminVendorItem extends Equatable {
   });
 
   factory AdminVendorItem.fromMap(Map<String, dynamic> map) => AdminVendorItem(
-        venderId: map['vender id']?.toString() ?? '',
+        venderId: mongoIdToString(map['vender id'] ?? map['_id']),
         name: map['name'] as String? ?? '',
         number: map['number'] as String? ?? '',
         email: map['email'] as String? ?? '',
-        panFile: map['pan_file'] as String? ?? '',
+        panFile: dynamicToPlainString(map['pan_file']),
         storeName: map['store_name'] as String? ?? '',
         address: map['address'] as String? ?? '',
         businessType: map['business_type'] as String? ?? '',

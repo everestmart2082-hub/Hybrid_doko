@@ -4,6 +4,7 @@ import 'package:quickmartcustomer/drawer.dart';
 import 'package:quickmartcustomer/features/contacts/bloc/contact_bloc.dart';
 import 'package:quickmartcustomer/features/contacts/bloc/contact_event.dart';
 import 'package:quickmartcustomer/features/contacts/bloc/contact_state.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class ContactUsPage extends StatefulWidget {
   const ContactUsPage({super.key});
@@ -46,6 +47,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text('Contact Us', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       body: Center(
         child: ConstrainedBox(

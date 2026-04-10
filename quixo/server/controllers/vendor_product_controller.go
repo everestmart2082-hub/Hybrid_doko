@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"quixo-server/models"
@@ -39,6 +41,24 @@ func bsonSliceToStrings(v interface{}) []string {
 	default:
 		return nil
 	}
+}
+
+// parseCategoryAttributesFromForm reads JSON object from form field "category attributes".
+// Second return is false when the field was omitted or blank (caller may keep existing values on edit).
+func parseCategoryAttributesFromForm(c *gin.Context) (bson.M, bool) {
+	raw := strings.TrimSpace(c.PostForm("category attributes"))
+	if raw == "" {
+		return nil, false
+	}
+	var m map[string]interface{}
+	if err := json.Unmarshal([]byte(raw), &m); err != nil {
+		return nil, false
+	}
+	out := bson.M{}
+	for k, v := range m {
+		out[k] = fmt.Sprint(v)
+	}
+	return out, true
 }
 
 // VendorProductAdd handles /api/vender/product/add
@@ -98,13 +118,16 @@ func VendorProductAdd(c *gin.Context) {
 		Approved:          false, // "submitted for verification"
 		Hidden:            false,
 	}
+	if attrs, ok := parseCategoryAttributesFromForm(c); ok {
+		product.CategoryAttributes = attrs
+	}
 
 	coll := utils.GetCollection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	_, err = coll.InsertOne(ctx, product)
-	if err != nil {
+	_, insertErr := coll.InsertOne(ctx, product)
+	if insertErr != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
@@ -172,19 +195,29 @@ func VendorProductEdit(c *gin.Context) {
 		photoPaths = bsonSliceToStrings(existing["photos"])
 	}
 
+	var catAttrs bson.M
+	if a, ok := parseCategoryAttributesFromForm(c); ok {
+		catAttrs = a
+	} else if v, ok := existing["category_attributes"].(bson.M); ok && v != nil {
+		catAttrs = v
+	} else if v, ok := existing["category_attributes"].(primitive.M); ok && v != nil {
+		catAttrs = bson.M(v)
+	}
+
 	updateProposed := models.ProductUpdateProposed{
-		Name:              name,
-		Brand:             brand,
-		ShortDescriptions: shortDesc,
-		Description:       description,
-		PricePerUnit:      pricePerUnit,
-		Unit:              unit,
-		Discount:          discount,
-		ProductCategory:   productCategory,
-		DeliveryCategory:  deliveryCategory,
-		Stock:             stock,
-		Photos:            photoPaths,
-		VendorID:          vendorID.(primitive.ObjectID),
+		Name:                 name,
+		Brand:                brand,
+		ShortDescriptions:    shortDesc,
+		Description:          description,
+		PricePerUnit:         pricePerUnit,
+		Unit:                 unit,
+		Discount:             discount,
+		ProductCategory:      productCategory,
+		DeliveryCategory:     deliveryCategory,
+		Stock:                stock,
+		Photos:               photoPaths,
+		VendorID:             vendorID.(primitive.ObjectID),
+		CategoryAttributes:   catAttrs,
 	}
 
 	update := bson.M{"$set": bson.M{
@@ -197,6 +230,8 @@ func VendorProductEdit(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
+
+	_ = pushContactToAllAdmins(ctx, "product", name, "", fmt.Sprintf("Product %q submitted for admin update review.", name), fmt.Sprintf("Product ID: %s", productID.Hex()), "product")
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully submitted for update verification"})
 }

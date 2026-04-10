@@ -57,7 +57,7 @@ class _VenderLoginPageState extends State<VenderLoginPage> {
             _showOtpAndVerify().then((_) => _awaitingOtp = false);
           }
           if (state is VenderAuthenticated && state.authenticated) {
-            Navigator.pushReplacementNamed(context, '/mainapp');
+            Navigator.pushReplacementNamed(context, '/profile');
           }
           if (state is VenderAuthFailed) {
             ScaffoldMessenger.of(context).showSnackBar(

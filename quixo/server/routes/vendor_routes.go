@@ -15,7 +15,7 @@ func SetupVendorRoutes(r *gin.Engine) {
 		venderGroup.POST("/registration/otp", controllers.VendorRegistrationOTP)
 		// Public endpoint
 		venderGroup.GET("/businessTypes", controllers.VendorBusinessTypes)
-        
+
 		protected := venderGroup.Group("/")
 		protected.Use(controllers.AuthMiddleware("vendor"))
 		{
@@ -26,6 +26,7 @@ func SetupVendorRoutes(r *gin.Engine) {
 			protected.DELETE("/product/delete", controllers.VendorProductDelete)
 
 			protected.POST("/order/all", controllers.VendorOrderAll)
+			//protected.POST("/order/assign-rider", controllers.VendorAssignRider)
 			protected.POST("/order/prepared/", controllers.VendorOrderPrepared)
 
 			protected.POST("/profile/update", controllers.VendorProfileUpdate)

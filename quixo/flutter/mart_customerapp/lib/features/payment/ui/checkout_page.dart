@@ -13,6 +13,7 @@ import 'package:quickmartcustomer/features/payment/bloc/payment_bloc.dart';
 import 'package:quickmartcustomer/features/payment/bloc/payment_event.dart';
 import 'package:quickmartcustomer/features/payment/bloc/payment_state.dart';
 import 'package:quickmartcustomer/features/payment/data/checkout_request_model.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -51,13 +52,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
   double _subtotal(List<CartItemModel> items) {
     return items.fold<double>(
       0,
-      (sum, e) => sum + (e.pricePerUnit * e.number),
+      (sum, e) => sum + ((e.pricePerUnit * (1 - (e.discount / 100))) * e.number),
     );
   }
 
   double _deliveryCharge(double subtotal, bool quick) {
     if (quick) return subtotal < 500 ? 50 : 0;
     return subtotal < 1000 ? 100 : 0;
+  }
+
+  double _discountAmount(List<CartItemModel> items) {
+    return items.fold<double>(
+      0,
+      (sum, e) => sum + ((e.pricePerUnit * e.number) - ((e.pricePerUnit * (1 - (e.discount / 100))) * e.number)),
+    );
   }
 
   @override
@@ -68,6 +76,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text('Checkout', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       body: MultiBlocListener(
         listeners: [
@@ -111,10 +120,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   }
                   final cartItems = cartState.items;
                   final quick = _isQuick(cartItems);
+                  final discountTotal = _discountAmount(cartItems);
                   final subtotal = _subtotal(cartItems);
                   final deliveryCharge = _deliveryCharge(subtotal, quick);
                   final vat = subtotal * 0.13;
-                  final total = subtotal + deliveryCharge + vat;
+                  final total = subtotal + deliveryCharge ;
 
                   final cartIds = cartItems.map((e) => e.id).where((e) => e.isNotEmpty).toList();
 
@@ -178,11 +188,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Total Amount: ${subtotal.toStringAsFixed(2)}'),
+                                Text('Items Total: ₹${(subtotal + discountTotal).toStringAsFixed(2)}'),
                                 const SizedBox(height: 8),
-                                Text('Delivary Charge: ${deliveryCharge.toStringAsFixed(2)}'),
+                                Text('Discount: -₹${discountTotal.toStringAsFixed(2)}'),
                                 const SizedBox(height: 8),
-                                Text('Total including vat: ${total.toStringAsFixed(2)}'),
+                                Text('Subtotal: ₹${subtotal.toStringAsFixed(2)}'),
+                                const SizedBox(height: 8),
+                                Text('Delivary Charge: ₹${deliveryCharge.toStringAsFixed(2)}'),
+                                const SizedBox(height: 8),
+                                // Text('VAT (13%): ₹${vat.toStringAsFixed(2)}'),
+                                // const SizedBox(height: 8),
+                                Text('Total: ₹${total.toStringAsFixed(2)}'),
                                 const SizedBox(height: 16),
                                 SizedBox(
                                   width: double.infinity,

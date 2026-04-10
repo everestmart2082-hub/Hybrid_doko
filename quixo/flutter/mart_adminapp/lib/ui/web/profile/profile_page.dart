@@ -202,7 +202,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600),
                             ),
-                            subtitle: Text(m.description),
+                            subtitle: Text(m.message),
                             isThreeLine: true,
                           ),
                         ),

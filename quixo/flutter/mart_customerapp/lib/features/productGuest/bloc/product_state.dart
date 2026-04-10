@@ -21,9 +21,10 @@ class ProductLoaded extends ProductGuestState {
 
 class ProductListLoaded extends ProductGuestState {
   final List<ProductListItem> products;
-  const ProductListLoaded(this.products);
+  final bool hasMore;
+  const ProductListLoaded(this.products, {this.hasMore = false});
   @override
-  List<Object?> get props => [products];
+  List<Object?> get props => [products, hasMore];
 }
 
 class ProductFailed extends ProductGuestState {

@@ -7,7 +7,7 @@ import 'package:quickmartrider/features/dashboard/bloc/dashboard_bloc.dart';
 import 'package:quickmartrider/features/dashboard/bloc/dashboard_event.dart';
 import 'package:quickmartrider/features/dashboard/bloc/dashboard_state.dart';
 import 'package:quickmartrider/features/dashboard/data/dashboard_model.dart';
-import 'package:quickmartrider/ui/web_shell.dart';
+import 'package:quickmartrider/drawer.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -26,9 +26,20 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return WebShell(
-      title: AppConstants.appName,
-      child: BlocBuilder<RiderDashboardBloc, RiderDashboardState>(
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        title: Text(
+          AppConstants.appName,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: Theme.of(context).primaryColorLight),
+        ),
+      ),
+      drawer: buildAppDrawer(context),
+      body: BlocBuilder<RiderDashboardBloc, RiderDashboardState>(
         builder: (context, state) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),

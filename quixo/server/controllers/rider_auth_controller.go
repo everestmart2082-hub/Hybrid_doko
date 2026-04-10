@@ -32,21 +32,33 @@ func RiderRegistration(c *gin.Context) {
 		return
 	}
 
+	saveRiderUpload := func(field string) string {
+		fh, err := c.FormFile(field)
+		if err != nil {
+			return ""
+		}
+		path, err := utils.SaveUploadedFile(fh)
+		if err != nil {
+			return ""
+		}
+		return path
+	}
+
 	otp, _ := GenerateOTP()
 	newRider := models.Rider{
 		ID:                primitive.NewObjectID(),
 		Name:              c.PostForm("name"),
 		Number:            phone,
 		Email:             c.PostForm("email"),
-		RcBookFile:        c.PostForm("Rc Book file"),
-		CitizenshipFile:   c.PostForm("Citizenship file"),
-		PanCardFile:       c.PostForm("pan card file"),
+		RcBookFile:        saveRiderUpload("Rc Book file"),
+		CitizenshipFile:   saveRiderUpload("Citizenship file"),
+		PanCardFile:       saveRiderUpload("pan card file"),
 		Address:           c.PostForm("Address"),
 		BikeModel:         c.PostForm("bike model"),
 		BikeNumber:        c.PostForm("bike number"),
 		BikeColor:         c.PostForm("bike color"),
 		Type:              c.PostForm("type"),
-		BikeInsuranceFile: c.PostForm("bike insurance paper file"),
+		BikeInsuranceFile: saveRiderUpload("bike insurance paper file"),
 		OTP:               otp,
 		Verified:          false,
 		Suspended:         false,

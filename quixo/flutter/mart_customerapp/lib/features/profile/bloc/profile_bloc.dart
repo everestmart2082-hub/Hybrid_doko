@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartcustomer/core/failures/api_exceptions.dart';
 import 'package:quickmartcustomer/core/failures/failures.dart';
 import '../repository/profile_remote.dart';
 import 'profile_event.dart';
@@ -73,6 +74,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileFailed _mapError(Object e) {
     if (e is Failure) {
       return ProfileFailed(e.message);
+    }
+    if (e is ApiException) {
+      return ProfileFailed(e.failure.message);
+    }
+    if (e is Exception) {
+      return ProfileFailed(e.toString().replaceFirst('Exception: ', ''));
     }
     return const ProfileFailed("Something went wrong");
   }

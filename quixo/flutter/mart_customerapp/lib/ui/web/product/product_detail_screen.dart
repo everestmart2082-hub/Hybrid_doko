@@ -5,6 +5,7 @@ import 'package:quickmartcustomer/features/cart/bloc/cart_bloc.dart';
 import 'package:quickmartcustomer/features/cart/bloc/cart_event.dart';
 import 'package:quickmartcustomer/features/cart/data/cart_model.dart';
 import 'package:quickmartcustomer/features/product/data/product_list_item_model.dart';
+import 'package:quickmartcustomer/widgets/customer_hub_bar_icons.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final ProductListItem productItem;
@@ -36,6 +37,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text(p.name, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),
         elevation: 1,
+        actions: const [CustomerHubBarIcons()],
       ),
       drawer: buildAppDrawer(context),
       body: SingleChildScrollView(

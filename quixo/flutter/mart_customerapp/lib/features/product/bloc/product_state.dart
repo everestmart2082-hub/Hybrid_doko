@@ -21,9 +21,11 @@ class ProductLoaded extends ProductState {
 
 class ProductListLoaded extends ProductState {
   final List<ProductListItem> products;
-  const ProductListLoaded(this.products);
+  /// From API `meta.has_more` — false when there is no next page.
+  final bool hasMore;
+  const ProductListLoaded(this.products, {this.hasMore = false});
   @override
-  List<Object?> get props => [products];
+  List<Object?> get props => [products, hasMore];
 }
 
 class ProductFailed extends ProductState {

@@ -14,8 +14,10 @@ class PaymentRemote {
       '/user/checkout',
       request.toFormData(),
     );
-
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
 
   /// PAYMENT STATUS
@@ -24,7 +26,9 @@ class PaymentRemote {
       '/user/payment',
       query: query.toQuery(),
     );
-
-    return SimpleResponseModel.fromJson(response.data ?? response);
+    final data = response is Map<String, dynamic>
+        ? response
+        : (response is Map ? response.cast<String, dynamic>() : <String, dynamic>{});
+    return SimpleResponseModel.fromJson(data);
   }
-}
+}

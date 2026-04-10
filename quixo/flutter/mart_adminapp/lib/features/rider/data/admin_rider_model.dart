@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:mart_adminapp/core/utils/mongo_json.dart';
 
 // ─── Rider List Item ─────────────────────────────────────────────────────────
 // Server returns key: "rider id"
@@ -47,20 +48,20 @@ class AdminRiderItem extends Equatable {
   });
 
   factory AdminRiderItem.fromMap(Map<String, dynamic> map) => AdminRiderItem(
-        riderId: map['rider id']?.toString() ?? '',
+        riderId: mongoIdToString(map['rider id'] ?? map['_id']),
         name: map['name'] as String? ?? '',
         number: map['number'] as String? ?? '',
         email: map['email'] as String? ?? '',
         rating: num.tryParse(map['rating']?.toString() ?? '')?.toDouble() ?? 0.0,
-        rcBookFile: map['rc_book_file'] as String? ?? '',
-        citizenshipFile: map['citizenship_file'] as String? ?? '',
-        panCardFile: map['pan_card_file'] as String? ?? '',
+        rcBookFile: dynamicToPlainString(map['rc_book_file']),
+        citizenshipFile: dynamicToPlainString(map['citizenship_file']),
+        panCardFile: dynamicToPlainString(map['pan_card_file']),
         address: map['address'] as String? ?? '',
         bikeModel: map['bike_model'] as String? ?? '',
         bikeNumber: map['bike_number'] as String? ?? '',
         bikeColor: map['bike_color'] as String? ?? '',
         type: map['type'] as String? ?? '',
-        bikeInsuranceFile: map['bike_insurance_paper_file'] as String? ?? '',
+        bikeInsuranceFile: dynamicToPlainString(map['bike_insurance_paper_file']),
         suspended: map['suspended'] as bool? ?? false,
         revenue: num.tryParse(map['revenue']?.toString() ?? '')?.toDouble() ?? 0.0,
         violations: (map['violations'] as List<dynamic>?) ?? [],

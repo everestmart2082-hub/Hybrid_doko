@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartrider/drawer.dart';
 import 'package:quickmartrider/features/auth/bloc/auth_bloc.dart';
 import 'package:quickmartrider/features/auth/bloc/auth_event.dart';
 import 'package:quickmartrider/features/auth/bloc/auth_state.dart';
@@ -154,6 +155,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorLight,
+      drawer: buildAppDrawer(context),
       body: BlocListener<RiderAuthBloc, RiderAuthState>(
         listener: (context, state) async {
           if (state is RiderAuthFailure) {
@@ -181,7 +183,7 @@ class _RiderRegisterPageState extends State<RiderRegisterPage> {
             }
 
             if (state.token != null && state.token!.isNotEmpty) {
-              Navigator.pushReplacementNamed(context, '/mainapp');
+              Navigator.pushReplacementNamed(context, '/profile');
             }
           }
         },
