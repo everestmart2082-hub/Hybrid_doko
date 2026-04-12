@@ -33,4 +33,6 @@ type Rider struct {
 	OTP                   string              `json:"otp" bson:"otp"`
 	UpdatesProposed       RiderUpdateProposed `json:"updates_proposed" bson:"updates_proposed"`
 	Messages              []Message           `json:"messages" bson:"messages"`
+	// Message is cumulative text from admin notify (and similar); appended on each send.
+	Message string `json:"message" bson:"message"`
 }

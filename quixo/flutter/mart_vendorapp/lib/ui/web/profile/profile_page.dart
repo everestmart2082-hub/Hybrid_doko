@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartvender/core/constants/api_constants.dart';
 import 'package:quickmartvender/features/profile/bloc/profile_bloc.dart';
 import 'package:quickmartvender/features/profile/bloc/profile_event.dart';
 import 'package:quickmartvender/features/profile/bloc/profile_state.dart';
@@ -169,7 +170,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 _InfoRow('Phone', p.number, Icons.phone),
                 _InfoRow('Email', p.email, Icons.email),
                 _InfoRow('Business Type', p.businessType, Icons.business),
-                _InfoRow('PAN', p.pan, Icons.file_copy),
+                // _InfoRow('PAN', p.pan, Icons.file_copy),
+                Image.network(_absolutePhotoUrl(p.pan) ?? ""),
                 _InfoRow('Address', p.address, Icons.location_on),
                 _InfoRow('Geolocation', p.geolocation, Icons.my_location),
                 _InfoRow('Description', p.description, Icons.description),
@@ -194,6 +196,15 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+
+  
+  String? _absolutePhotoUrl(String path) {
+    final t = path.trim();
+    if (t.isEmpty) return null;
+    if (t.startsWith('http://') || t.startsWith('https://')) return t;
+    final p = t.startsWith('/') ? t : '/$t';
+    return '${ApiEndpoints.baseUrl}$p';
   }
 
   // ── Edit form ─────────────────────────────────────────────────────────────

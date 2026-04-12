@@ -29,4 +29,6 @@ type Vendor struct {
 	UpdationRequested bool                 `json:"updation_requested" bson:"updation_requested"`
 	UpdatesProposed   VendorUpdateProposed `json:"updates_proposed" bson:"updates_proposed"`
 	Messages          []Message            `json:"messages" bson:"messages"`
+	// Message is cumulative text from admin notify (and similar); appended on each send.
+	Message string `json:"message" bson:"message"`
 }

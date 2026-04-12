@@ -12,6 +12,8 @@ class ProfileModel extends Equatable {
   final String businessType;
   final String description;
   final String geolocation;
+  /// Cumulative admin "Notify" text (from profile API `admin_message`).
+  final String adminMessage;
 
   const ProfileModel({
     required this.name,
@@ -23,6 +25,7 @@ class ProfileModel extends Equatable {
     required this.businessType,
     required this.description,
     required this.geolocation,
+    this.adminMessage = '',
   });
 
   @override
@@ -35,20 +38,24 @@ class ProfileModel extends Equatable {
         email,
         businessType,
         description,
-        geolocation
+        geolocation,
+        adminMessage,
       ];
 
   factory ProfileModel.fromMap(Map<String, dynamic> map) {
+    String s(dynamic v) => v?.toString() ?? '';
     return ProfileModel(
-      name: map["name"] ?? "",
-      number: map["number"] ?? "",
-      pan: map["pan number"] ?? "",
-      storeName: map["store name"] ?? "",
-      address: map["address"] ?? "",
-      email: map["email"] ?? "",
-      businessType: map["business type"] ?? "",
-      description: map["description"] ?? "",
-      geolocation: map["geolocation"] ?? "",
+      name: s(map['name']),
+      number: s(map['number']),
+      pan: s(map['Pan file'] ?? map['pan_file'] ?? map['pan number']),
+      storeName: s(map['storeName'] ?? map['store name'] ?? map['store_name']),
+      address: s(map['Address'] ?? map['address']),
+      email: s(map['email']),
+      businessType: s(
+          map['BusinessType'] ?? map['business type'] ?? map['business_type']),
+      description: s(map['Description'] ?? map['description']),
+      geolocation: s(map['geolocation']),
+      adminMessage: s(map['admin_message']),
     );
   }
 

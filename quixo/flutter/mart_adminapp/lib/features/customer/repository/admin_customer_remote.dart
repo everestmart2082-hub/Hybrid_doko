@@ -50,12 +50,10 @@ class AdminCustomerRemote {
 
   // POST /admin/user/notification
   Future<bool> sendNotification(String userId, String message) async {
-    final raw = await dio.post(
+    final Map<String, dynamic> map = await dio.post(
       ApiEndpoints.adminUserNotification,
-      {'user id': userId, 'message': message},
-      options: Options(contentType: Headers.formUrlEncodedContentType),
+      FormData.fromMap({'user id': userId, 'message': message}),
     );
-    final map = Map<String, dynamic>.from(raw as Map);
     return checkSuccess(map);
   }
 

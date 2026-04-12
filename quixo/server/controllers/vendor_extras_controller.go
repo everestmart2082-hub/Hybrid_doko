@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -59,8 +60,13 @@ func VendorChartMonth(c *gin.Context) {
 
 // VendorNotification handles /api/vender/notification
 func VendorNotification(c *gin.Context) {
-	vendorID, exists := c.Get("userID")
+	vendorIDVal, exists := c.Get("userID")
 	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
+		return
+	}
+	vid, ok := vendorIDVal.(primitive.ObjectID)
+	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
 		return
 	}
@@ -71,8 +77,8 @@ func VendorNotification(c *gin.Context) {
 
 	cursor, err := coll.Find(ctx, bson.M{
 		"$or": []bson.M{
-			{"target_id": vendorID, "type": "vendor"},
-			{"user_id": vendorID},
+			{"target_id": vid, "type": "vendor"},
+			{"user_id": vid},
 		},
 	}, options.Find().SetSort(bson.D{{Key: "date", Value: -1}}).SetLimit(50))
 	if err != nil {
@@ -80,18 +86,11 @@ func VendorNotification(c *gin.Context) {
 		return
 	}
 	defer cursor.Close(ctx)
-	var notifs []models.Notification
-	if err := cursor.All(ctx, &notifs); err != nil {
+
+	mapped, err := cursorNotificationsToSlice(ctx, cursor)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
-	}
-
-	mapped := make([]gin.H, 0, len(notifs))
-	for _, n := range notifs {
-		mapped = append(mapped, gin.H{
-			"message": n.Message,
-			"date":    n.Date.Format(time.RFC3339),
-		})
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -114,10 +113,19 @@ func VendorContactAdmin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "message required"})
 		return
 	}
+	vid, ok := vendorID.(primitive.ObjectID)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
+		return
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	footer := fmt.Sprintf("Vendor account ID: %v", vendorID)
 	if err := pushContactToAllAdmins(ctx, "vendor", name, email, message, footer); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "message not sent"})
+		return
+	}
+	if err := insertContactNotification(ctx, "vendor", message, vid); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "message not sent"})
 		return
 	}

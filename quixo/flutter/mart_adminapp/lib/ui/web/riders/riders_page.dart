@@ -165,6 +165,21 @@ class _RiderCardState extends State<_RiderCard> {
                 ),
                 const SizedBox(height: 8),
                 Text('Vehicle: ${r.bikeColor} ${r.bikeModel} [${r.bikeNumber}]', style: Theme.of(context).textTheme.bodyMedium),
+                if (r.adminMessage.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    'Admin notify (stored message)',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  SelectableText(
+                    r.adminMessage,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 12,

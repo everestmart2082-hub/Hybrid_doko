@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:mart_adminapp/core/utils/mongo_json.dart';
 
 // ─── User List Item ─────────────────────────────────────────────────────────
 // Server returns key: "user id"
@@ -9,6 +10,8 @@ class AdminUserItem extends Equatable {
   final List<dynamic> violations;
   final bool? status;         // maps "verified"
   final bool? updateRequest;  // maps "updateRequest"
+  /// Cumulative text from admin "Notify" (Mongo `message`).
+  final String adminMessage;
 
   const AdminUserItem({
     required this.userId,
@@ -16,18 +19,21 @@ class AdminUserItem extends Equatable {
     required this.violations,
     this.status,
     this.updateRequest,
+    this.adminMessage = '',
   });
 
   factory AdminUserItem.fromMap(Map<String, dynamic> map) => AdminUserItem(
-        userId: map['user id']?.toString() ?? '',
+        userId: mongoIdToString(map['user id'] ?? map['_id']),
         name: map['name'] as String? ?? '',
         violations: (map['violations'] as List<dynamic>?) ?? [],
         status: map['status'] as bool?,
         updateRequest: map['updateRequest'] as bool?,
+        adminMessage: map['message']?.toString() ?? '',
       );
 
   @override
-  List<Object?> get props => [userId, name, violations, status, updateRequest];
+  List<Object?> get props =>
+      [userId, name, violations, status, updateRequest, adminMessage];
 }
 
 // ─── State Request ──────────────────────────────────────────────────────────

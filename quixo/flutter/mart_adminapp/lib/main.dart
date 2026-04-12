@@ -15,6 +15,8 @@ import 'package:mart_adminapp/features/orders/repository/admin_orders_remote.dar
 import 'package:mart_adminapp/features/products/bloc/admin_product_bloc.dart';
 import 'package:mart_adminapp/features/products/repository/admin_category_remote.dart';
 import 'package:mart_adminapp/features/products/repository/admin_product_remote.dart';
+import 'package:mart_adminapp/features/notifications/bloc/admin_notifications_bloc.dart';
+import 'package:mart_adminapp/features/notifications/repository/admin_inbox_remote.dart';
 import 'package:mart_adminapp/features/profile/bloc/admin_profile_bloc.dart';
 import 'package:mart_adminapp/features/profile/repository/admin_profile_remote.dart';
 import 'package:mart_adminapp/features/rider/bloc/admin_rider_bloc.dart';
@@ -82,6 +84,7 @@ class AdminRoot extends StatelessWidget {
         RepositoryProvider(create: (_) => AdminRiderRemote(dio: dioClient)),
         RepositoryProvider(create: (_) => AdminEmployeeRemote(dio: dioClient)),
         RepositoryProvider(create: (_) => AdminProfileRemote(dio: dioClient)),
+        RepositoryProvider(create: (_) => AdminInboxRemote(dio: dioClient)),
         RepositoryProvider(
             create: (_) => AdminSettingsRemote(dio: dioClient)),
       ],
@@ -116,6 +119,10 @@ class AdminRoot extends StatelessWidget {
           BlocProvider(
               create: (context) =>
                   AdminProfileBloc(context.read<AdminProfileRemote>())),
+          BlocProvider(
+              create: (context) => AdminNotificationsBloc(
+                    context.read<AdminInboxRemote>(),
+                  )),
         ],
         child: BlocBuilder<SettingsBloc, SettingsState>(
           builder: (context, settingsState) {

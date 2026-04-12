@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
-	"quixo-server/models"
 	"quixo-server/utils"
 
 	"github.com/gin-gonic/gin"
@@ -130,15 +130,29 @@ func CustomerSendMessage(c *gin.Context) {
 		return
 	}
 
-	messageText := c.PostForm("message")
+	messageText := strings.TrimSpace(c.PostForm("message"))
 	name := c.PostForm("name")
 	email := c.PostForm("email")
+	if messageText == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"status": false, "message": "message required"})
+		return
+	}
+
+	uid, ok := userID.(primitive.ObjectID)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	footer := fmt.Sprintf("User ID: %v", userID)
 	if err := pushContactToAllAdmins(ctx, "customer", name, email, messageText, footer); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
+		return
+	}
+	if err := insertContactNotification(ctx, "customer", messageText, uid); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
 		return
 	}
@@ -158,22 +172,27 @@ func CustomerNotification(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Look natively using the notification mechanism injected during the Admin implementation
-	cursor, err := coll.Find(ctx, bson.M{"target_id": userID, "type": "user"}, options.Find().SetLimit(50))
+	uid, ok := userID.(primitive.ObjectID)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
+		return
+	}
+
+	// Admin pushes use type "user"; contact-us rows use "customer".
+	cursor, err := coll.Find(ctx, bson.M{
+		"target_id": uid,
+		"type":      bson.M{"$in": []string{"user", "customer"}},
+	}, options.Find().SetSort(bson.D{{Key: "date", Value: -1}}).SetLimit(50))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
+	defer cursor.Close(ctx)
 
-	var results []models.Notification
-	cursor.All(ctx, &results)
-
-	var mapped []gin.H
-	for _, n := range results {
-		mapped = append(mapped, gin.H{
-			"message": n.Message,
-			"date":    n.Date.String(),
-		})
+	mapped, err := cursorNotificationsToSlice(ctx, cursor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": mapped})

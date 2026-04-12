@@ -126,6 +126,21 @@ class _VendorCardState extends State<_VendorCard> {
                                 _InfoRow('Verified', v.status?.toString() ?? 'null'),
                                 _InfoRow('Suspended', v.suspended.toString()),
                                 _InfoRow('Update Request', v.updateRequest?.toString() ?? 'null'),
+                                if (v.adminMessage.isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    'Admin notify (stored message)',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  SelectableText(
+                                    v.adminMessage,
+                                    style: Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                ],
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 4),
                                   child: Text('Description: ${v.description}', style: Theme.of(context).textTheme.bodyMedium),

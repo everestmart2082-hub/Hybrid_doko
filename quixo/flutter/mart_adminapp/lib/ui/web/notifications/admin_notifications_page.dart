@@ -1,45 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mart_adminapp/features/profile/bloc/admin_profile_bloc.dart';
-import 'package:mart_adminapp/features/profile/bloc/admin_profile_event.dart';
-import 'package:mart_adminapp/features/profile/bloc/admin_profile_state.dart';
-import 'package:mart_adminapp/features/profile/data/admin_profile_model.dart';
+import 'package:mart_adminapp/features/notifications/bloc/admin_notifications_bloc.dart';
+import 'package:mart_adminapp/features/notifications/bloc/admin_notifications_event.dart';
+import 'package:mart_adminapp/features/notifications/bloc/admin_notifications_state.dart';
+import 'package:mart_adminapp/features/notifications/data/admin_notification_model.dart';
 import 'package:mart_adminapp/ui/web/web_shell.dart';
 
-enum _AdminInboxTab { contact, order, product, register, others }
+enum _AdminNotificationTab { contact, order, product, miscellaneous }
 
-extension on _AdminInboxTab {
+extension on _AdminNotificationTab {
   String get label {
     switch (this) {
-      case _AdminInboxTab.contact:
+      case _AdminNotificationTab.contact:
         return 'Contact';
-      case _AdminInboxTab.order:
+      case _AdminNotificationTab.order:
         return 'Order';
-      case _AdminInboxTab.product:
+      case _AdminNotificationTab.product:
         return 'Product';
-      case _AdminInboxTab.register:
-        return 'Register';
-      case _AdminInboxTab.others:
-        return 'Others';
+      case _AdminNotificationTab.miscellaneous:
+        return 'Miscellaneous';
     }
   }
 
-  bool matches(AdminInboxMessage m) {
-    final t = m.type.toLowerCase().trim();
+  bool matches(AdminNotificationItem n) {
     switch (this) {
-      case _AdminInboxTab.contact:
-        return t == 'contact';
-      case _AdminInboxTab.order:
-        return t == 'order';
-      case _AdminInboxTab.product:
-        return t == 'product';
-      case _AdminInboxTab.register:
-        return t == 'register';
-      case _AdminInboxTab.others:
-        return t != 'contact' &&
-            t != 'order' &&
-            t != 'product' &&
-            t != 'register';
+      case _AdminNotificationTab.contact:
+        return n.isContact;
+      case _AdminNotificationTab.order:
+        return n.isOrder;
+      case _AdminNotificationTab.product:
+        return n.isProduct;
+      case _AdminNotificationTab.miscellaneous:
+        return n.isMiscellaneous;
     }
   }
 }
@@ -58,8 +50,8 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
-    context.read<AdminProfileBloc>().add(AdminProfileLoad());
+    _tabController = TabController(length: 4, vsync: this);
+    context.read<AdminNotificationsBloc>().add(const AdminNotificationsLoad());
   }
 
   @override
@@ -72,12 +64,13 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   Widget build(BuildContext context) {
     return WebShell(
       title: 'Notifications',
-      child: BlocBuilder<AdminProfileBloc, AdminProfileState>(
+      child: BlocBuilder<AdminNotificationsBloc, AdminNotificationsState>(
         builder: (context, state) {
-          if (state is AdminProfileLoading || state is AdminProfileInitial) {
+          if (state is AdminNotificationsLoading ||
+              state is AdminNotificationsInitial) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (state is AdminProfileFailed) {
+          if (state is AdminNotificationsFailed) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -88,8 +81,8 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: () => context
-                          .read<AdminProfileBloc>()
-                          .add(AdminProfileLoad()),
+                          .read<AdminNotificationsBloc>()
+                          .add(const AdminNotificationsLoad()),
                       child: const Text('Retry'),
                     ),
                   ],
@@ -97,8 +90,8 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
               ),
             );
           }
-          if (state is AdminProfileLoaded) {
-            final msgs = state.profile.messages;
+          if (state is AdminNotificationsLoaded) {
+            final items = state.items;
             return Column(
               children: [
                 Material(
@@ -106,7 +99,7 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
                   child: TabBar(
                     controller: _tabController,
                     isScrollable: true,
-                    tabs: _AdminInboxTab.values
+                    tabs: _AdminNotificationTab.values
                         .map((e) => Tab(text: e.label))
                         .toList(),
                   ),
@@ -114,12 +107,10 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
-                    children: _AdminInboxTab.values
-                        .map((tab) => _MessageList(
-                              messages: msgs
-                                  .where((m) => tab.matches(m))
-                                  .toList()
-                                  .reversed
+                    children: _AdminNotificationTab.values
+                        .map((tab) => _NotificationList(
+                              items: items
+                                  .where((n) => tab.matches(n))
                                   .toList(),
                             ))
                         .toList(),
@@ -135,38 +126,69 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage>
   }
 }
 
-class _MessageList extends StatelessWidget {
-  final List<AdminInboxMessage> messages;
+class _NotificationList extends StatelessWidget {
+  final List<AdminNotificationItem> items;
 
-  const _MessageList({required this.messages});
+  const _NotificationList({required this.items});
 
   @override
   Widget build(BuildContext context) {
-    if (messages.isEmpty) {
+    if (items.isEmpty) {
       return Center(
         child: Text(
-          'No messages',
+          'No notifications',
           style: Theme.of(context).textTheme.bodyLarge,
         ),
       );
     }
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: messages.length,
-      itemBuilder: (context, i) {
-        final m = messages[i];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: ListTile(
-            title: Text(
-              m.type.isEmpty ? 'message' : m.type,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            subtitle: Text('${m.date}\n${m.message}'),
-            isThreeLine: true,
-          ),
-        );
+    final sorted = List<AdminNotificationItem>.from(items)
+      ..sort((a, b) => b.date.compareTo(a.date));
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<AdminNotificationsBloc>().add(const AdminNotificationsLoad());
+        await context.read<AdminNotificationsBloc>().stream.firstWhere(
+              (s) =>
+                  s is AdminNotificationsLoaded ||
+                  s is AdminNotificationsFailed,
+            );
       },
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: sorted.length,
+        itemBuilder: (context, i) {
+          final n = sorted[i];
+          final typeLabel =
+              n.type.isEmpty ? 'notification' : n.type;
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      typeLabel,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  if (n.received)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: Icon(Icons.done_all, size: 18),
+                    ),
+                ],
+              ),
+              subtitle: Text(
+                '${n.date}\n'
+                '${n.message.isEmpty ? '(no message)' : n.message}\n'
+                'target: ${n.targetId}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              isThreeLine: true,
+            ),
+          );
+        },
+      ),
     );
   }
 }

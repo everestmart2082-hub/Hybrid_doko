@@ -64,6 +64,9 @@ class ApiEndpoints {
   static const String adminOrderAll = '/admin/order/all';
   static const String adminDashboard = '/admin/dashboard';
 
+  // ========== NOTIFICATIONS (Mongo `notifications` collection) ==========
+  static const String adminNotificationsAll = '/admin/notifications/all';
+
   // ========== SETTINGS / CONSTANTS ==========
   static const String adminChangeConstants = '/admin/changeConstants';
   static const String adminConstantsAll = '/admin/constants/all';

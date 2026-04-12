@@ -44,6 +44,7 @@ func CustomerProfileGet(c *gin.Context) {
 			"number":          user.Number,
 			"email":           user.Email,
 			"default address": "", // Address mappings not yet available inside standard customer schema
+			"admin_message":   user.Message,
 		},
 	})
 }

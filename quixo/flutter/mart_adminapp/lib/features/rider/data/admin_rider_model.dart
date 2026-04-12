@@ -24,6 +24,8 @@ class AdminRiderItem extends Equatable {
   final List<dynamic> violations;
   final bool? status;         // maps "verified"
   final bool? updateRequest;  // maps "updateRequest"
+  /// Cumulative text from admin "Notify" (Mongo `message`).
+  final String adminMessage;
 
   const AdminRiderItem({
     required this.riderId,
@@ -45,6 +47,7 @@ class AdminRiderItem extends Equatable {
     required this.violations,
     this.status,
     this.updateRequest,
+    this.adminMessage = '',
   });
 
   factory AdminRiderItem.fromMap(Map<String, dynamic> map) => AdminRiderItem(
@@ -67,13 +70,15 @@ class AdminRiderItem extends Equatable {
         violations: (map['violations'] as List<dynamic>?) ?? [],
         status: map['status'] as bool?,
         updateRequest: map['updateRequest'] as bool?,
+        adminMessage: map['message']?.toString() ?? '',
       );
 
   @override
   List<Object?> get props => [
     riderId, name, number, email, rating, rcBookFile, citizenshipFile,
     panCardFile, address, bikeModel, bikeNumber, bikeColor, type,
-    bikeInsuranceFile, suspended, revenue, violations, status, updateRequest
+    bikeInsuranceFile, suspended, revenue, violations, status, updateRequest,
+    adminMessage,
   ];
 }
 

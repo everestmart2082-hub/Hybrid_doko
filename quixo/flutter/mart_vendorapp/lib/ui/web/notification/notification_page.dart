@@ -63,7 +63,10 @@ class _NotificationPageState extends State<NotificationPage> {
                           ),
                         ),
                         title: Text(n.message),
-                        trailing: Text(n.date, style: theme.textTheme.bodySmall),
+                        trailing: Text(
+                          n.date.isEmpty ? '—' : n.date,
+                          style: theme.textTheme.bodySmall,
+                        ),
                       );
                     },
                   ),

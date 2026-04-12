@@ -15,6 +15,7 @@ class RiderProfileResponseModel extends Equatable {
   final String? insurancePaperUrl;
   final String? panCardUrl;
   final String? citizenshipUrl;
+  final String? adminMessage;
 
   const RiderProfileResponseModel({
     required this.success,
@@ -30,6 +31,7 @@ class RiderProfileResponseModel extends Equatable {
     this.insurancePaperUrl,
     this.panCardUrl,
     this.citizenshipUrl,
+    this.adminMessage,
   });
 
   static bool _toBool(dynamic value) {
@@ -62,6 +64,7 @@ class RiderProfileResponseModel extends Equatable {
       insurancePaperUrl: msg["bike insurance paper file"]?.toString(),
       panCardUrl: msg["pan card file"]?.toString(),
       citizenshipUrl: msg["Citizenship file"]?.toString(),
+      adminMessage: msg["admin_message"]?.toString(),
     );
   }
 
@@ -80,5 +83,6 @@ class RiderProfileResponseModel extends Equatable {
         insurancePaperUrl,
         panCardUrl,
         citizenshipUrl,
+        adminMessage,
       ];
 }

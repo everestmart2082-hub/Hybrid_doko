@@ -19,6 +19,8 @@ class AdminVendorItem extends Equatable {
   final List<dynamic> violations;
   final bool? status;       // maps "verified"
   final bool? updateRequest; // maps "updateRequest"
+  /// Cumulative text from admin "Notify" (Mongo `message`).
+  final String adminMessage;
 
   const AdminVendorItem({
     required this.venderId,
@@ -35,6 +37,7 @@ class AdminVendorItem extends Equatable {
     required this.violations,
     this.status,
     this.updateRequest,
+    this.adminMessage = '',
   });
 
   factory AdminVendorItem.fromMap(Map<String, dynamic> map) => AdminVendorItem(
@@ -52,12 +55,14 @@ class AdminVendorItem extends Equatable {
         violations: (map['violations'] as List<dynamic>?) ?? [],
         status: map['status'] as bool?,
         updateRequest: map['updateRequest'] as bool?,
+        adminMessage: map['message']?.toString() ?? '',
       );
 
   @override
   List<Object?> get props => [
     venderId, name, number, email, panFile, storeName, address,
-    businessType, description, revenue, suspended, violations, status, updateRequest
+    businessType, description, revenue, suspended, violations, status, updateRequest,
+    adminMessage,
   ];
 }
 

@@ -24,4 +24,6 @@ type User struct {
 	OTP        string             `json:"otp" bson:"otp"`
 	Violations []Violation        `json:"violations" bson:"violations"`
 	Messages   []Message          `json:"messages" bson:"messages"`
+	// Message is cumulative text from admin notify (and similar); appended on each send.
+	Message string `json:"message" bson:"message"`
 }

@@ -22,7 +22,11 @@ class ProfileRemote {
 
     checkSuccess(map);
 
-    return ProfileModel.fromMap(map["message"] ?? map["data"]);
+    final raw = map['data'];
+    if (raw is Map) {
+      return ProfileModel.fromMap(Map<String, dynamic>.from(raw));
+    }
+    throw Exception(map['message']?.toString() ?? 'Invalid profile response');
   }
 
   Future<bool> updateProfile(ProfileModel model) async {
@@ -50,7 +54,7 @@ class ProfileRemote {
 
   Future<bool> deleteProfile(ProfileDeleteModel model) async {
 
-    final encodedReason = Uri.encodeComponent(model.reason ?? "delete");
+    final encodedReason = Uri.encodeComponent(model.reason);
     Map<String, dynamic> map = await dio.delete(
       "${ApiEndpoints.profileDelete}?reason=$encodedReason",
       {},

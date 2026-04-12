@@ -127,6 +127,21 @@ class _CustomerCardState extends State<_CustomerCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('verified: ${u.status}', style: Theme.of(context).textTheme.bodyMedium),
+                if (u.adminMessage.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Admin notify (stored message)',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  SelectableText(
+                    u.adminMessage,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
                 const SizedBox(height: 6),
                 Text('updateRequest: ${u.updateRequest}', style: Theme.of(context).textTheme.bodyMedium),
                 const SizedBox(height: 14),

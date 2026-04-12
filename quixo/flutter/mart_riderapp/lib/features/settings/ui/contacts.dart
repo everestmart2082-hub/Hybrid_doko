@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quickmartrider/drawer.dart';
 import 'package:quickmartrider/features/contacts/bloc/contact_bloc.dart';
 import 'package:quickmartrider/features/contacts/bloc/contact_event.dart';
 import 'package:quickmartrider/features/contacts/bloc/contact_state.dart';
@@ -41,6 +42,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorLight,
+      drawer: buildAppDrawer(context),
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorDark,
         title: Text('Contact Us', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).primaryColorLight)),

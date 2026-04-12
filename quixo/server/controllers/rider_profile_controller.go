@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"quixo-server/models"
@@ -55,6 +56,7 @@ func RiderProfileGet(c *gin.Context) {
 			"suspended":                 r.Suspended,
 			"revenue":                   r.Revenue,
 			"violations":                r.Violations,
+			"admin_message":             r.Message,
 		},
 	})
 }
@@ -141,27 +143,33 @@ func RiderDashboard(c *gin.Context) {
 
 // RiderNotification handles /api/rider/notification
 func RiderNotification(c *gin.Context) {
-	riderID, _ := c.Get("userID")
+	riderIDVal, ok := c.Get("userID")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
+		return
+	}
+	rid, ok := riderIDVal.(primitive.ObjectID)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
+		return
+	}
 
 	coll := utils.GetCollection("notifications")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := coll.Find(ctx, bson.M{"target_id": riderID, "type": "rider"}, options.Find().SetLimit(50))
+	cursor, err := coll.Find(ctx, bson.M{"target_id": rid, "type": "rider"},
+		options.Find().SetSort(bson.D{{Key: "date", Value: -1}}).SetLimit(50))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
+	defer cursor.Close(ctx)
 
-	var results []models.Notification
-	cursor.All(ctx, &results)
-
-	var mapped []gin.H
-	for _, n := range results {
-		mapped = append(mapped, gin.H{
-			"message": n.Message,
-			"date":    n.Date.String(),
-		})
+	mapped, err := cursorNotificationsToSlice(ctx, cursor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": mapped})
@@ -169,16 +177,34 @@ func RiderNotification(c *gin.Context) {
 
 // RiderSendMessage handles /api/rider/sendmessage
 func RiderSendMessage(c *gin.Context) {
-	riderID, _ := c.Get("userID")
-	messageText := c.PostForm("message")
+	riderID, ok := c.Get("userID")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": false, "message": "message not sent"})
+		return
+	}
+	rid, ok := riderID.(primitive.ObjectID)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
+		return
+	}
+
+	messageText := strings.TrimSpace(c.PostForm("message"))
 	name := c.PostForm("name")
 	email := c.PostForm("email")
+	if messageText == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"status": false, "message": "message required"})
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	footer := fmt.Sprintf("Rider ID: %v", riderID)
 	if err := pushContactToAllAdmins(ctx, "rider", name, email, messageText, footer); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
+		return
+	}
+	if err := insertContactNotification(ctx, "rider", messageText, rid); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": false, "message": "message not sent"})
 		return
 	}

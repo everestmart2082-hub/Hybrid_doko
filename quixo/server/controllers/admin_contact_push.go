@@ -9,6 +9,7 @@ import (
 	"quixo-server/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // pushContactToAllAdmins appends a message to every admin document (shared inbox).
@@ -34,5 +35,24 @@ func pushContactToAllAdmins(ctx context.Context, senderLabel, displayName, email
 		Description: desc,
 	}
 	_, err := coll.UpdateMany(ctx, bson.M{}, bson.M{"$push": bson.M{"messages": msg}})
+	return err
+}
+
+// insertContactNotification stores a notifications collection row for the admin app (Contact tab).
+// notifType must be vendor | customer | rider to match sender role.
+func insertContactNotification(ctx context.Context, notifType, message string, targetID primitive.ObjectID) error {
+	if notifType == "" || targetID.IsZero() {
+		return nil
+	}
+	ncoll := utils.GetCollection("notifications")
+	_, err := ncoll.InsertOne(ctx, bson.M{
+		"_id":        primitive.NewObjectID(),
+		"type":       notifType,
+		"message":    message,
+		"target_id":  targetID,
+		"date":       time.Now(),
+		"received":   false,
+		"category":   "contact",
+	})
 	return err
 }

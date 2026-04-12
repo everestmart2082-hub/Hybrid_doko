@@ -58,6 +58,7 @@ func SetupAdminRoutes(r *gin.Engine) {
 			protected.GET("/employee/all", controllers.AdminGetAllEmployees)
 
 			// Notifications
+			protected.POST("/notifications/all", controllers.AdminNotificationsAll)
 			protected.POST("/vender/notification", controllers.AdminVendorNotification)
 			protected.POST("/user/notification", controllers.AdminUserNotification)
 			protected.POST("/rider/notification", controllers.AdminRiderNotification)

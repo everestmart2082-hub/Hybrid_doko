@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -10,6 +11,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // VendorProfileUpdate handles /api/vender/profile/update
@@ -118,32 +121,43 @@ func VendorProfileDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully paused/delete"})
 }
 
-// VendorProfileGet handles /api/vendor/profile
+// vendorProfileDoc holds only scalar profile fields so BSON decode cannot fail on
+// legacy or oddly-shaped nested arrays (e.g. violations) on otherwise valid vendors.
+type vendorProfileDoc struct {
+	ID           primitive.ObjectID `bson:"_id"`
+	Name         string             `bson:"name"`
+	Number       string             `bson:"number"`
+	PanFile      string             `bson:"pan_file"`
+	StoreName    string             `bson:"store_name"`
+	Address      string             `bson:"address"`
+	Email        string             `bson:"email"`
+	BusinessType string             `bson:"business_type"`
+	Description  string             `bson:"description"`
+	Geolocation  string             `bson:"geolocation"`
+	Message      string             `bson:"message"`
+}
+
+// VendorProfileGet handles POST /api/vender/profile
 func VendorProfileGet(c *gin.Context) {
 	vendorID, exists := c.Get("userID")
-	println(vendorID)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
 		return
 	}
 
-	// passedVendorIDStr := c.PostForm("vendor id")
-	// if passedVendorIDStr != "" {
-	// 	passedVendorID, err := primitive.ObjectIDFromHex(passedVendorIDStr)
-	// 	if err != nil || passedVendorID != vendorID {
-	// 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid vendor id"})
-	// 		return
-	// 	}
-	// }
-
 	coll := utils.GetCollection("vendors")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var vendor models.Vendor
-	err := coll.FindOne(ctx, bson.M{"_id": vendorID}).Decode(&vendor)
+	var doc vendorProfileDoc
+	err := coll.FindOne(ctx, bson.M{"_id": vendorID}).Decode(&doc)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "vendor not found"})
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			// Use 200 so HTTP clients (e.g. Dio default validateStatus) surface message, not a transport 404.
+			c.JSON(http.StatusOK, gin.H{"success": false, "message": "vendor not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
 
@@ -151,16 +165,17 @@ func VendorProfileGet(c *gin.Context) {
 		"success": true,
 		"message": "success",
 		"data": gin.H{
-			"id":           vendor.ID.Hex(),
-			"name":         vendor.Name,
-			"number":       vendor.Number,
-			"storeName":    vendor.StoreName,
-			"Address":      vendor.Address,
-			"email":        vendor.Email,
-			"BusinessType": vendor.BusinessType,
-			"Description":  vendor.Description,
-			"geolocation":  vendor.Geolocation,
-			"Pan file":     vendor.PanFile,
+			"id":           doc.ID.Hex(),
+			"name":         doc.Name,
+			"number":       doc.Number,
+			"storeName":    doc.StoreName,
+			"Address":      doc.Address,
+			"email":        doc.Email,
+			"BusinessType": doc.BusinessType,
+			"Description":  doc.Description,
+			"geolocation":  doc.Geolocation,
+			"Pan file":     doc.PanFile,
+			"admin_message": doc.Message,
 		},
 	})
 }
