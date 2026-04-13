@@ -111,6 +111,9 @@ func RiderProfileOTP(c *gin.Context) {
 	// Schema logic sets updation requested until admin manually validates
 	proposedUpdates, _ := rider["updates_proposed"].(primitive.M)
 	coll.UpdateOne(ctx, bson.M{"_id": riderID}, bson.M{"$set": bson.M{"updation_requested": true, "updates_proposed": proposedUpdates}, "$unset": bson.M{"otp": ""}})
+	if rid, ok := riderID.(primitive.ObjectID); ok {
+		emitProfileUpdateRequestedEvent(ctx, "rider", rid, true)
+	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully sent for updation"})
 }

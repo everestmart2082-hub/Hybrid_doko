@@ -16,7 +16,7 @@ import (
 // RiderRegistration handles /api/rider/registration/
 func RiderRegistration(c *gin.Context) {
 	phone := c.PostForm("number")
-	
+
 	coll := utils.GetCollection("riders")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -90,6 +90,7 @@ func RiderRegistrationOTP(c *gin.Context) {
 	}
 
 	coll.UpdateOne(ctx, bson.M{"_id": rider.ID}, bson.M{"$unset": bson.M{"otp": ""}})
+	emitRegistrationEvent(ctx, "rider", rider.ID, true)
 
 	token, _ := GenerateJWT(rider.ID, "rider")
 	c.JSON(http.StatusOK, gin.H{

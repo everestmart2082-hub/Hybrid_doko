@@ -131,6 +131,7 @@ func VendorProductAdd(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
+	emitVendorProductEvent(ctx, eventVendorProductAdded, product.VendorID, product.ID, product.Name, true)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully submitted for verification"})
 }
@@ -205,19 +206,19 @@ func VendorProductEdit(c *gin.Context) {
 	}
 
 	updateProposed := models.ProductUpdateProposed{
-		Name:                 name,
-		Brand:                brand,
-		ShortDescriptions:    shortDesc,
-		Description:          description,
-		PricePerUnit:         pricePerUnit,
-		Unit:                 unit,
-		Discount:             discount,
-		ProductCategory:      productCategory,
-		DeliveryCategory:     deliveryCategory,
-		Stock:                stock,
-		Photos:               photoPaths,
-		VendorID:             vendorID.(primitive.ObjectID),
-		CategoryAttributes:   catAttrs,
+		Name:               name,
+		Brand:              brand,
+		ShortDescriptions:  shortDesc,
+		Description:        description,
+		PricePerUnit:       pricePerUnit,
+		Unit:               unit,
+		Discount:           discount,
+		ProductCategory:    productCategory,
+		DeliveryCategory:   deliveryCategory,
+		Stock:              stock,
+		Photos:             photoPaths,
+		VendorID:           vendorID.(primitive.ObjectID),
+		CategoryAttributes: catAttrs,
 	}
 
 	update := bson.M{"$set": bson.M{
@@ -232,6 +233,9 @@ func VendorProductEdit(c *gin.Context) {
 	}
 
 	_ = pushContactToAllAdmins(ctx, "product", name, "", fmt.Sprintf("Product %q submitted for admin update review.", name), fmt.Sprintf("Product ID: %s", productID.Hex()), "product")
+	if vid, ok := vendorID.(primitive.ObjectID); ok {
+		emitVendorProductEvent(ctx, eventVendorProductEditRequested, vid, productID, name, false)
+	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully submitted for update verification"})
 }

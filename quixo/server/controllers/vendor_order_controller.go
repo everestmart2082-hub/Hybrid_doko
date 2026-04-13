@@ -120,7 +120,7 @@ func VendorOrderAll(c *gin.Context) {
 
 // VendorAssignRider handles /api/vender/order/assign-rider
 func VendorAssignRider(c *gin.Context) {
-	_, exists := c.Get("userID")
+	vendorIDVal, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
 		return
@@ -163,12 +163,15 @@ func VendorAssignRider(c *gin.Context) {
 			return
 		}
 	}
+	if vid, ok := vendorIDVal.(primitive.ObjectID); ok {
+		emitOrderEvent(ctx, eventRiderAssigned, targetOID, "vendor", vid, "assigned")
+	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "rider assigned"})
 }
 
 // VendorOrderPrepared handles /api/vender/order/prepared/
 func VendorOrderPrepared(c *gin.Context) {
-	_, exists := c.Get("userID")
+	vendorIDVal, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "server error"})
 		return
@@ -207,6 +210,9 @@ func VendorOrderPrepared(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
+	}
+	if vid, ok := vendorIDVal.(primitive.ObjectID); ok {
+		emitOrderEvent(ctx, eventOrderPrepared, orderID, "vendor", vid, "pending")
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "order prepared"})

@@ -1,11 +1,18 @@
 import 'package:flutter/foundation.dart';
 
 class ApiEndpoints {
+  // Optional override for physical devices:
+  // flutter run --dart-define=API_HOST=http://192.168.x.x:5000
+  static const String _hostOverride = String.fromEnvironment('API_HOST');
+
   // Base
   static String get _host {
-    // Android emulator needs 10.0.2.2, while web should use localhost.
+    if (_hostOverride.isNotEmpty) return _hostOverride;
     if (kIsWeb) return 'http://localhost:5000';
-    return 'http://10.0.2.2:5000';
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://10.0.2.2:5000';
+    }
+    return 'http://localhost:5000';
   }
 
   static String get baseImageUrl => _host;

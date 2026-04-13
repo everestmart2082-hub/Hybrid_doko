@@ -1,7 +1,21 @@
+import 'package:flutter/foundation.dart';
+
 class ApiEndpoints {
-  // Base
-  static const String baseImageUrl = 'http://10.0.2.2:5000';
-  static const String baseUrl = "http://localhost:5000";//'http://10.0.2.2:5000';
+  // Base host override for real devices:
+  // flutter run --dart-define=API_HOST=http://192.168.x.x:5000
+  static const String _hostOverride = String.fromEnvironment('API_HOST');
+
+  static String get _host {
+    if (_hostOverride.isNotEmpty) return _hostOverride;
+    if (kIsWeb) return 'http://localhost:5000';
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://10.0.2.2:5000';
+    }
+    return 'http://localhost:5000';
+  }
+
+  static String get baseImageUrl => _host;
+  static String get baseUrl => _host;
 
   // ========== AUTH ==========
   static const String register = "/api/vender/registration/";

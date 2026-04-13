@@ -58,6 +58,7 @@ import 'package:quickmartcustomer/features/product/repository/product_remote.dar
 
 const String checkNotificationsTask = "checkNotifications";
 
+@pragma('vm:entry-point')
 void callbackDispatcher() {
   if (kIsWeb) return;
   Workmanager().executeTask((task, inputData) async {
@@ -94,6 +95,8 @@ void main() async {
     initBackgroundTasks();
     await initNotifications();
   }
+
+  print(ApiEndpoints.baseUrl);
 
   runApp(MyApp());
 }

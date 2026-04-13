@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -182,8 +181,10 @@ func CustomerCheckout(c *gin.Context) {
 
 	_, _ = cartColl.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": cartObjectIDs}, "user_id": userID})
 
-	if len(parentOrderIDs) > 0 {
-		_ = pushContactToAllAdmins(ctx, "order", "", "", fmt.Sprintf("Customer placed %d new order group(s).", len(parentOrderIDs)), fmt.Sprintf("User ID: %v", userID), "order")
+	if uid, ok := userID.(primitive.ObjectID); ok {
+		for _, parentID := range parentOrderIDs {
+			emitOrderEvent(ctx, eventOrderCreated, parentID, "user", uid, "ongoing")
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "in progress", "orders": parentOrderIDs})

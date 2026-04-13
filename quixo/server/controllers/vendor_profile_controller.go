@@ -91,6 +91,9 @@ func VendorProfileUpdateOTP(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
 	}
+	if vid, ok := vendorID.(primitive.ObjectID); ok {
+		emitProfileUpdateRequestedEvent(ctx, "vendor", vid, true)
+	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully applied for verification"})
 }
@@ -165,16 +168,16 @@ func VendorProfileGet(c *gin.Context) {
 		"success": true,
 		"message": "success",
 		"data": gin.H{
-			"id":           doc.ID.Hex(),
-			"name":         doc.Name,
-			"number":       doc.Number,
-			"storeName":    doc.StoreName,
-			"Address":      doc.Address,
-			"email":        doc.Email,
-			"BusinessType": doc.BusinessType,
-			"Description":  doc.Description,
-			"geolocation":  doc.Geolocation,
-			"Pan file":     doc.PanFile,
+			"id":            doc.ID.Hex(),
+			"name":          doc.Name,
+			"number":        doc.Number,
+			"storeName":     doc.StoreName,
+			"Address":       doc.Address,
+			"email":         doc.Email,
+			"BusinessType":  doc.BusinessType,
+			"Description":   doc.Description,
+			"geolocation":   doc.Geolocation,
+			"Pan file":      doc.PanFile,
 			"admin_message": doc.Message,
 		},
 	})

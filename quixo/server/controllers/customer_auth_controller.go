@@ -81,6 +81,7 @@ func CustomerRegistrationOTP(c *gin.Context) {
 	coll.UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$unset": bson.M{"otp": ""}, "$set": bson.M{"deactivate": false}})
 
 	_ = pushContactToAllAdmins(ctx, "customer", user.Name, user.Email, "New customer completed registration (OTP verified).", fmt.Sprintf("User ID: %s", user.ID.Hex()), "register")
+	emitRegistrationEvent(ctx, "user", user.ID, false)
 
 	token, _ := GenerateJWT(user.ID, "user") // specific rule user
 	c.JSON(http.StatusOK, gin.H{
@@ -102,7 +103,7 @@ func CustomerLogin(c *gin.Context) {
 	var user models.User
 	err := coll.FindOne(ctx, bson.M{"number": phone}).Decode(&user)
 	if err != nil || user.Deactivate {
-		c.JSON(http.StatusOK, gin.H{"success": false, "message": "not registered"}) 
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "not registered"})
 		return
 	}
 
@@ -113,7 +114,7 @@ func CustomerLogin(c *gin.Context) {
 
 	otp, _ := GenerateOTP()
 	coll.UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": bson.M{"otp": otp}})
-	
+
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "verify otp"})
 }
 

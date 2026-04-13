@@ -136,7 +136,7 @@ func VendorRegistration(c *gin.Context) {
 
 	name := c.PostForm("name")
 	number := c.PostForm("number")
-	
+
 	// Check if vendor with this number already exists
 	var existingVendor models.Vendor
 	err := coll.FindOne(ctx, bson.M{"number": number}).Decode(&existingVendor)
@@ -225,6 +225,7 @@ func VendorRegistrationOTP(c *gin.Context) {
 	}
 
 	collection.UpdateOne(ctx, bson.M{"_id": regDoc.ID}, bson.M{"$unset": bson.M{"otp": ""}})
+	emitRegistrationEvent(ctx, "vendor", regDoc.ID, true)
 
 	token, err := GenerateJWT(regDoc.ID, "vendor")
 	if err != nil {

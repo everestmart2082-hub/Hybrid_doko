@@ -111,14 +111,17 @@ func CustomerProfileUpdateOTP(c *gin.Context) {
 		return
 	}
 
-	// Dynamic schema mutation mapping from interim state 
+	// Dynamic schema mutation mapping from interim state
 	proposedUpdates, mapOk := user["updates_proposed"].(primitive.M)
+	uid, _ := userID.(primitive.ObjectID)
 	if mapOk {
 		coll.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$set": proposedUpdates, "$unset": bson.M{"otp": "", "updates_proposed": ""}})
+		emitProfileUpdateRequestedEvent(ctx, "user", uid, true)
 		c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully updated"})
 	} else {
 		// Fallback clean if empty
 		coll.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$unset": bson.M{"otp": "", "updates_proposed": ""}})
+		emitProfileUpdateRequestedEvent(ctx, "user", uid, true)
 		c.JSON(http.StatusOK, gin.H{"success": true, "message": "successfully updated"})
 	}
 }

@@ -188,6 +188,7 @@ func RiderGenerateOTP(c *gin.Context) {
 
 // RiderDeliverProduct handles /api/rider/order/delivered
 func RiderDeliverProduct(c *gin.Context) {
+	riderIDVal, _ := c.Get("userID")
 	orderIDStr := c.PostForm("orders id")
 	orderID, _ := primitive.ObjectIDFromHex(orderIDStr)
 	otp := c.PostForm("otp")
@@ -273,6 +274,9 @@ func RiderDeliverProduct(c *gin.Context) {
 		orderColl.UpdateOne(ctx, bson.M{"_id": orderID}, bson.M{"$set": bson.M{"status": "delivered"}})
 	}
 	_, _ = userColl.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$unset": bson.M{"otp": ""}})
+	if rid, ok := riderIDVal.(primitive.ObjectID); ok {
+		emitOrderEvent(ctx, eventOrderDelivered, ordersID, "rider", rid, "delivered")
+	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "order delvered"}) // mimicking exact schema text
 }
 
@@ -345,6 +349,9 @@ func RiderAcceptOrder(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 		return
+	}
+	if rid, ok := riderID.(primitive.ObjectID); ok {
+		emitOrderEvent(ctx, eventRiderAccepted, orderID, "rider", rid, "accepted")
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "order accepted"})

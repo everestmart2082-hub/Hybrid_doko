@@ -160,6 +160,7 @@ func AdminOrderAll(c *gin.Context) {
 
 // AdminAssignRider handles /api/admin/order/assign-rider
 func AdminAssignRider(c *gin.Context) {
+	adminIDVal, _ := c.Get("userID")
 	targetID := c.PostForm("orders id")
 	if targetID == "" {
 		targetID = c.PostForm("order id")
@@ -193,6 +194,9 @@ func AdminAssignRider(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "server error"})
 			return
 		}
+	}
+	if aid, ok := adminIDVal.(primitive.ObjectID); ok {
+		emitOrderEvent(ctx, eventRiderAssigned, targetOID, "admin", aid, "assigned")
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "rider assigned"})
 }

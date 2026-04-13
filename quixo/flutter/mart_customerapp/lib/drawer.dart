@@ -85,6 +85,11 @@ Drawer buildAppDrawer(BuildContext context) {
                   icon: Icons.receipt_long,
                   route: '/orders',
                 ),
+                tile(
+                  title: 'Notifications',
+                  icon: Icons.notifications,
+                  route: '/notifications',
+                ),
 
                 tile(
                   title: 'Wishlist',
